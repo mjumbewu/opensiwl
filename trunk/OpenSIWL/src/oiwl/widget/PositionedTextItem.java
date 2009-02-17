@@ -113,5 +113,32 @@ public class PositionedTextItem extends TextItem {
         ((PositionedLine)this.getLine(aIndex)).xpos = x;
         ((PositionedLine)this.getLine(aIndex)).ypos = y;
     }
-    
+
+    /**
+     * Calculate the width and height as the difference between the greatest
+     * and least horizontal and vertical extents occupied by all the lines in
+     * this TextItem.
+     */
+    protected synchronized void recalculateSizes() {
+        int numLines = this.getTotalLine();
+
+        int minx = Integer.MAX_VALUE;
+        int miny = Integer.MAX_VALUE;
+        int maxx = Integer.MIN_VALUE;
+        int maxy = Integer.MIN_VALUE;
+        for (int index = 0; index < numLines; ++index) {
+            int x = this.getX(index);
+            int y = this.getY(index);
+            Font f = this.getFont(index);
+            String t = this.getText(index);
+
+            minx = Math.min(minx, x);
+            maxx = Math.max(maxx, x + f.stringWidth(t));
+            miny = Math.min(miny, y);
+            maxy = Math.max(maxy, y + f.getHeight());
+        }
+        this.setSizes(maxx-minx, maxy-miny);
+        this.validateSizes();
+    }
+
 }
