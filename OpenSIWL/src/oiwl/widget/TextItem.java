@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package com.sprintpcs.lcdui.open.widget;
+package oiwl.widget;
 
 import java.util.Vector;
 import javax.microedition.lcdui.Font;
