@@ -71,6 +71,15 @@ public abstract class TextItem {
      * Add a line of text to the TextItem.  All unspecified parameters are set
      * to the default.
      * @param text The string of text
+     */
+    public void addLine(String text) {
+        this.addLine(text, DEFAULT_LINE_FONT);
+    }
+    
+    /**
+     * Add a line of text to the TextItem.  All unspecified parameters are set
+     * to the default.
+     * @param text The string of text
      * @param font The font for the line
      */
     public void addLine(String text, Font font) {
@@ -164,59 +173,78 @@ public abstract class TextItem {
     private boolean m_areSizesValid = false;
     private int m_width = 0;
     private int m_height = 0;
-    
-    synchronized void recalculateSizes() {
-        int numLines = this.getTotalLine();
-        
-        int minx = Integer.MAX_VALUE;
-        int miny = Integer.MAX_VALUE;
-        int maxx = Integer.MIN_VALUE;
-        int maxy = Integer.MIN_VALUE;
-        for (int index = 0; index < numLines; ++index) {
-            int x = this.getX(index);
-            int y = this.getY(index);
-            Font f = this.getFont(index);
-            String t = this.getText(index);
-            
-            minx = Math.min(minx, x);
-            maxx = Math.max(maxx, x + f.stringWidth(t));
-            miny = Math.min(miny, y);
-            maxy = Math.max(maxy, y + f.getHeight());
-        }
-        this.setSizes(maxx-minx, maxy-miny);
-        this.validateSizes();
-    }
-    
+
+    /**
+     * Call recalculateSizes to update the values reported by getWidth and
+     * getHeight.  Only classes derived from TextItem should ever need to
+     * call recalculateSizes.
+     */
+    protected abstract void recalculateSizes();
+
+    /**
+     * Check whether the values reported by getWidth and getHeight are
+     * accurate.
+     * @return true if getWidth and getHeight are valid; false otherwise.
+     */
     protected boolean areSizesValid() {
         return this.m_areSizesValid;
     }
-    
+
+    /**
+     * Set a flag to notify the TextItem that the width and height need to be
+     * recalculated.
+     */
     protected void invalidateSizes() {
         this.m_areSizesValid = false;
     }
-    
+
+    /**
+     * Set a flag to notify the TextItem that the width and height DO NOT need
+     * to be recalculated.
+     */
     protected void validateSizes() {
         this.m_areSizesValid = true;
     }
-    
-    int getWidth() {
+
+    /**
+     * Get the width of the TextItem
+     * @return The width of the TextItem
+     */
+    public int getWidth() {
         if (!m_areSizesValid) this.recalculateSizes();
         return this.m_width;
     }
-    
+
+    /**
+     * Set the width of the TextItem
+     * @param aWidth The width of the TextItem
+     */
     protected void setWidth(int aWidth) {
         this.m_width = aWidth;
     }
-    
+
+    /**
+     * Get the height of the TextItem
+     * @return The height of the TextItem
+     */
     int getHeight() {
         if (!m_areSizesValid) this.recalculateSizes();
         return this.m_height;
     }
-    
+
+    /**
+     * Set the height of the TextItem
+     * @param aHeight The height of the TextItem
+     */
     protected void setHeight(int aHeight) {
         this.m_height = aHeight;
     }
-    
+
+    /**
+     * Set the width and height of the TextItem
+     * @param w The width of the TextItem
+     * @param h The height of the TextItem
+     */
     protected void setSizes(int w, int h) {
         this.setWidth(w);
         this.setHeight(h);

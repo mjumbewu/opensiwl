@@ -5,11 +5,11 @@
 
 package oiwl.widget;
 
-import java.lang.IllegalArgumentException;
 import javax.microedition.lcdui.Font;
 
 /**
- *
+ * An AlignedTextItem is a TextItem that is aligned along some edges or in the
+ * center of a bounding box.
  * @author mjumbewu
  */
 public class AlignedTextItem extends TextItem {
@@ -27,6 +27,8 @@ public class AlignedTextItem extends TextItem {
      * Constant for right horizontal alignment
      */
     public static int RIGHT = 4;
+
+    private static int HCOMPONENT = LEFT|HCENTER|RIGHT;
     
     /**
      * Constant for top vertical alignment
@@ -42,6 +44,8 @@ public class AlignedTextItem extends TextItem {
      * Constant for bottom vertical alignment
      */
     public static int BOTTOM = 32;
+
+    private static int VCOMPONENT = TOP|VCENTER|BOTTOM;
     
     /**
      * The alignment of the text.
@@ -55,25 +59,76 @@ public class AlignedTextItem extends TextItem {
     protected class AlignedLine extends Line {
         int top = 0;
     }
-    
+
+    /**
+     * Get the vertical and horizontal alignment of the TextItem
+     * @return The vertical and horizontal alignment of the TextItem
+     */
     public int getAlignment() {
         return m_alignment;
     }
-    
+
+    /**
+     * Get the horizontal component of the TextItem's alignment
+     * @return The horizontal component of the alignment
+     */
+    public int getHAlignment() {
+        return (this.getAlignment() & AlignedTextItem.HCOMPONENT);
+    }
+
+    /**
+     * Get the vertical component of the TextItem's alignment
+     * @return The vertical component of the alignment
+     */
+    public int getVAlignment() {
+        return (this.getAlignment() & AlignedTextItem.VCOMPONENT);
+    }
+
+    /**
+     * Set the horizontal and vertical alignment of the TextItem
+     * @param aAlignment The alignment flags
+     * @throws IllegalArgumentException if either a vertical of horizontal
+     *         alignment is invalid
+     * @see setHAlignment
+     * @see setVAlignment
+     */
     public void setAlignment(int aAlignment) {
-        if ((aAlignment & AlignedTextItem.LEFT) == 0 &&
-            (aAlignment & AlignedTextItem.HCENTER) == 0 &&
-            (aAlignment & AlignedTextItem.RIGHT) == 0) {
-            throw new IllegalArgumentException("No horizontal alignment specified.");
+        this.setHAlignment(aAlignment & AlignedTextItem.HCOMPONENT);
+        this.setVAlignment(aAlignment & AlignedTextItem.VCOMPONENT);
+    }
+
+    /**
+     * Set the horizontal component of the TextItem's alignment
+     * @param aAlignment The horizontal component of the alignment
+     * @throws IllegalArgumentException if the alignment does not match exactly
+     *         one of the horizontal alignment flags
+     */
+    public void setHAlignment(int aAlignment) {
+        if ((aAlignment != AlignedTextItem.LEFT) &&
+            (aAlignment != AlignedTextItem.HCENTER) &&
+            (aAlignment != AlignedTextItem.RIGHT)) {
+            throw new IllegalArgumentException(
+                    "Illegal horizontal alignment specified: " +
+                    Integer.toString(aAlignment));
         }
-        
-        if ((aAlignment & AlignedTextItem.TOP) == 0 &&
-            (aAlignment & AlignedTextItem.VCENTER) == 0 &&
-            (aAlignment & AlignedTextItem.BOTTOM) == 0) {
-            throw new IllegalArgumentException("No vertical alignment specified.");
+        this.m_alignment = aAlignment | this.getVAlignment();
+    }
+
+    /**
+     * Set the vertical component of the TextItem's alignment
+     * @param aAlignment The vertical component of the alignment
+     * @throws IllegalArgumentException if the alignment does not match exactly
+     *         one of the vertical alignment flags
+     */
+    public void setVAlignment(int aAlignment) {
+        if ((aAlignment != AlignedTextItem.TOP) &&
+            (aAlignment != AlignedTextItem.VCENTER) &&
+            (aAlignment != AlignedTextItem.BOTTOM)) {
+            throw new IllegalArgumentException(
+                    "Illegal vertical alignment specified: " +
+                    Integer.toString(aAlignment));
         }
-        
-        this.m_alignment = aAlignment;
+        this.m_alignment = aAlignment | this.getHAlignment();
     }
     
     /**
@@ -83,7 +138,7 @@ public class AlignedTextItem extends TextItem {
     protected Line makeLine() {
         return new AlignedLine();
     }
-    
+
     private int m_bound_width;
     private int m_bound_height;
     
@@ -176,7 +231,11 @@ public class AlignedTextItem extends TextItem {
             return this.m_bound_height - h + t;
     }
 
-    synchronized void recalculateSizes() {
+    /**
+     * Calculate the width and the height as the width of the widest line and
+     * the sum of the heights of the lines, respectively, in this TextItem.
+     */
+    protected synchronized void recalculateSizes() {
         int numLines = this.getTotalLine();
         
         int h = 0;
@@ -193,8 +252,14 @@ public class AlignedTextItem extends TextItem {
         this.recalculateTops();
         this.validateSizes();
     }
-    
-    synchronized void recalculateTops() {
+
+    /**
+     * Calculate the relative positions of the tops of the lines in this
+     * TextItem.  The top-most line always has a top=0.  Every top from there
+     * on is the top of the previous line offset by the height of the previous
+     * line.
+     */
+    protected synchronized void recalculateTops() {
         int numLines = this.getTotalLine();
         
         int t = 0;
