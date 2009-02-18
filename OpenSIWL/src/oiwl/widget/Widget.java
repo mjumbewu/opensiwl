@@ -5,7 +5,6 @@
 
 package oiwl.widget;
 
-import javax.microedition.lcdui.Graphics;
 import java.util.Vector;
 
 /**
@@ -85,25 +84,5 @@ public abstract class Widget {
                 (y >= this.getYPos()) &&
                 (x < this.getXPos() + this.getWidth()) &&
                 (y < this.getYPos() + this.getHeight()));
-    }
-
-    /**
-     * Update the specified section of the widget.
-     * @param g The Graphics context to draw to.
-     * @param x The x-coordinate of the top-left corner
-     * @param y The y-coordinate of the top-left corner
-     * @param width The width of the section
-     * @param height The height of the section
-     */
-    abstract void render(Graphics g, int x, int y, int width, int height);
-    
-    /**
-     * This is equivalent to calling render with <code>x=0</code>,
-     * <code>y=0</code>, <code>width=getWidth()</code>, and
-     * <code>height=getHeight()</code>.
-     * @param g The Graphics context to draw to.
-     */
-    void render(Graphics g) {
-        this.render(g, 0, 0, this.getWidth(), this.getHeight());
     }
 }
