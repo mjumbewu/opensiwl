@@ -11,6 +11,8 @@ import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 
+import java.util.Hashtable;
+
 /**
  * A Frame is the canvas for an OIWL-base UI.
  * <h3>Display</h3>
@@ -31,9 +33,11 @@ import javax.microedition.lcdui.Image;
  * <li>pointerFlick</li>
  * <li>pointerUp</li>
  * </ul>
+ * 
+ * <h3>Layout Management</h3>
  * @author mjumbewu
  */
-public abstract class Frame extends GameCanvas {
+public abstract class Frame extends GameCanvas implements ItemParent {
     /**
      * Constant for the stock light background image
      */
@@ -51,9 +55,24 @@ public abstract class Frame extends GameCanvas {
 
     private int m_backgroundColor = 0x00ffffff;
     private Image m_backgroundImage = null;
+    
+    private Layout m_layout = null;
 
+    /**
+     * Default constructor for a Frame.  Initializes the orientation to 
+     * Orientation.PORTRAIT
+     */
     public Frame() {
+        this(Orientation.PORTRAIT);
+    }
+    
+    /**
+     * Constructor that initializes the orientation of the Frame.
+     * @param orient The desired Frame orientation
+     */
+    public Frame(int orient) {
         super(true);
+        this.setOrientation(orient);
     }
     
     /**
@@ -100,48 +119,125 @@ public abstract class Frame extends GameCanvas {
         m_backgroundImage = null;
     }
     
-    public static int PORTRAIT = 1;
-    public static int LANDSCAPE = 2;
-    
     private int m_orientation;
     private Image m_orientedBuffer;
     
+    /**
+     * Get the orientation of the Frame.
+     * @return The orientation of the Frame
+     */
     public int getOrientation() {
         return this.m_orientation;
     }
     
+    /**
+     * Set the orientation of the Frame.
+     * @param aOrientation The desired orientation of the frame
+     */
     public void setOrientation(int aOrientation) {
-        if (aOrientation != LANDSCAPE &&
-            aOrientation != PORTRAIT) {
+        if (aOrientation != Orientation.LANDSCAPE &&
+            aOrientation != Orientation.PORTRAIT) {
             throw new IllegalArgumentException(
                     "Invalid orientation value: " + 
                     Integer.toString(aOrientation));
         }
-        this.m_orientation = aOrientation;
-        this.reinitOrientedBuffer();
-        this.orientationChanged(aOrientation);
+        
+        if (this.getOrientation() != aOrientation) {
+            this.m_orientation = aOrientation;
+            this.reinitOrientedBuffer();
+            this.reinitLayoutSize();
+
+            // call the orientation changed callback method
+            this.orientationChanged(aOrientation);
+        }
     }
     
+    /**
+     * Reset the image that acts as the offscreen buffer for this Frame.  This
+     * needs to be done when the Frame orientation changes.
+     */
     private void reinitOrientedBuffer() {
         m_orientedBuffer = Image.createImage(getWidth(), getHeight());
     }
     
+    /**
+     * Handler that is called when the Frame orientation changes.
+     * @param orient The new Frame orientation
+     */
     protected void orientationChanged(int orient) {}
     
+    /**
+     * Check that the Item is appropriate to be added to a Frame.  Appropriate
+     * Item objects include Layout objects, WidgetItem objects, and
+     * DisplayItem objects.
+     * @param item The Item to check
+     * @return Whether the Item is an appropriate child
+     */
+    public boolean isValidChild(Item item) {
+        if (Layout.class.isInstance(item) ||
+                WidgetItem.class.isInstance(item) ||
+                DisplayItem.class.isInstance(item))
+            return true;
+        else
+            return false;
+    }
+    
+    /**
+     * Set this Frame object's Layout
+     * @param aLayout The layout
+     */
+    public void setLayout(Layout aLayout) {
+        aLayout.setParent(this);
+        this.m_layout = aLayout;
+        this.reinitLayoutSize();
+    }
+    
+    /**
+     * Get this Frame object's Layout
+     * @return The layout
+     */
+    public Layout getLayout() {
+        return this.m_layout;
+    }
+    
+    private void reinitLayoutSize() {
+        if (this.getLayout() != null) {
+            getLayout().setSize(this.getLayoutWidth(), this.getLayoutHeight());
+        }
+    }
+    
+    /**
+     * Return the width of the Frame.  The width is the shorter dimension in
+     * PORTRAIT mode and the longer dimension in LANDSCAPE mode.
+     * @return The width of the Frame
+     */
     public int getWidth() {
-        if (this.getOrientation() == PORTRAIT)
+        if (this.getOrientation() == Orientation.PORTRAIT)
             return super.getWidth();
         
         else /* LANDSCAPE */
             return super.getHeight();
     }
     
+    /**
+     * Return the height of the Frame.  The height is the longer dimension in
+     * PORTRAIT mode and the shorter dimension in LANDSCAPE mode.
+     * @return The height of the Frame
+     */
     public int getHeight() {
-        if (this.getOrientation() == PORTRAIT)
+        if (this.getOrientation() == Orientation.PORTRAIT)
             return super.getHeight();
         
         else /* LANDSCAPE */
             return super.getWidth();
+    }
+    
+    public int getLayoutWidth() {
+        return this.getWidth();
+    }
+    
+    public int getLayoutHeight() {
+        return this.getHeight();
     }
     
     protected Graphics getGraphics() {
@@ -176,6 +272,7 @@ public abstract class Frame extends GameCanvas {
     }
     
     public void flushGraphics(int x, int y, int w, int h) {
+        this.getLayout().draw(this.getGraphics());
         invalidateRegion(x, y, x+w, y+h);
         this.repaint();
     }
@@ -185,18 +282,20 @@ public abstract class Frame extends GameCanvas {
     }
     
     public void paint(Graphics g) {
+//        super.paint(g);
+        
         int l = m_invalidated_l;
         int t = m_invalidated_t;
         int r = m_invalidated_r;
         int b = m_invalidated_b;
         
-        if (getOrientation() == PORTRAIT)
+        if (getOrientation() == Orientation.PORTRAIT)
             g.drawRegion(m_orientedBuffer, l, t, r-l, b-t, 
                     Sprite.TRANS_NONE, l, t, Graphics.TOP|Graphics.LEFT);
         
         else /* LANDSCAPE, right-handed rotation */
             g.drawRegion(m_orientedBuffer, l, t, r-l, b-t, 
-                    Sprite.TRANS_ROT90, b, l, Graphics.TOP|Graphics.LEFT);
+                    Sprite.TRANS_ROT90, l, this.getHeight()-b, Graphics.TOP|Graphics.LEFT);
         
         resetInvalidatedRegion();
     }

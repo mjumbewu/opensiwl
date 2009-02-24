@@ -9,6 +9,7 @@ package oiwl.widget;
  *
  * @author mjumbewu
  */
-public interface WidgetEventListener {
+public abstract class WidgetItem extends Item {
+
 
 }
