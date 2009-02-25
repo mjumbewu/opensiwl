@@ -9,6 +9,7 @@ package oiwl.widget;
  *
  * @author mjumbewu
  */
-public abstract class DisplayItem extends Item {
-
+public interface WidgetParent {
+    public boolean isValidChild(Widget item);
+    public void handleChildRedraw(int x, int y, int w, int h);
 }

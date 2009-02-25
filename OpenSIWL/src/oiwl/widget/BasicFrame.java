@@ -25,7 +25,7 @@ public class BasicFrame extends Frame {
     public void draw(Graphics g, int x,int y, int w, int h) {
         int num_widgets = this.getTotalWidget();
         for (int i = 0; i < num_widgets; ++i) {
-            WidgetItem iw = this.getItemAt(i);
+            ItemWidget iw = this.getItemAt(i);
             if (iw.intersects(x, y, w, h)) iw.draw(g);
         }
     }
@@ -37,7 +37,7 @@ public class BasicFrame extends Frame {
             this.frame = frame;
         }
         
-        void redrawFrame(Item widget, 
+        void redrawFrame(Widget widget, 
                 int oldx, int oldy, int oldw, int oldh,
                 int newx, int newy, int neww, int newh) {
             int l = Math.min(oldx, newx);
@@ -48,7 +48,7 @@ public class BasicFrame extends Frame {
             frame.draw(m_graphics, l, t, r-l, b-t);
         }
         
-        void widgetMoved(Item widget, Event.Point point) {
+        void widgetMoved(Widget widget, Event.Point point) {
             int width = widget.getWidth();
             int height = widget.getHeight();
             redrawFrame(widget,
@@ -56,7 +56,7 @@ public class BasicFrame extends Frame {
                     widget.getXPos(), widget.getYPos(), width, height);
         }
         
-        void widgetSized(Item widget, Event.Size size) {
+        void widgetSized(Widget widget, Event.Size size) {
             int left = widget.getXPos();
             int top = widget.getYPos();
             redrawFrame(widget,
@@ -64,26 +64,26 @@ public class BasicFrame extends Frame {
                     left, top, widget.getWidth(), widget.getHeight());
         }
         
-        public void onEvent(int type, Item sender, Object data) {
+        public void onEvent(int type, Widget sender, Object data) {
             if (type == Event.MOVED)
                 widgetMoved(sender, (Event.Point)data);
         }
     }
     
-    public void addWidget(WidgetItem aWidget) {
+    public void addWidget(ItemWidget aWidget) {
         if (this.getIndex(aWidget) == -1)
             m_widgets.addElement(aWidget);
     }
     
-    public int getIndex(WidgetItem aWidget) {
+    public int getIndex(ItemWidget aWidget) {
         return this.m_widgets.indexOf(aWidget);
     }
     
-    public WidgetItem getItemAt(int index) {
-        return (WidgetItem)this.m_widgets.elementAt(index);
+    public ItemWidget getItemAt(int index) {
+        return (ItemWidget)this.m_widgets.elementAt(index);
     }
     
-    public void removeItemWidget(WidgetItem aWidget) {
+    public void removeItemWidget(ItemWidget aWidget) {
         this.m_widgets.removeElement(aWidget);
     }
     

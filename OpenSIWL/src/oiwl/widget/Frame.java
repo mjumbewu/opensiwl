@@ -11,7 +11,7 @@ import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 
-import java.util.Hashtable;
+import java.util.Vector;
 
 /**
  * A Frame is the canvas for an OIWL-base UI.
@@ -37,7 +37,7 @@ import java.util.Hashtable;
  * <h3>Layout Management</h3>
  * @author mjumbewu
  */
-public abstract class Frame extends GameCanvas implements ItemParent {
+public abstract class Frame extends GameCanvas implements WidgetParent {
     /**
      * Constant for the stock light background image
      */
@@ -57,6 +57,7 @@ public abstract class Frame extends GameCanvas implements ItemParent {
     private Image m_backgroundImage = null;
     
     private Layout m_layout = null;
+    private Vector m_panels = new Vector();
 
     /**
      * Default constructor for a Frame.  Initializes the orientation to 
@@ -167,19 +168,23 @@ public abstract class Frame extends GameCanvas implements ItemParent {
     protected void orientationChanged(int orient) {}
     
     /**
-     * Check that the Item is appropriate to be added to a Frame.  Appropriate
-     * Item objects include Layout objects, WidgetItem objects, and
-     * DisplayItem objects.
-     * @param item The Item to check
-     * @return Whether the Item is an appropriate child
+     * Check that the Widget is appropriate to be added to a Frame.  Appropriate
+     * Widget objects include Layout objects, ItemWidget objects, and
+     * StaticWidget objects.
+     * @param item The Widget to check
+     * @return Whether the Widget is an appropriate child
      */
-    public boolean isValidChild(Item item) {
+    public boolean isValidChild(Widget item) {
         if (Layout.class.isInstance(item) ||
-                WidgetItem.class.isInstance(item) ||
-                DisplayItem.class.isInstance(item))
+                ItemWidget.class.isInstance(item) ||
+                StaticWidget.class.isInstance(item))
             return true;
         else
             return false;
+    }
+    
+    public void handleChildRedraw(int x, int y, int w, int h) {
+        this.invalidateRegion(x, y, x+w, y+h);
     }
     
     /**
@@ -204,6 +209,34 @@ public abstract class Frame extends GameCanvas implements ItemParent {
         if (this.getLayout() != null) {
             getLayout().setSize(this.getLayoutWidth(), this.getLayoutHeight());
         }
+    }
+    
+    public void addPanel(Panel panel) {
+        m_panels.addElement(panel);
+        if (panel.getAttachment() == Panel.TOP) {
+            panel.setPos(this.getLayoutXPos(), this.getLayoutYPos());
+            panel.setSize(this.getLayoutWidth(), panel.getHeight());
+        }
+        else if (panel.getAttachment() == Panel.LEFT) {
+            panel.setPos(this.getLayoutXPos(), this.getLayoutYPos());
+            panel.setSize(panel.getWidth(), this.getLayoutHeight());
+        }
+        else if (panel.getAttachment() == Panel.RIGHT) {
+            panel.setPos(this.getLayoutXPos()+this.getLayoutWidth(), this.getLayoutYPos());
+            panel.setSize(panel.getWidth(), this.getLayoutHeight());
+        }
+        else if (panel.getAttachment() == Panel.BOTTOM) {
+            panel.setPos(this.getLayoutXPos(), this.getLayoutYPos()+this.getLayoutHeight());
+            panel.setSize(this.getLayoutWidth(), panel.getHeight());
+        }
+    }
+    
+    public int getNumPanels() {
+        return m_panels.size();
+    }
+    
+    public Panel getPanel(int index) {
+        return (Panel)m_panels.elementAt(index);
     }
     
     /**
@@ -232,12 +265,54 @@ public abstract class Frame extends GameCanvas implements ItemParent {
             return super.getWidth();
     }
     
+    public int getLayoutXPos() {
+        int pos = 0;
+        int num_panels = this.getNumPanels();
+        
+        for (int i = 0; i < num_panels; ++i) {
+            Panel panel = this.getPanel(i);
+            if (panel.getAttachment() == Panel.LEFT)
+                pos += panel.getWidth();
+        }
+        return pos;
+    }
+    
+    public int getLayoutYPos() {
+        int pos = 0;
+        int num_panels = this.getNumPanels();
+        
+        for (int i = 0; i < num_panels; ++i) {
+            Panel panel = this.getPanel(i);
+            if (panel.getAttachment() == Panel.TOP)
+                pos += panel.getHeight();
+        }
+        return pos;
+    }
+    
     public int getLayoutWidth() {
-        return this.getWidth();
+        int total = this.getWidth();
+        int num_panels = this.getNumPanels();
+        
+        for (int i = 0; i < num_panels; ++i) {
+            Panel panel = this.getPanel(i);
+            if (panel.getAttachment() == Panel.RIGHT ||
+                    panel.getAttachment() == Panel.LEFT)
+                total -= panel.getWidth();
+        }
+        return total;
     }
     
     public int getLayoutHeight() {
-        return this.getHeight();
+        int total = this.getHeight();
+        int num_panels = this.getNumPanels();
+        
+        for (int i = 0; i < num_panels; ++i) {
+            Panel panel = this.getPanel(i);
+            if (panel.getAttachment() == Panel.BOTTOM ||
+                    panel.getAttachment() == Panel.TOP)
+                total -= panel.getHeight();
+        }
+        return total;
     }
     
     protected Graphics getGraphics() {
@@ -257,29 +332,38 @@ public abstract class Frame extends GameCanvas implements ItemParent {
     }
     
     private synchronized void invalidateRegion(int l, int t, int r, int b) {
+        // If the invalidated region is empty, then set to the parameters
         if (m_invalidated_l == m_invalidated_r ||
             m_invalidated_t == m_invalidated_b) {
             m_invalidated_l = l;
             m_invalidated_t = t;
             m_invalidated_r = r;
             m_invalidated_b = b;
-        } else {
+        } 
+        
+        // If it's not empty, then set to the bounding box
+        else {
             m_invalidated_l = Math.min(l, m_invalidated_l);
             m_invalidated_t = Math.min(l, m_invalidated_t);
             m_invalidated_r = Math.max(l, m_invalidated_r);
             m_invalidated_b = Math.max(l, m_invalidated_b);
         }
+        
+        // Request a repaint
+        this.repaint(l,t,r-l,b-t);
     }
     
-    public void flushGraphics(int x, int y, int w, int h) {
-        this.getLayout().draw(this.getGraphics());
-        invalidateRegion(x, y, x+w, y+h);
-        this.repaint();
-    }
-    
-    public void flushGraphics() {
-        flushGraphics(0, 0, getWidth(), getHeight());
-    }
+//    public void flushGraphics(int x, int y, int w, int h) {
+//        Graphics buffer = this.getGraphics();
+//        
+//        this.getLayout().draw(buffer);
+//        for (int i = 0; i < this.getNumPanels(); ++i)
+//            this.getPanel(i).draw(buffer);
+//    }
+//    
+//    public void flushGraphics() {
+//        flushGraphics(0, 0, getWidth(), getHeight());
+//    }
     
     public void paint(Graphics g) {
 //        super.paint(g);
@@ -289,6 +373,12 @@ public abstract class Frame extends GameCanvas implements ItemParent {
         int r = m_invalidated_r;
         int b = m_invalidated_b;
         
+        Graphics buffer = this.getGraphics();
+        
+        this.getLayout().draw(buffer, l, t, r-l, b-t);
+        for (int i = 0; i < this.getNumPanels(); ++i)
+            this.getPanel(i).draw(buffer, l, t, r-l, b-t);
+
         if (getOrientation() == Orientation.PORTRAIT)
             g.drawRegion(m_orientedBuffer, l, t, r-l, b-t, 
                     Sprite.TRANS_NONE, l, t, Graphics.TOP|Graphics.LEFT);
@@ -298,5 +388,6 @@ public abstract class Frame extends GameCanvas implements ItemParent {
                     Sprite.TRANS_ROT90, l, this.getHeight()-b, Graphics.TOP|Graphics.LEFT);
         
         resetInvalidatedRegion();
+        this.flushGraphics(l, t, r-l, b-t);
     }
 }

@@ -12,13 +12,13 @@ import javax.microedition.lcdui.Graphics;
  *
  * @author mjumbewu
  */
-public abstract class Layout extends Item implements ItemParent {
+public abstract class Layout extends Widget implements WidgetParent {
     /**
      * The internal representation of a line of text
      * @author mjumbewu
      */
     protected class Cell {
-        Item item = null;
+        Widget item = null;
     }
     
     private Vector m_cells = new Vector();
@@ -47,20 +47,20 @@ public abstract class Layout extends Item implements ItemParent {
     }
     
     /**
-     * Manage an Item with the Layout.  All unspecified parameters are set
+     * Manage an Widget with the Layout.  All unspecified parameters are set
      * to the default.
-     * @param text The Item
+     * @param text The Widget
      */
-    public void manage(Item item) {
+    public void manage(Widget item) {
         this.manage(item, -1);
     }
     
     /**
-     * Manage an Item with the Layout.
-     * @param text The Item to be managed.
-     * @param index The desired index for the Item
+     * Manage an Widget with the Layout.
+     * @param text The Widget to be managed.
+     * @param index The desired index for the Widget
      */
-    public void manage(Item item, int index) {
+    public void manage(Widget item, int index) {
         this.addCell(this.makeCell(), item, index);
     }
     
@@ -68,11 +68,11 @@ public abstract class Layout extends Item implements ItemParent {
      * An internal method to initialized a given Cell with the given values and
      * insert it into the set of Cell objects
      * @param newCell The Cell to initialize
-     * @param item The Item to put in the Cell
+     * @param item The Widget to put in the Cell
      * @param index The index at which to inset the Cell; if index=-1 then the
      *              Cell is appended
      */
-    protected void addCell(Cell newCell, Item item, int index) {
+    protected void addCell(Cell newCell, Widget item, int index) {
         System.out.println("Check the validity of the child...");
         if (this.isValidChild(item)) {
             System.out.println("Set the item in the new cell");
@@ -92,48 +92,52 @@ public abstract class Layout extends Item implements ItemParent {
         }
     }
     
-    public boolean isValidChild(Item item) {
+    public boolean isValidChild(Widget item) {
         return this.getParent().isValidChild(item);
     }
     
+    public void handleChildRedraw(int x, int y, int w, int h) {
+        this.getParent().handleChildRedraw(x, y, w, h);
+    }
+    
     /**
-     * Get the Item contained in a given Cell
+     * Get the Widget contained in a given Cell
      * @param aIndex The index of the cell
-     * @return The Item in a Cell
+     * @return The Widget in a Cell
      */
-    public Item getItem(int aIndex) {
+    public Widget getWidget(int aIndex) {
         return ((Cell)m_cells.elementAt(aIndex)).item;
     }
     
     /**
-     * Get the number of lines in the TextItem
-     * @return The number of lines in the TextItem
+     * Get the number of Widget objects in the Layout
+     * @return The number of objects in the Layout
      */
-    public int getItemCount() {
+    public int getWidgetCount() {
         return m_cells.size();
     }
     
     /**
-     * Remove the line from the TextItem
-     * @param aIndex The index of the item to be removed
-     * @return The removed Item
+     * Remove the Widget from the Layout
+     * @param aIndex The index of the Widget to be removed
+     * @return The removed Widget
      */
-    public Item unmanage(int aIndex) {
-        Item item = this.getItem(aIndex);
+    public Widget unmanage(int aIndex) {
+        Widget item = this.getWidget(aIndex);
         m_cells.removeElementAt(aIndex);
         return item;
     }
     
     /**
-     * Get the index of the given Item.
-     * @param item The Item
-     * @return The index of the Item, or -1 if no such Item is managed by this
+     * Get the index of the given Widget.
+     * @param item The Widget
+     * @return The index of the Widget, or -1 if no such Widget is managed by this
      *         Layout.
      */
-    public int getIndexOf(Item item) {
-        int num_item = this.getItemCount();
+    public int getIndexOf(Widget item) {
+        int num_item = this.getWidgetCount();
         for (int i = 0; i < num_item; ++i)
-            if (this.getItem(i) == item)
+            if (this.getWidget(i) == item)
                 return i;
         return -1;
     }
@@ -144,7 +148,7 @@ public abstract class Layout extends Item implements ItemParent {
     
     /**
      * Call recalculateSizes to update the values reported by getWidth and
-     * getHeight.  Only classes derived from TextItem should ever need to
+     * getHeight.  Only classes derived from Layout should ever need to
      * call recalculateSizes.
      */
     protected abstract void recalculateSizes();
@@ -159,7 +163,7 @@ public abstract class Layout extends Item implements ItemParent {
     }
 
     /**
-     * Set a flag to notify the TextItem that the ortho and axial need to be
+     * Set a flag to notify the Layout that the width and height need to be
      * recalculated.
      */
     protected void invalidateSizes() {
@@ -167,7 +171,7 @@ public abstract class Layout extends Item implements ItemParent {
     }
 
     /**
-     * Set a flag to notify the TextItem that the ortho and axial DO NOT need
+     * Set a flag to notify the Layout that the width and height DO NOT need
      * to be recalculated.
      */
     protected void validateSizes() {
@@ -175,41 +179,41 @@ public abstract class Layout extends Item implements ItemParent {
     }
 
     /**
-     * Get the minimum ortho of the Layout
-     * @return The ortho of the Layout
+     * Get the minimum width of the Layout
+     * @return The width of the Layout
      */
     public int getSpecifiedWidth() {
         return super.getWidth();
     }
 
     /**
-     * Set the ortho minimum of the Layout
-     * @param aWidth The ortho of the Layout
+     * Set the width minimum of the Layout
+     * @param aWidth The width of the Layout
      */
     protected void setSpecifiedWidth(int aWidth) {
         super.setWidth(aWidth);
     }
 
     /**
-     * Get the minimum axial of the TextItem
-     * @return The axial of the TextItem
+     * Get the minimum height of the Layout
+     * @return The height of the Layout
      */
     public int getSpecifiedHeight() {
         return super.getHeight();
     }
 
     /**
-     * Set the minimum axial of the Layout
-     * @param aHeight The axial of the TextItem
+     * Set the minimum height of the Layout
+     * @param aHeight The height of the Layout
      */
     protected void setSpecifiedHeight(int aHeight) {
         super.setHeight(aHeight);
     }
 
     /**
-     * Set the minimum ortho and axial of the Layout
-     * @param w The ortho of the TextItem
-     * @param h The axial of the TextItem
+     * Set the minimum width and height of the Layout
+     * @param w The width of the Layout
+     * @param h The height of the Layout
      */
     protected void setSpeciefiedSize(int w, int h) {
         this.setSpecifiedWidth(w);
@@ -217,10 +221,10 @@ public abstract class Layout extends Item implements ItemParent {
     }
     
     /**
-     * Get the ortho of the bounding box of the Layout object's contents.  The
+     * Get the width of the bounding box of the Layout object's contents.  The
      * stretched size is the minimum size needed to encompas a Layout object's
      * complete contents.
-     * @return The ortho of the bounding box
+     * @return The width of the bounding box
      */
     public int getStretchedWidth() {
         if (!m_areSizesValid) this.recalculateSizes();
@@ -228,18 +232,18 @@ public abstract class Layout extends Item implements ItemParent {
     }
     
     /**
-     * Set the ortho of the bounding box
-     * @param w The ortho of the bounding box
+     * Set the width of the bounding box
+     * @param w The width of the bounding box
      */
     protected void setStretchedWidth(int w) {
         m_stretched_width = w;
     }
     
     /**
-     * Get the axial of the bounding box of the Layout object's contents.  The
+     * Get the height of the bounding box of the Layout object's contents.  The
      * stretched size is the minimum size needed to encompas a Layout object's
      * complete contents.
-     * @return The axial of the bounding box
+     * @return The height of the bounding box
      */
     public int getStretchedHeight() {
         if (!m_areSizesValid) this.recalculateSizes();
@@ -247,8 +251,8 @@ public abstract class Layout extends Item implements ItemParent {
     }
     
     /**
-     * Set the axial of the bounding box
-     * @param h The axial of the bounding box
+     * Set the height of the bounding box
+     * @param h The height of the bounding box
      */
     protected void setStretchedHeight(int h) {
         m_stretched_height = h;
@@ -258,8 +262,8 @@ public abstract class Layout extends Item implements ItemParent {
      * Set the size of the bounding box of the Layout object's contents.  The
      * stretched size is the minimum size needed to encompas a Layout object's
      * complete contents.
-     * @param w The ortho of the bounding box
-     * @param h The axial of the bounding box
+     * @param w The width of the bounding box
+     * @param h The height of the bounding box
      */
     protected void setStretchedSize(int w, int h) {
         this.setStretchedWidth(w);
@@ -267,20 +271,20 @@ public abstract class Layout extends Item implements ItemParent {
     }
     
     /**
-     * Get the effective ortho of the Layout object.  This will be the greater
-     * of the stretched ortho (the contents' bounding box) and the minimum 
-     * ortho (as likely set by this object's container).
-     * @return The effective ortho
+     * Get the effective width of the Layout object.  This will be the greater
+     * of the stretched width (the contents' bounding box) and the minimum 
+     * width (as likely set by this object's container).
+     * @return The effective width
      */
     public int getWidth() {
         return Math.max(this.getSpecifiedWidth(), this.getStretchedWidth());
     }
     
     /**
-     * Get the effective axial of the Layout object.  This will be the greater
-     * of the stretched axial (the contents' bounding box) and the minimum 
-     * axial (as likely set by this object's container).
-     * @return The effective axial
+     * Get the effective height of the Layout object.  This will be the greater
+     * of the stretched height (the contents' bounding box) and the minimum 
+     * height (as likely set by this object's container).
+     * @return The effective height
      */
     public int getHeight() {
         return Math.max(this.getSpecifiedHeight(), this.getStretchedHeight());
@@ -296,12 +300,12 @@ public abstract class Layout extends Item implements ItemParent {
     
     /**
      * Draw the specified region (given in parent coordinates, not local) of
-     * the TextItem.
+     * the Layout.
      * @param g The target Graphic context
      * @param x The left edge of the region
      * @param y The top of the region
-     * @param ortho The ortho of the region
-     * @param axial The axial of the region
+     * @param width The width of the region
+     * @param height The height of the region
      */
     void draw(Graphics g, int x, int y, int width, int height) {
         // ::TODO:: Optimize this drawing method.  For example, only draw cells
@@ -310,13 +314,13 @@ public abstract class Layout extends Item implements ItemParent {
         //          each time, but only when you need a different portion of 
         //          the image.
         
-        int num_cells = this.getItemCount();
+        int num_cells = this.getWidgetCount();
         
         // NOTE: Should we declare t, f, c, x, and y outside of the loop, or
         //       should we trust the compiler to optimize this for us?  The
         //       same question could be asked of the bitwise or.
         for (int i = 0; i < num_cells; ++i) {
-            Item item = this.getItem(i);
+            Widget item = this.getWidget(i);
             item.draw(g, x, y, width, height);
         }
     }
