@@ -214,7 +214,6 @@ public abstract class Frame extends Canvas implements WidgetParent {
     }
     
     public void addPanel(Panel panel) {
-        m_panels.addElement(panel);
         if (panel.getAttachment() == Panel.TOP) {
             panel.setPos(this.getLayoutXPos(), this.getLayoutYPos());
             panel.setSize(this.getLayoutWidth(), panel.getHeight());
@@ -231,6 +230,7 @@ public abstract class Frame extends Canvas implements WidgetParent {
             panel.setPos(this.getLayoutXPos(), this.getLayoutYPos()+this.getLayoutHeight());
             panel.setSize(this.getLayoutWidth(), panel.getHeight());
         }
+        m_panels.addElement(panel);
     }
     
     public int getNumPanels() {
