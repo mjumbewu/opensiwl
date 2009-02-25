@@ -74,6 +74,7 @@ public abstract class Frame extends GameCanvas implements WidgetParent {
     public Frame(int orient) {
         super(true);
         this.setOrientation(orient);
+        this.invalidate();
     }
     
     /**
@@ -184,7 +185,8 @@ public abstract class Frame extends GameCanvas implements WidgetParent {
     }
     
     public void handleChildRedraw(int x, int y, int w, int h) {
-        this.invalidateRegion(x, y, x+w, y+h);
+//        this.invalidateRegion(x, y, x+w, y+h);
+        this.invalidate();
     }
     
     /**
@@ -351,6 +353,10 @@ public abstract class Frame extends GameCanvas implements WidgetParent {
         
         // Request a repaint
         this.repaint(l,t,r-l,b-t);
+    }
+    
+    private void invalidate() {
+        this.invalidateRegion(0, 0, this.getWidth(), this.getHeight());
     }
     
 //    public void flushGraphics(int x, int y, int w, int h) {
