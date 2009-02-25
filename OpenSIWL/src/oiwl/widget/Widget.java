@@ -28,6 +28,11 @@ public abstract class Widget {
         return this.m_parent;
     }
     
+    protected void requestRedraw() {
+        this.getParent().handleChildRedraw(this.getXPos(), 
+                this.getYPos(), this.getWidth(), this.getHeight());
+    }
+    
     /**
      * Add an object to the set of this widget's listeners.
      * @param evl The EventListener that receives events for this widget.

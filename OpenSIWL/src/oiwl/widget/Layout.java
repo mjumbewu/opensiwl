@@ -125,6 +125,7 @@ public abstract class Layout extends Widget implements WidgetParent {
     public Widget unmanage(int aIndex) {
         Widget item = this.getWidget(aIndex);
         m_cells.removeElementAt(aIndex);
+        this.invalidateSizes();
         return item;
     }
     
@@ -168,6 +169,7 @@ public abstract class Layout extends Widget implements WidgetParent {
      */
     protected void invalidateSizes() {
         this.m_areSizesValid = false;
+        this.requestRedraw();
     }
 
     /**
