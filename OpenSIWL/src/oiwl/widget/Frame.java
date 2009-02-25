@@ -37,7 +37,7 @@ import java.util.Vector;
  * <h3>Layout Management</h3>
  * @author mjumbewu
  */
-public abstract class Frame extends GameCanvas implements WidgetParent {
+public abstract class Frame extends Canvas implements WidgetParent {
     /**
      * Constant for the stock light background image
      */
@@ -72,7 +72,7 @@ public abstract class Frame extends GameCanvas implements WidgetParent {
      * @param orient The desired Frame orientation
      */
     public Frame(int orient) {
-        super(true);
+        super();
         this.setOrientation(orient);
         this.invalidate();
     }
@@ -359,32 +359,27 @@ public abstract class Frame extends GameCanvas implements WidgetParent {
         this.invalidateRegion(0, 0, this.getWidth(), this.getHeight());
     }
     
-//    public void flushGraphics(int x, int y, int w, int h) {
-//        Graphics buffer = this.getGraphics();
-//        
-//        this.getLayout().draw(buffer);
-//        for (int i = 0; i < this.getNumPanels(); ++i)
-//            this.getPanel(i).draw(buffer);
-//    }
-//    
-//    public void flushGraphics() {
-//        flushGraphics(0, 0, getWidth(), getHeight());
-//    }
-    
     public void paint(Graphics g) {
-//        super.paint(g);
         
         int l = m_invalidated_l;
         int t = m_invalidated_t;
         int r = m_invalidated_r;
         int b = m_invalidated_b;
+
+        System.out.println("painting the region x="
+                + Integer.toString(l) + ", y="
+                + Integer.toString(t) + ", w="
+                + Integer.toString(r-l) + ", h="
+                + Integer.toString(b-t));
         
+        // Draw the layout and the panels to the oriented buffer
         Graphics buffer = this.getGraphics();
-        
+
         this.getLayout().draw(buffer, l, t, r-l, b-t);
         for (int i = 0; i < this.getNumPanels(); ++i)
             this.getPanel(i).draw(buffer, l, t, r-l, b-t);
 
+        // Draw the oriented buffer to the screen
         if (getOrientation() == Orientation.PORTRAIT)
             g.drawRegion(m_orientedBuffer, l, t, r-l, b-t, 
                     Sprite.TRANS_NONE, l, t, Graphics.TOP|Graphics.LEFT);
@@ -394,6 +389,6 @@ public abstract class Frame extends GameCanvas implements WidgetParent {
                     Sprite.TRANS_ROT90, l, this.getHeight()-b, Graphics.TOP|Graphics.LEFT);
         
         resetInvalidatedRegion();
-        this.flushGraphics(l, t, r-l, b-t);
+//        this.flushGraphics(l, t, r-l, b-t);
     }
 }
