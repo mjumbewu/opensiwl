@@ -11,20 +11,20 @@ import javax.microedition.lcdui.Graphics;
  *
  * @author mjumbewu
  */
-public abstract class Item {
+public abstract class Widget {
     private int m_height;
     private int m_width;
     private int m_xpos;
     private int m_ypos;
 
-    private ItemParent m_parent;
+    private WidgetParent m_parent;
     private EventSender m_events;
 
-    void setParent(ItemParent ip) {
+    void setParent(WidgetParent ip) {
         this.m_parent = ip;
     }
     
-    public ItemParent getParent() {
+    public WidgetParent getParent() {
         return this.m_parent;
     }
     
@@ -37,7 +37,7 @@ public abstract class Item {
     }
 
     /**
-     * Get the height of this Item.
+     * Get the height of this Widget.
      * @return The height of this widget
      */
     public int getHeight() {
@@ -53,7 +53,7 @@ public abstract class Item {
     }
 
     /**
-     * Get the width of this Item.
+     * Get the width of this Widget.
      * @return The width of this widget
      */
     public int getWidth() {
@@ -69,7 +69,7 @@ public abstract class Item {
     }
     
     /**
-     * Set the width and height of the Item.  In some cases, this is just a
+     * Set the width and height of the Widget.  In some cases, this is just a
      * suggestion for the width and the height (e.g. in the case of a Layout,
      * when this sets the minimum width and height).
      * @param w The suggested width
@@ -139,7 +139,7 @@ public abstract class Item {
     
     /**
      * Determine whether the point specified by the coordinates are within the
-     * bounding area of the Item
+     * bounding area of the Widget
      * @param x The x-coordinate of the point
      * @param y The y-coordinate of the point
      * @return True if the point is within the bounds of the widget, false
@@ -154,12 +154,12 @@ public abstract class Item {
     
     /**
      * Determine whether the rectangular region specified by the bounds 
-     * intersects with this Item
+     * intersects with this Widget
      * @param l The left edge of the region
      * @param t The top of the region
      * @param w The width of the region
      * @param h The height of the region
-     * @return True if the region intersect this Item.  False otherwise.
+     * @return True if the region intersect this Widget.  False otherwise.
      */
     public boolean intersects(int l, int t, int w, int h) {
         int r = l + w;
@@ -175,9 +175,9 @@ public abstract class Item {
      * Update the specified section of the widget.
      * @param g The Graphics context to draw to.
      * @param x The x-coordinate of the top-left corner, relative to the 
-     *          Item's position
+     *          Widget's position
      * @param y The y-coordinate of the top-left corner, relataive to the 
-     *          Item's position
+     *          Widget's position
      * @param width The width of the section
      * @param height The height of the section
      */

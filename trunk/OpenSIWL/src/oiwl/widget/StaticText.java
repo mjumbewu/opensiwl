@@ -9,26 +9,26 @@ import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 
 /**
- * In this implementation of the SIWL, TextItem is an abstract class.  The 
- * PositionedTextItem class is most closely analagous to the TextItem in the
+ * In this implementation of the SIWL, StaticText is an abstract class.  The 
+ * PositionedTextItem class is most closely analagous to the StaticText in the
  * original SIWL.
  * 
  * @author mjumbewu
  */
-public class TextItem extends DisplayItem {
+public class StaticText extends StaticWidget {
     private String m_text;
     private Font m_font;
     private int m_color;
 
-    public TextItem(String text) {
+    public StaticText(String text) {
         this(text, Font.getDefaultFont());
     }
     
-    public TextItem(String text, Font font) {
+    public StaticText(String text, Font font) {
         this(text, font, 0x00000000);
     }
     
-    public TextItem(String text, Font font, int color) {
+    public StaticText(String text, Font font, int color) {
         m_text = text;
         m_font = font;
         m_color = color;
@@ -62,7 +62,7 @@ public class TextItem extends DisplayItem {
     
     /**
      * Draw the specified region (given in parent coordinates, not local) of
-     * the TextItem.
+     * the StaticText.
      * @param g The target Graphic context
      * @param x The left edge of the region
      * @param y The top of the region

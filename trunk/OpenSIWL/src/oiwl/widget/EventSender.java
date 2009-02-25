@@ -23,7 +23,7 @@ public class EventSender {
         m_listeners.removeElement(evl);
     }
     
-    public void sendEvent(int type, Item sender, Object data) {
+    public void sendEvent(int type, Widget sender, Object data) {
         if (eventsAreAllowed()) {
             int num_listeners = m_listeners.size();
             for (int i = 0; i < num_listeners; ++i) {

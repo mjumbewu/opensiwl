@@ -9,7 +9,6 @@ package oiwl.widget;
  *
  * @author mjumbewu
  */
-public abstract class WidgetItem extends Item {
-
+public abstract class StaticWidget extends Widget {
 
 }

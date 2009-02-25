@@ -116,18 +116,18 @@ public abstract class LinearLayout extends Layout {
     abstract protected void setStretchedAxialSize(int size);
     abstract protected void setStretchedOrthoSize(int size);
     
-    abstract protected int getAxialPos(Item item);
-    abstract protected int getOrthoPos(Item item);
-    abstract protected void setAxialPos(Item item, int pos);
-    abstract protected void setOrthoPos(Item item, int pos);
+    abstract protected int getAxialPos(Widget item);
+    abstract protected int getOrthoPos(Widget item);
+    abstract protected void setAxialPos(Widget item, int pos);
+    abstract protected void setOrthoPos(Widget item, int pos);
     
-    abstract protected int getAxialSize(Item item);
-    abstract protected int getOrthoSize(Item item);
-    abstract protected void setAxialSize(Item item, int size);
-    abstract protected void setOrthoSize(Item item, int size);
+    abstract protected int getAxialSize(Widget item);
+    abstract protected int getOrthoSize(Widget item);
+    abstract protected void setAxialSize(Widget item, int size);
+    abstract protected void setOrthoSize(Widget item, int size);
     
-    abstract protected int getMinAxialSize(Item item);
-    abstract protected int getMinOrthoSize(Item item);
+    abstract protected int getMinAxialSize(Widget item);
+    abstract protected int getMinOrthoSize(Widget item);
     
     abstract protected int getAxialAlign(int index);
     abstract protected int getOrthoAlign(int index);
@@ -137,7 +137,7 @@ public abstract class LinearLayout extends Layout {
      * the sum of the heights of the lines, respectively, in this TextItem.
      */
     protected synchronized void recalculateSizes() {
-        int num_items = this.getItemCount();
+        int num_items = this.getWidgetCount();
         
         int axial = 0;
         int ortho = 0;
@@ -162,7 +162,7 @@ public abstract class LinearLayout extends Layout {
      * line.
      */
     protected synchronized void recalculateOffsets() {
-        int num_items = this.getItemCount();
+        int num_items = this.getWidgetCount();
         
         int available_size = this.getAxialSize();
         int expanding_boxes = num_items;
@@ -194,7 +194,7 @@ public abstract class LinearLayout extends Layout {
             else 
                 box.axial = min_axial_size;
             
-            // Make sure the Item is properly sized
+            // Make sure the Widget is properly sized
             if (box.fill) {
                 setAxialSize(box.item, box.axial - 2*box.padding);
                 setOrthoSize(box.item, box.ortho);

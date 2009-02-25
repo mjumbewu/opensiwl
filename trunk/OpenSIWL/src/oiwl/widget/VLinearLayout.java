@@ -23,18 +23,18 @@ public class VLinearLayout extends LinearLayout {
     protected void setStretchedAxialSize(int size) { this.setStretchedHeight(size); }
     protected void setStretchedOrthoSize(int size) {this.setStretchedWidth(size); }
     
-    protected int getAxialPos(Item item) { return item.getYPos(); }
-    protected int getOrthoPos(Item item) { return item.getXPos(); }
-    protected void setAxialPos(Item item, int pos) { item.setYPos(pos); }
-    protected void setOrthoPos(Item item, int pos) { item.setXPos(pos); }
+    protected int getAxialPos(Widget item) { return item.getYPos(); }
+    protected int getOrthoPos(Widget item) { return item.getXPos(); }
+    protected void setAxialPos(Widget item, int pos) { item.setYPos(pos); }
+    protected void setOrthoPos(Widget item, int pos) { item.setXPos(pos); }
     
-    protected int getAxialSize(Item item) { return item.getHeight(); }
-    protected int getOrthoSize(Item item) { return item.getWidth(); }
-    protected void setAxialSize(Item item, int size) { item.setHeight(size); }
-    protected void setOrthoSize(Item item, int size) { item.setWidth(size); }
+    protected int getAxialSize(Widget item) { return item.getHeight(); }
+    protected int getOrthoSize(Widget item) { return item.getWidth(); }
+    protected void setAxialSize(Widget item, int size) { item.setHeight(size); }
+    protected void setOrthoSize(Widget item, int size) { item.setWidth(size); }
     
-    protected int getMinAxialSize(Item item) { return item.getMinHeight(); }
-    protected int getMinOrthoSize(Item item) { return item.getMinWidth(); }
+    protected int getMinAxialSize(Widget item) { return item.getMinHeight(); }
+    protected int getMinOrthoSize(Widget item) { return item.getMinWidth(); }
     
     protected int getAxialAlign(int index) { return this.getVAlignment(index) << 3; }
     protected int getOrthoAlign(int index) { return this.getHAlignment(index) << 6; }

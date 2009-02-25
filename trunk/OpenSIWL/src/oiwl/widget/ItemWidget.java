@@ -9,6 +9,7 @@ package oiwl.widget;
  *
  * @author mjumbewu
  */
-public interface ItemParent {
-    public boolean isValidChild(Item item);
+public abstract class ItemWidget extends WidgetWithLayout {
+
+
 }
