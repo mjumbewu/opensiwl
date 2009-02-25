@@ -20,6 +20,7 @@ public class Panel extends WidgetWithLayout implements WidgetParent {
     int m_attatchment;
     
     public Panel(int attatch) {
+        super();
         this.setSize(50, 50);
         this.m_attatchment = attatch;
         if (attatch == TOP || attatch == BOTTOM)
