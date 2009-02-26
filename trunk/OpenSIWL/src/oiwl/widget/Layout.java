@@ -169,7 +169,7 @@ public abstract class Layout extends Widget implements WidgetParent {
      */
     protected void invalidateSizes() {
         this.m_areSizesValid = false;
-        this.requestRedraw();
+        this.redraw();
     }
 
     /**

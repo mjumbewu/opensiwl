@@ -20,22 +20,35 @@ public abstract class Widget {
     private WidgetParent m_parent;
     private EventSender m_events;
 
+    /**
+     * Set the WidgetParent for this Widget.  The application should have no
+     * need to call this method; only the Widget or its new WidgetParent need.
+     * @param ip The new WidgetParent of this Widget
+     */
     void setParent(WidgetParent ip) {
         this.m_parent = ip;
     }
-    
+
+    /**
+     * Get the WidgetParent of this Widget.
+     * @return This Widget object's WidgetParent
+     */
     public WidgetParent getParent() {
         return this.m_parent;
     }
-    
-    protected void requestRedraw() {
+
+    /**
+     * Request a redraw of this Widget.  The WidgetParent is responsible for
+     * figuring out what to do with the request.
+     */
+    protected void redraw() {
         this.getParent().handleChildRedraw(this.getXPos(), 
                 this.getYPos(), this.getWidth(), this.getHeight());
     }
     
     /**
-     * Add an object to the set of this widget's listeners.
-     * @param evl The EventListener that receives events for this widget.
+     * Add an object to the set of this Widget object's listeners.
+     * @param evl The EventListener that receives events for this Widget.
      */
     public void addEventListener(EventListener evl) {
         m_events.addListener(evl);
@@ -48,13 +61,29 @@ public abstract class Widget {
     public int getHeight() {
         return this.m_height;
     }
-    
+
+    /**
+     * Get the minimum height that this Widget desires to be.  For most Widget
+     * objects, this corresponds to its actual height.  For some (e.g. Layout)
+     * it may be smaller.
+     * @return The minimum height that this Widget desires to be
+     */
     int getMinHeight() {
         return this.getHeight();
     }
-    
+
+    /**
+     * Suggest a height for this Widget.
+     * @param height The height suggestion
+     */
     void setHeight(int height) {
-        this.m_height = height;
+        if (m_height != height) {
+            int w = this.getWidth();
+            int h = this.getHeight();
+
+            this.m_height = height;
+            this.m_events.sendEvent(Event.RESIZED, this, new Size(w,h));
+        }
     }
 
     /**
@@ -65,12 +94,27 @@ public abstract class Widget {
         return this.m_width;
     }
     
+    /**
+     * Get the minimum width that this Widget desires to be.  For most Widget
+     * objects, this corresponds to its actual width.  For some (e.g. Layout)
+     * it may be smaller.
+     */
     int getMinWidth() {
         return this.getWidth();
     }
-    
+
+    /**
+     * Suggest a width for this Widget.
+     * @param width The width suggestion
+     */
     void setWidth(int width) {
-        this.m_width = width;
+        if (m_width != width) {
+            int w = this.getWidth();
+            int h = this.getHeight();
+
+            this.m_width = width;
+            this.m_events.sendEvent(Event.RESIZED, this, new Size(w,h));
+        }
     }
     
     /**
@@ -86,30 +130,38 @@ public abstract class Widget {
     }
 
     /**
-     * Set the x-coordinate of this widget's top-left corner
-     * @param aPos The  x-coordinate of this widget's top-left corner
+     * Set the x-coordinate of this Widget object's top-left corner
+     * @param aPos The  x-coordinate of this Widget object's top-left corner
      */
     void setXPos(int aPos) {
         if (m_xpos != aPos) {
+            int x = this.getXPos();
+            int y = this.getYPos();
+
             m_xpos = aPos;
+            this.m_events.sendEvent(Event.MOVED, this, new Point(x,y));
         }
     }
 
     /**
-     * Get the x-coordinate of this widget's top-left corner
-     * @return The x-coordinate of this widget's top-left corner
+     * Get the x-coordinate of this Widget object's top-left corner
+     * @return The x-coordinate of this Widget object's top-left corner
      */
     public int getXPos() {
         return m_xpos;
     }
 
     /**
-     * Set the y-coordinate of this widget's top-left corner
-     * @param aPos The y-coordinate of this widget's top-left corner
+     * Set the y-coordinate of this Widget object's top-left corner
+     * @param aPos The y-coordinate of this Widget object's top-left corner
      */
     void setYPos(int aPos) {
         if (m_ypos != aPos) {
+            int x = this.getXPos();
+            int y = this.getYPos();
+
             m_ypos = aPos;
+            this.m_events.sendEvent(Event.MOVED, this, new Point(x,y));
         }
     }
     

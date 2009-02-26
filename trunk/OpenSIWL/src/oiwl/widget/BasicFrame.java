@@ -48,7 +48,7 @@ public class BasicFrame extends Frame {
             frame.draw(m_graphics, l, t, r-l, b-t);
         }
         
-        void widgetMoved(Widget widget, Event.Point point) {
+        void widgetMoved(Widget widget, Point point) {
             int width = widget.getWidth();
             int height = widget.getHeight();
             redrawFrame(widget,
@@ -56,7 +56,7 @@ public class BasicFrame extends Frame {
                     widget.getXPos(), widget.getYPos(), width, height);
         }
         
-        void widgetSized(Widget widget, Event.Size size) {
+        void widgetSized(Widget widget, Size size) {
             int left = widget.getXPos();
             int top = widget.getYPos();
             redrawFrame(widget,
@@ -66,7 +66,7 @@ public class BasicFrame extends Frame {
         
         public void onEvent(int type, Widget sender, Object data) {
             if (type == Event.MOVED)
-                widgetMoved(sender, (Event.Point)data);
+                widgetMoved(sender, (Point)data);
         }
     }
     
