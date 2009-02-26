@@ -24,9 +24,9 @@ public class Panel extends WidgetWithLayout implements WidgetParent {
         this.setSize(50, 50);
         this.m_attatchment = attatch;
         if (attatch == TOP || attatch == BOTTOM)
-            setLayout(new VLinearLayout());
+            setLayout(new LinearLayout(Orientation.HORIZONTAL));
         else
-            setLayout(new VLinearLayout());
+            setLayout(new LinearLayout(Orientation.VERTICAL));
     }
     
     public boolean isValidChild(Widget item) {
@@ -40,6 +40,7 @@ public class Panel extends WidgetWithLayout implements WidgetParent {
     }
     
     public void draw(Graphics g, int x, int y, int w, int h) {
+        g.drawRect(this.getXPos(), this.getYPos(), this.getWidth(), this.getHeight());
         getLayout().draw(g, x, y, w, h);
     }
 }

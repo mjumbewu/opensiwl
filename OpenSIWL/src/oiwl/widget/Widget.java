@@ -18,7 +18,7 @@ public abstract class Widget {
     private int m_ypos;
 
     private WidgetParent m_parent;
-    private EventSender m_events;
+    private EventSender m_events = new EventSender();
 
     /**
      * Set the WidgetParent for this Widget.  The application should have no
@@ -173,23 +173,44 @@ public abstract class Widget {
         return m_ypos;
     }
     
+    /**
+     * Set the x- and y-coordinates of this Widget object's top-left corner
+     * @param x The x-coordinate
+     * @param y The y-coordinate
+     */
     void setPos(int x, int y) {
         this.setXPos(x);
         this.setYPos(y);
     }
     
+    /**
+     * Get the x-value of the left-most edge of the Widget
+     * @return The left-most edge
+     */
     public int getLeft() {
         return this.getXPos();
     }
     
+    /**
+     * Get the y-value of the top-most edge of the Widget
+     * @return The top-most edge
+     */
     public int getTop() {
         return this.getYPos();
     }
     
+    /** 
+     * Get the x-value of the right-most edge of the Widget
+     * @return The right-most edge
+     */
     public int getRight() {
         return this.getLeft() + this.getWidth();
     }
     
+    /**
+     * Get the y-value of the bottom-most edge of the Widget
+     * @return The bottom-most edge
+     */
     public int getBottom() {
         return this.getTop() + this.getHeight();
     }
@@ -229,12 +250,11 @@ public abstract class Widget {
     }
 
     /**
-     * Update the specified section of the widget.
+     * Update the specified section of the widget.  The given bounds are given
+     * in absolute coordinates (i.e. relative to the device's display)
      * @param g The Graphics context to draw to.
-     * @param x The x-coordinate of the top-left corner, relative to the 
-     *          Widget's position
-     * @param y The y-coordinate of the top-left corner, relataive to the 
-     *          Widget's position
+     * @param x The x-coordinate of the top-left corner
+     * @param y The y-coordinate of the top-left corner
      * @param width The width of the section
      * @param height The height of the section
      */
@@ -247,6 +267,7 @@ public abstract class Widget {
      * @param g The Graphics context to draw to.
      */
     void draw(Graphics g) {
-        this.draw(g, 0, 0, this.getWidth(), this.getHeight());
+        this.draw(g, this.getXPos(), this.getYPos(), 
+                this.getWidth(), this.getHeight());
     }
 }
