@@ -13,18 +13,33 @@ import oiwl.widget.*;
  */
 public class OpenSIWLTests extends MIDlet {
     Display display;
+    TestFrame[] testFrames;
+    int currentTestIndex;
+    boolean isInitialized = false;
     
     public void startApp() {
-        System.out.println("Creating the frame");
-        TestFrame1 myframe = new TestFrame1();
-        
-//        System.out.println("Setting the orientation");
-//        myframe.setOrientation(Orientation.LANDSCAPE);
-        
-        System.out.println("Displaying the frame.");
-        display = Display.getDisplay(this);
-        display.setCurrent(myframe);
-//        myframe.flushGraphics();
+        if (!isInitialized) {
+            System.out.println("Creating the frames");
+            testFrames = new TestFrame[2];
+            testFrames[0] = new TestFrame1(this);
+            testFrames[1] = new TestFrame2(this);
+            currentTestIndex = 0;
+            isInitialized = true;
+
+            display = Display.getDisplay(this);
+            nextTest();
+        }
+    }
+    
+    public void nextTest() {
+        if (currentTestIndex < testFrames.length) {
+            System.out.println("Displaying the frame.");
+            TestFrame currentTestFrame = testFrames[currentTestIndex++];
+            display.setCurrent(currentTestFrame);
+            currentTestFrame.start();
+        } else {
+            this.notifyDestroyed();
+        }
     }
 
     public void pauseApp() {
