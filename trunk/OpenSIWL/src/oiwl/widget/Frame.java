@@ -5,7 +5,6 @@
 
 package oiwl.widget;
 
-import javax.microedition.lcdui.game.GameCanvas;
 import javax.microedition.lcdui.game.Sprite;
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Graphics;
@@ -185,8 +184,8 @@ public abstract class Frame extends Canvas implements WidgetParent {
     }
     
     public void handleChildRedraw(int x, int y, int w, int h) {
-//        this.invalidateRegion(x, y, x+w, y+h);
-        this.invalidate();
+        this.invalidateRegion(x, y, x+w, y+h);
+//        this.invalidate();
     }
     
     /**
@@ -216,20 +215,21 @@ public abstract class Frame extends Canvas implements WidgetParent {
     public void addPanel(Panel panel) {
         if (panel.getAttachment() == Panel.TOP) {
             panel.setPos(this.getLayoutXPos(), this.getLayoutYPos());
-            panel.setSize(this.getLayoutWidth(), panel.getHeight());
+            panel.setWidth(this.getLayoutWidth());
         }
         else if (panel.getAttachment() == Panel.LEFT) {
             panel.setPos(this.getLayoutXPos(), this.getLayoutYPos());
-            panel.setSize(panel.getWidth(), this.getLayoutHeight());
+            panel.setHeight(this.getLayoutHeight());
         }
         else if (panel.getAttachment() == Panel.RIGHT) {
-            panel.setPos(this.getLayoutXPos()+this.getLayoutWidth(), this.getLayoutYPos());
-            panel.setSize(panel.getWidth(), this.getLayoutHeight());
+            panel.setPos(this.getLayoutXPos()+this.getLayoutWidth()-panel.getWidth(), this.getLayoutYPos());
+            panel.setHeight(this.getLayoutHeight());
         }
         else if (panel.getAttachment() == Panel.BOTTOM) {
-            panel.setPos(this.getLayoutXPos(), this.getLayoutYPos()+this.getLayoutHeight());
-            panel.setSize(this.getLayoutWidth(), panel.getHeight());
+            panel.setPos(this.getLayoutXPos(), this.getLayoutYPos()+this.getLayoutHeight()-panel.getHeight());
+            panel.setWidth(this.getLayoutWidth());
         }
+        panel.setParent(this);
         m_panels.addElement(panel);
     }
     
@@ -359,36 +359,54 @@ public abstract class Frame extends Canvas implements WidgetParent {
         this.invalidateRegion(0, 0, this.getWidth(), this.getHeight());
     }
     
+    private void drawBackground(Graphics g, int x, int y, int w, int h) {
+        int c0 = g.getColor();
+        
+        // Draw the bg color
+        g.setColor(this.getBackgroundColor());
+        g.fillRect(x, y, w, h);
+        
+        // Draw the bg image (if it exists)
+        Image bgimage = this.getBackgroundImage();
+        if (bgimage != null)
+            g.drawRegion(bgimage, x, y, w, h, Sprite.TRANS_NONE, x, y, Graphics.TOP|Graphics.LEFT);
+        
+        // Reset the color to what it originally was
+        g.setColor(c0);
+    }
+    
     public void paint(Graphics g) {
         
-        int l = m_invalidated_l;
-        int t = m_invalidated_t;
+        int x = m_invalidated_l;
+        int y = m_invalidated_t;
         int r = m_invalidated_r;
         int b = m_invalidated_b;
+        int w = r-x;
+        int h = b-y;
 
         System.out.println("painting the region x="
-                + Integer.toString(l) + ", y="
-                + Integer.toString(t) + ", w="
-                + Integer.toString(r-l) + ", h="
-                + Integer.toString(b-t));
+                + Integer.toString(x) + ", y="
+                + Integer.toString(y) + ", w="
+                + Integer.toString(w) + ", h="
+                + Integer.toString(h));
         
         // Draw the layout and the panels to the oriented buffer
         Graphics buffer = this.getGraphics();
-
-        this.getLayout().draw(buffer, l, t, r-l, b-t);
+        
+        this.drawBackground(buffer, x, y, w, h);
+        this.getLayout().draw(buffer, x, y, w, h);
         for (int i = 0; i < this.getNumPanels(); ++i)
-            this.getPanel(i).draw(buffer, l, t, r-l, b-t);
+            this.getPanel(i).draw(buffer, x, y, w, h);
 
         // Draw the oriented buffer to the screen
         if (getOrientation() == Orientation.PORTRAIT)
-            g.drawRegion(m_orientedBuffer, l, t, r-l, b-t, 
-                    Sprite.TRANS_NONE, l, t, Graphics.TOP|Graphics.LEFT);
+            g.drawRegion(m_orientedBuffer, x, y, w, h, 
+                    Sprite.TRANS_NONE, x, y, Graphics.TOP|Graphics.LEFT);
         
         else /* LANDSCAPE, right-handed rotation */
-            g.drawRegion(m_orientedBuffer, l, t, r-l, b-t, 
-                    Sprite.TRANS_ROT90, l, this.getHeight()-b, Graphics.TOP|Graphics.LEFT);
+            g.drawRegion(m_orientedBuffer, x, y, w, h, 
+                    Sprite.TRANS_ROT90, x, this.getHeight()-b, Graphics.TOP|Graphics.LEFT);
         
         resetInvalidatedRegion();
-//        this.flushGraphics(l, t, r-l, b-t);
     }
 }

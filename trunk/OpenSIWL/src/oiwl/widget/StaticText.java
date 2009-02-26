@@ -37,24 +37,24 @@ public class StaticText extends StaticWidget {
     }
     
     /**
-     * Get the string of text of a Line
-     * @return The text on the given line
+     * Get the string of text
+     * @return The text
      */
     public String getText() {
         return m_text;
     }
     
     /**
-     * Get the font of a Line
-     * @return The font on the given line
+     * Get the font
+     * @return The font
      */
     public Font getFont() {
         return m_font;
     }
     
     /**
-     * Get the color of a Line
-     * @return The color on the given line
+     * Get the color
+     * @return The color
      */
     public int getColor() {
         return m_color;
@@ -70,22 +70,24 @@ public class StaticText extends StaticWidget {
      * @param height The height of the region
      */
     void draw(Graphics g, int x, int y, int width, int height) {
-        int xoff = this.getXPos();
-        int yoff = this.getYPos();
-        
-        // Store the font and color so that we can come back to it later
-        Font f0 = g.getFont();
-        int c0 = g.getColor();
-        
-        String text = this.getText();
-        Font font = this.getFont();
-        int color = this.getColor();
-            
-        g.setFont(font);
-        g.setColor(color);
-        g.drawString(text, xoff, yoff, Graphics.TOP|Graphics.LEFT);
-        
-        g.setFont(f0);
-        g.setColor(c0);
+        if (this.intersects(x, y, width, height)) {
+            int xoff = this.getXPos();
+            int yoff = this.getYPos();
+
+            // Store the font and color so that we can come back to it later
+            Font f0 = g.getFont();
+            int c0 = g.getColor();
+
+            String text = this.getText();
+            Font font = this.getFont();
+            int color = this.getColor();
+
+            g.setFont(font);
+            g.setColor(color);
+            g.drawString(text, xoff, yoff, Graphics.TOP|Graphics.LEFT);
+
+            g.setFont(f0);
+            g.setColor(c0);
+        }
     }
 }
