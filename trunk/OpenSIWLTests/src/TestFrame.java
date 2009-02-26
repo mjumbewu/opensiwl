@@ -10,13 +10,18 @@ import javax.microedition.lcdui.Font;
  *
  * @author mjumbewu
  */
-public class TestFrame extends Frame implements Runnable {
+public abstract class TestFrame extends Frame implements Runnable {
     Panel testPanel = new Panel(Panel.BOTTOM);
+    String testID;
     
-    public TestFrame(int orient) {
-        super(orient);
+    OpenSIWLTests app;
+    
+    public TestFrame(OpenSIWLTests App, String TestID, int Orient) {
+        super(Orient);
+        testID = TestID;
+        app = App;
         this.addPanel(testPanel);
-        testPanel.getLayout().manage(new StaticText("Performing test...", Font.getDefaultFont(), 0x000000ff));
+        testPanel.getLayout().manage(new StaticText(testID + ": Performing test...", Font.getDefaultFont(), 0x000000ff));
     }
     
     protected void start() {
@@ -24,18 +29,20 @@ public class TestFrame extends Frame implements Runnable {
         runner.start();
     }
     
-    protected boolean runtest() {
-        return true;
-    }
+    abstract protected boolean runtest();
     
     public void run() {
         boolean success = runtest();
         testPanel.getLayout().unmanage(0);
         if (success)
-            testPanel.getLayout().manage(new StaticText("Success!",
+            testPanel.getLayout().manage(new StaticText(testID + ": Success!",
                     Font.getDefaultFont(), 0x0000ff00));
         else
-            testPanel.getLayout().manage(new StaticText("Failure!",
+            testPanel.getLayout().manage(new StaticText(testID + ": Failure!",
                     Font.getDefaultFont(), 0x00ff0000));
+    }
+    
+    public void keyPressed(int key) {
+        app.nextTest();
     }
 }
