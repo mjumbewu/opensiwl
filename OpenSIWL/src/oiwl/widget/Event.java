@@ -33,14 +33,4 @@ public class Event {
      * of the resized Item.
      */
     public static final int RESIZED = 7;
-    
-    public class Point {
-        public int left;
-        public int top;
-    }
-    
-    public class Size {
-        public int width;
-        public int height;
-    }
 }
