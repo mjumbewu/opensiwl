@@ -12,7 +12,8 @@ import javax.microedition.lcdui.Graphics;
  *
  * @author mjumbewu
  */
-public abstract class Layout extends Widget implements WidgetParent {
+public abstract class Layout extends Widget 
+        implements WidgetParent, EventListener {
     /**
      * The internal representation of a line of text
      * @author mjumbewu
@@ -63,6 +64,11 @@ public abstract class Layout extends Widget implements WidgetParent {
     public void manage(Widget item, int index) {
         this.addCell(this.makeCell(), item, index);
     }
+
+    public void onEvent(int type, Widget sender, Object data) {
+//        if (type == Event.RESIZED)
+            invalidateSizes();
+    }
     
     /**
      * An internal method to initialized a given Cell with the given values and
@@ -73,18 +79,16 @@ public abstract class Layout extends Widget implements WidgetParent {
      *              Cell is appended
      */
     protected void addCell(Cell newCell, Widget item, int index) {
-        System.out.println("Check the validity of the child...");
         if (this.isValidChild(item)) {
-            System.out.println("Set the item in the new cell");
+            item.setParent(this);
+            item.addEventListener(this);
             newCell.item = item;
 
-            System.out.println("Put the item in the vector");
             if (index == -1)
                 m_cells.addElement(newCell);
             else
                 m_cells.insertElementAt(newCell, index);
             
-            System.out.println("invalidate sizes");
             this.invalidateSizes();
         } else {
             throw new java.lang.IllegalArgumentException("Cannot add Item of" +
@@ -124,6 +128,7 @@ public abstract class Layout extends Widget implements WidgetParent {
      */
     public Widget unmanage(int aIndex) {
         Widget item = this.getWidget(aIndex);
+        item.removeEventListener(this);
         m_cells.removeElementAt(aIndex);
         this.invalidateSizes();
         return item;
@@ -184,7 +189,7 @@ public abstract class Layout extends Widget implements WidgetParent {
      * Get the minimum width of the Layout
      * @return The width of the Layout
      */
-    public int getSpecifiedWidth() {
+    public int getSuggestedWidth() {
         return super.getWidth();
     }
 
@@ -192,7 +197,7 @@ public abstract class Layout extends Widget implements WidgetParent {
      * Set the width minimum of the Layout
      * @param aWidth The width of the Layout
      */
-    protected void setSpecifiedWidth(int aWidth) {
+    protected void setSuggestedWidth(int aWidth) {
         super.setWidth(aWidth);
     }
 
@@ -200,7 +205,7 @@ public abstract class Layout extends Widget implements WidgetParent {
      * Get the minimum height of the Layout
      * @return The height of the Layout
      */
-    public int getSpecifiedHeight() {
+    public int getSuggestedHeight() {
         return super.getHeight();
     }
 
@@ -208,7 +213,7 @@ public abstract class Layout extends Widget implements WidgetParent {
      * Set the minimum height of the Layout
      * @param aHeight The height of the Layout
      */
-    protected void setSpecifiedHeight(int aHeight) {
+    protected void setSuggestedHeight(int aHeight) {
         super.setHeight(aHeight);
     }
 
@@ -217,9 +222,9 @@ public abstract class Layout extends Widget implements WidgetParent {
      * @param w The width of the Layout
      * @param h The height of the Layout
      */
-    protected void setSpeciefiedSize(int w, int h) {
-        this.setSpecifiedWidth(w);
-        this.setSpecifiedHeight(h);
+    protected void setSuggestedSize(int w, int h) {
+        this.setSuggestedWidth(w);
+        this.setSuggestedHeight(h);
     }
     
     /**
@@ -279,7 +284,7 @@ public abstract class Layout extends Widget implements WidgetParent {
      * @return The effective width
      */
     public int getWidth() {
-        return Math.max(this.getSpecifiedWidth(), this.getStretchedWidth());
+        return Math.max(this.getSuggestedWidth(), this.getStretchedWidth());
     }
     
     /**
@@ -289,7 +294,7 @@ public abstract class Layout extends Widget implements WidgetParent {
      * @return The effective height
      */
     public int getHeight() {
-        return Math.max(this.getSpecifiedHeight(), this.getStretchedHeight());
+        return Math.max(this.getSuggestedHeight(), this.getStretchedHeight());
     }
     
     public int getMinWidth() {
@@ -323,6 +328,7 @@ public abstract class Layout extends Widget implements WidgetParent {
         //       same question could be asked of the bitwise or.
         for (int i = 0; i < num_cells; ++i) {
             Widget item = this.getWidget(i);
+            g.drawRect(item.getXPos(), item.getYPos(), item.getWidth(), item.getHeight());
             item.draw(g, x, y, width, height);
         }
     }

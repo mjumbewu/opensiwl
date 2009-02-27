@@ -12,8 +12,8 @@ import java.util.Vector;
  * @author mjumbewu
  */
 public class EventSender {
-    private Vector m_listeners;
-    private boolean m_do_events;
+    private Vector m_listeners = new Vector();
+    private boolean m_do_events = true;
     
     public void addListener(EventListener evl) {
         m_listeners.addElement(evl);

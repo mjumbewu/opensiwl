@@ -26,7 +26,7 @@ public class Event {
      * of the moved Item.
      */
     public static final int MOVED = 6;
-    
+
     /**
      * The constant for the RESIZED event type.  The auxiliary data for this 
      * type of event will be a Size object representing the previous size
