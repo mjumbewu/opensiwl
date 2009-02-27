@@ -46,8 +46,8 @@ public abstract class Widget {
      * figuring out what to do with the request.
      */
     protected void redraw() {
-        this.getParent().handleChildRedraw(this.getLocalXPos(),
-                this.getLocalYPos(), this.getWidth(), this.getHeight());
+        this.getParent().handleChildRedraw(this.getGlobalXPos(),
+                this.getGlobalYPos(), this.getWidth(), this.getHeight());
     }
     
     /**
@@ -259,23 +259,30 @@ public abstract class Widget {
      * @return True if the point is within the bounds of the widget, false
      *         otherwise
      */
-    public boolean contains(int x, int y) {
-        return ((x >= this.getLocalXPos()) &&
-                (y >= this.getLocalYPos()) &&
-                (x < this.getLocalXPos() + this.getWidth()) &&
-                (y < this.getLocalYPos() + this.getHeight()));
+    public boolean containsGlobal(int x, int y) {
+        return ((x >= this.getGlobalXPos()) &&
+                (y >= this.getGlobalYPos()) &&
+                (x < this.getGlobalXPos() + this.getWidth()) &&
+                (y < this.getGlobalYPos() + this.getHeight()));
+    }
+    
+    public boolean containsLocal(int x, int y) {
+        return ((x >= 0) &&
+                (y >= 0) &&
+                (x < this.getWidth()) &&
+                (y < this.getHeight()));
     }
     
     /**
      * Determine whether the rectangular region specified by the bounds 
-     * intersects with this Widget
+     * intersectsGlobal with this Widget
      * @param l The left edge of the region
      * @param t The top of the region
      * @param w The width of the region
      * @param h The height of the region
      * @return True if the region intersect this Widget.  False otherwise.
      */
-    public boolean intersects(int l, int t, int w, int h) {
+    public boolean intersectsGlobal(int l, int t, int w, int h) {
         int r = l + w;
         int b = t + h;
         
@@ -283,6 +290,16 @@ public abstract class Widget {
                 (r > this.getLeft()) &&
                 (t < this.getBottom()) &&
                 (b > this.getTop()));
+    }
+
+    public boolean intersectsLocal(int l, int t, int w, int h) {
+        int r = l + w;
+        int b = t + h;
+        
+        return ((r > 0) &&
+                (b > 0) &&
+                (l < this.getWidth()) &&
+                (t < this.getHeight()));
     }
 
     /**

@@ -402,9 +402,18 @@ public abstract class Frame extends Canvas implements WidgetParent {
         Graphics buffer = this.getGraphics();
         
         this.drawBackground(buffer, x, y, w, h);
-        this.getLayout().draw(buffer, x, y, w, h);
-        for (int i = 0; i < this.getNumPanels(); ++i)
-            this.getPanel(i).draw(buffer, x, y, w, h);
+        Layout layout = this.getLayout();
+        int layoutx = layout.getLocalXPos();
+        int layouty = layout.getLocalYPos();
+        layout.draw(buffer, layoutx, layouty, 
+                x - layoutx, y - layouty, w, h);
+        for (int i = 0; i < this.getNumPanels(); ++i) {
+            Panel panel = this.getPanel(i);
+            int panelx = panel.getLocalXPos();
+            int panely = panel.getLocalYPos();
+            panel.draw(buffer, panelx, panely,
+                    x - panelx, y - panely, w, h);
+        }
 
         // Draw the oriented buffer to the screen
         if (getOrientation() == Orientation.PORTRAIT)
@@ -416,5 +425,22 @@ public abstract class Frame extends Canvas implements WidgetParent {
                     Sprite.TRANS_ROT90, x, this.getHeight()-b, Graphics.TOP|Graphics.LEFT);
         
         resetInvalidatedRegion();
+    }
+    
+    public void pointerDown (int x, int y) {}
+    public void pointerDrag (int x, int y) {}
+    public void pointerUp   (int x, int y) {}
+    public void pointerFlick(int x, int y) {}
+    
+    public void pointerPressed(int x, int y) {
+        this.pointerDown(x, y);
+    }
+    
+    public void pointerDragged(int x, int y) {
+        this.pointerDrag(x, y);
+    }
+    
+    public void pointerReleased(int x, int y) {
+        this.pointerUp(x, y);
     }
 }

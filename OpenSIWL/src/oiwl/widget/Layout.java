@@ -314,7 +314,7 @@ public abstract class Layout extends Widget
      * @param width The width of the region
      * @param height The height of the region
      */
-    void draw(Graphics g, int x, int y, int width, int height) {
+    void draw(Graphics g, int xoff, int yoff, int x, int y, int width, int height) {
         // ::TODO:: Optimize this drawing method.  For example, only draw cells
         //          that intersect the region; consider drawing to a stored 
         //          image so that all the draw calls don't have to be made
@@ -323,13 +323,14 @@ public abstract class Layout extends Widget
         
         int num_cells = this.getWidgetCount();
         
-        // NOTE: Should we declare t, f, c, x, and y outside of the loop, or
-        //       should we trust the compiler to optimize this for us?  The
-        //       same question could be asked of the bitwise or.
-        for (int i = 0; i < num_cells; ++i) {
-            Widget item = this.getWidget(i);
-            g.drawRect(item.getLocalXPos(), item.getLocalYPos(), item.getWidth(), item.getHeight());
-            item.draw(g, x, y, width, height);
-        }
+        if (this.intersectsLocal(x, y, width, height))
+            for (int i = 0; i < num_cells; ++i) {
+                Widget item = this.getWidget(i);
+                int itemx = item.getLocalXPos();
+                int itemy = item.getLocalYPos();
+                g.drawRect(xoff + itemx, yoff + itemy, item.getWidth(), item.getHeight());
+                item.draw(g, xoff + itemx, yoff + itemy,
+                        x - itemx, y - itemy, width, height);
+            }
     }
 }
