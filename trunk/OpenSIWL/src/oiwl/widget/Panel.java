@@ -29,14 +29,6 @@ public class Panel extends WidgetWithLayout implements WidgetParent {
             setLayout(new LinearLayout(Orientation.VERTICAL));
     }
     
-    public int getGlobalXPos() {
-        return getLocalXPos();
-    }
-
-    public int getGlobalYPos() {
-        return getLocalYPos();
-    }
-
     public boolean isValidChild(Widget item) {
         return (ItemWidget.class.isInstance(item) ||
                 StaticWidget.class.isInstance(item) ||
@@ -47,8 +39,14 @@ public class Panel extends WidgetWithLayout implements WidgetParent {
         return this.m_attatchment;
     }
     
-    public void draw(Graphics g, int x, int y, int w, int h) {
-        g.drawRect(this.getLocalXPos(), this.getLocalYPos(), this.getWidth(), this.getHeight());
-        getLayout().draw(g, x, y, w, h);
+    public void draw(Graphics g, int xoff, int yoff, int x, int y, int w, int h) {
+        if (this.intersectsLocal(x, y, w, h)) {
+            g.drawRect(xoff, yoff, this.getWidth(), this.getHeight());
+            Layout layout = this.getLayout();
+            int layoutx = layout.getLocalXPos();
+            int layouty = layout.getLocalYPos();
+            getLayout().draw(g, xoff + layoutx, yoff + layouty,
+                    x - layoutx, y - layouty, w, h);
+        }
     }
 }

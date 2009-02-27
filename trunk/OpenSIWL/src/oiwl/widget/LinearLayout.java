@@ -212,9 +212,20 @@ public class LinearLayout extends Layout {
         }
         
         int offset = 0;
-
+        
+        // Calculate and set the axial and orthogonal position and size for 
+        // each managed Widget object.  Every time the Layout receives a
+        // MOVED or RESIZED event it invalidates its size again, so turn off
+        // each Widget object's events before adjusting, or else we'll get
+        // an explosion of recalculations -- really slow.
+        //
+        // TODO: Instead of supressing the Widget objects' events altogether,
+        //       we should simply have this Layout ignore them.
         for (int index = 0; index < num_items; ++index) {
             LinearCell box = (LinearCell)this.getCell(index);
+            
+            // Momentarily disable the Widget object's events
+            box.item.getEventSender().supressEvents();
             
             // Set the box offset
             box.offset = offset;
@@ -265,8 +276,8 @@ public class LinearLayout extends Layout {
             else /* MAX */
                 or_pos = box.ortho - getProperties().getOrthoSize(box.item);
 
-            getProperties().setAxialPos(box.item, ax_pos + layout_ax_pos);
-            getProperties().setOrthoPos(box.item, or_pos + layout_op_pos);
+            getProperties().setAxialPos(box.item, ax_pos);
+            getProperties().setOrthoPos(box.item, or_pos);
             
             // Update the offset and available axial for the next box
             offset += box.axial;
@@ -274,6 +285,9 @@ public class LinearLayout extends Layout {
                 available_size -= box.axial;
                 --expanding_boxes;
             }
+            
+            // Reenable events for the Widget
+            box.item.getEventSender().allowEvents();
         }
     }
 
