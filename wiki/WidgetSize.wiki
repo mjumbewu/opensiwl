@@ -1,0 +1,22 @@
+#summary Explanation of the calculation of width and height for Widget objects
+
+= Introduction =
+
+Widget objects have several size functions:
+
+ * getHeight/Width (the actual height/width)
+ * setHeight/Width (protected, a suggestion for height/width)
+ * getMinHeight/Width
+ * setMinHeight/Width (protected)
+
+And for Layout objects only:
+ * getStretchedHeight/Width
+ * setStretchedHeight/Width (protected)
+
+
+= Details =
+
+Add your content here.  Format your content with:
+  * Text in *bold* or _italic_
+  * Headings, paragraphs, and lists
+  * Automatic links to other wiki pages
