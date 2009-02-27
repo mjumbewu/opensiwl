@@ -71,8 +71,8 @@ public class StaticText extends StaticWidget {
      */
     void draw(Graphics g, int x, int y, int width, int height) {
         if (this.intersects(x, y, width, height)) {
-            int xoff = this.getXPos();
-            int yoff = this.getYPos();
+            int xoff = this.getLocalXPos();
+            int yoff = this.getLocalYPos();
 
             // Store the font and color so that we can come back to it later
             Font f0 = g.getFont();

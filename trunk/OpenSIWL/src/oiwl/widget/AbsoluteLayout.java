@@ -33,7 +33,7 @@ public abstract class AbsoluteLayout extends Layout {
      * @param pos The x-position
      */
     public void setXPos(Widget item, int pos) {
-        item.setXPos(pos);
+        item.setLocalXPos(pos);
     }
     
     /**
@@ -43,7 +43,7 @@ public abstract class AbsoluteLayout extends Layout {
      * @param pos The y-position
      */
     public void setYPos(Widget item, int pos) {
-        item.setYPos(pos);
+        item.setLocalYPos(pos);
     }
     
     /**

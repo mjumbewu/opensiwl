@@ -328,7 +328,7 @@ public abstract class Layout extends Widget
         //       same question could be asked of the bitwise or.
         for (int i = 0; i < num_cells; ++i) {
             Widget item = this.getWidget(i);
-            g.drawRect(item.getXPos(), item.getYPos(), item.getWidth(), item.getHeight());
+            g.drawRect(item.getLocalXPos(), item.getLocalYPos(), item.getWidth(), item.getHeight());
             item.draw(g, x, y, width, height);
         }
     }

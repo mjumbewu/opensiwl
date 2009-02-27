@@ -46,8 +46,8 @@ public abstract class Widget {
      * figuring out what to do with the request.
      */
     protected void redraw() {
-        this.getParent().handleChildRedraw(this.getXPos(), 
-                this.getYPos(), this.getWidth(), this.getHeight());
+        this.getParent().handleChildRedraw(this.getLocalXPos(),
+                this.getLocalYPos(), this.getWidth(), this.getHeight());
     }
     
     /**
@@ -151,10 +151,10 @@ public abstract class Widget {
      * Set the x-coordinate of this Widget object's top-left corner
      * @param aPos The  x-coordinate of this Widget object's top-left corner
      */
-    void setXPos(int aPos) {
+    void setLocalXPos(int aPos) {
         if (m_xpos != aPos) {
-            int x = this.getXPos();
-            int y = this.getYPos();
+            int x = this.getLocalXPos();
+            int y = this.getLocalYPos();
 
             m_xpos = aPos;
             this.sendPosChange(x, y);
@@ -165,18 +165,22 @@ public abstract class Widget {
      * Get the x-coordinate of this Widget object's top-left corner
      * @return The x-coordinate of this Widget object's top-left corner
      */
-    public int getXPos() {
+    public int getLocalXPos() {
         return m_xpos;
+    }
+
+    public int getGlobalXPos() {
+        return getLocalXPos() + getParent().getGlobalXPos();
     }
 
     /**
      * Set the y-coordinate of this Widget object's top-left corner
      * @param aPos The y-coordinate of this Widget object's top-left corner
      */
-    void setYPos(int aPos) {
+    void setLocalYPos(int aPos) {
         if (m_ypos != aPos) {
-            int x = this.getXPos();
-            int y = this.getYPos();
+            int x = this.getLocalXPos();
+            int y = this.getLocalYPos();
 
             m_ypos = aPos;
             this.sendPosChange(x, y);
@@ -187,8 +191,12 @@ public abstract class Widget {
      * Get the y-coordinate of this widget's top-left corner
      * @return The y-coordinate of this widget's top-left corner
      */
-    public int getYPos() {
+    public int getLocalYPos() {
         return m_ypos;
+    }
+
+    public int getGlobalYPos() {
+        return getLocalYPos() + getParent().getGlobalYPos();
     }
 
     /**
@@ -196,9 +204,9 @@ public abstract class Widget {
      * @param x The x-coordinate
      * @param y The y-coordinate
      */
-    void setPos(int x, int y) {
-        this.setXPos(x);
-        this.setYPos(y);
+    void setLocalPos(int x, int y) {
+        this.setLocalXPos(x);
+        this.setLocalYPos(y);
     }
     
     /**
@@ -207,7 +215,7 @@ public abstract class Widget {
      * @param oldy The previous y-position
      */
     protected void sendPosChange(int oldx, int oldy) {
-        if (oldx != this.getXPos() || oldy != this.getYPos())
+        if (oldx != this.getLocalXPos() || oldy != this.getLocalYPos())
             this.m_events.sendEvent(Event.MOVED, this, new Point(oldx,oldy));
     }
 
@@ -216,7 +224,7 @@ public abstract class Widget {
      * @return The left-most edge
      */
     public int getLeft() {
-        return this.getXPos();
+        return this.getGlobalXPos();
     }
     
     /**
@@ -224,7 +232,7 @@ public abstract class Widget {
      * @return The top-most edge
      */
     public int getTop() {
-        return this.getYPos();
+        return this.getGlobalYPos();
     }
     
     /** 
@@ -252,10 +260,10 @@ public abstract class Widget {
      *         otherwise
      */
     public boolean contains(int x, int y) {
-        return ((x >= this.getXPos()) && 
-                (y >= this.getYPos()) &&
-                (x < this.getXPos() + this.getWidth()) &&
-                (y < this.getYPos() + this.getHeight()));
+        return ((x >= this.getLocalXPos()) &&
+                (y >= this.getLocalYPos()) &&
+                (x < this.getLocalXPos() + this.getWidth()) &&
+                (y < this.getLocalYPos() + this.getHeight()));
     }
     
     /**
@@ -279,23 +287,29 @@ public abstract class Widget {
 
     /**
      * Update the specified section of the widget.  The given bounds are given
-     * in absolute coordinates (i.e. relative to the device's display)
+     * in local coordinates
      * @param g The Graphics context to draw to.
-     * @param x The x-coordinate of the top-left corner
-     * @param y The y-coordinate of the top-left corner
+     * @param xoff The global (i.e. device coordinated) x offset where the
+     *             Widget will be drawn
+     * @param yoff The global y offset where the Widget will be drawn
+     * @param x The local x-coordinate of the top-left corner
+     * @param y The local y-coordinate of the top-left corner
      * @param width The width of the section
      * @param height The height of the section
      */
-    abstract void draw(Graphics g, int x, int y, int width, int height);
+    abstract void draw(Graphics g, int xoff, int yoff,
+            int x, int y, int width, int height);
     
     /**
      * This is equivalent to calling render with <code>x=0</code>,
      * <code>y=0</code>, <code>width=getWidth()</code>, and
      * <code>height=getHeight()</code>.
      * @param g The Graphics context to draw to.
+     * @param xoff The global (i.e. device coordinated) x offset where the
+     *             Widget will be drawn
+     * @param yoff The global y offset where the Widget will be drawn
      */
-    void draw(Graphics g) {
-        this.draw(g, this.getXPos(), this.getYPos(), 
-                this.getWidth(), this.getHeight());
+    void draw(Graphics g, int xoff, int yoff) {
+        this.draw(g, xoff, yoff, 0, 0, this.getWidth(), this.getHeight());
     }
 }

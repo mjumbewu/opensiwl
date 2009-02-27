@@ -22,7 +22,7 @@ public abstract class WidgetWithLayout extends Widget implements WidgetParent {
             throw new IllegalArgumentException("Layout should not be null");
         m_layout = aLayout;
         m_layout.setParent(this);
-        m_layout.setPos(this.getXPos(), this.getYPos());
+        m_layout.setLocalPos(this.getLocalXPos(), this.getLocalYPos());
         m_layout.setSize(this.getWidth(), this.getHeight());
     }
     
@@ -30,18 +30,18 @@ public abstract class WidgetWithLayout extends Widget implements WidgetParent {
         return m_layout;
     }
     
-    void setXPos(int aPos) {
+    void setLocalXPos(int aPos) {
         Layout layout = getLayout();
         if (layout != null)
-            layout.setXPos(aPos);
-        super.setXPos(aPos);
+            layout.setLocalXPos(aPos);
+        super.setLocalXPos(aPos);
     }
     
-    void setYPos(int aPos) {
+    void setLocalYPos(int aPos) {
         Layout layout = getLayout();
         if (layout != null)
-            layout.setYPos(aPos);
-        super.setYPos(aPos);
+            layout.setLocalYPos(aPos);
+        super.setLocalYPos(aPos);
     }
     
     void setWidth(int aSize) {
