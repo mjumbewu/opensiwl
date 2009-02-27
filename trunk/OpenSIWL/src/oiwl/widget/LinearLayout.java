@@ -176,9 +176,12 @@ public class LinearLayout extends Layout {
             ortho = Math.max(ortho, getProperties().getOrthoSize(box.item));
         }
         
+        this.validateSizes();
+        int oldw = this.getWidth();
+        int oldh = this.getHeight();
         getProperties().setStretchedAxialSize(axial);
         getProperties().setStretchedOrthoSize(ortho);
-        this.validateSizes();
+        this.getEventSender().sendEvent(Event.RESIZED, this, new Size(this.getWidth(), this.getHeight()));
         this.recalculateOffsets();
     }
 
@@ -191,7 +194,12 @@ public class LinearLayout extends Layout {
     protected synchronized void recalculateOffsets() {
         int num_items = this.getWidgetCount();
         
-        int available_size = getProperties().getAxialSize();
+        int layout_ax_pos = getProperties().getAxialPos();
+        int layout_op_pos = getProperties().getOrthoPos();
+        int layout_ax_size = getProperties().getAxialSize();
+        int layout_or_size = getProperties().getOrthoSize();
+
+        int available_size = layout_ax_size;
         int expanding_boxes = num_items;
         
         // First, go through and find out how many cells are [not] expanding
@@ -203,9 +211,8 @@ public class LinearLayout extends Layout {
             }
         }
         
-        int ax_offset = getProperties().getAxialPos(), 
-                or_offset = getProperties().getOrthoPos(), 
-                offset = 0;
+        int offset = 0;
+
         for (int index = 0; index < num_items; ++index) {
             LinearCell box = (LinearCell)this.getCell(index);
             
@@ -213,21 +220,27 @@ public class LinearLayout extends Layout {
             box.offset = offset;
             
             // Calculate the size of the current box
-            box.ortho = getProperties().getOrthoSize();
-            int min_axial_size = getProperties().getMinAxialSize(box.item) + 2*box.padding;
+            box.ortho = layout_or_size;
+            int min_axial_box_size = getProperties().getMinAxialSize(box.item) + 2*box.padding;
             if (box.expand) 
                 box.axial =
-                    Math.max(available_size / expanding_boxes, min_axial_size);
+                    Math.max(available_size / expanding_boxes, min_axial_box_size);
             else 
-                box.axial = min_axial_size;
+                box.axial = min_axial_box_size;
             
             // Make sure the Widget is properly sized
             if (box.fill) {
                 getProperties().setAxialSize(box.item, box.axial - 2*box.padding);
                 getProperties().setOrthoSize(box.item, box.ortho);
             } else {
-                getProperties().setAxialSize(box.item, min_axial_size - 2*box.padding);
-                getProperties().setOrthoSize(box.item, getProperties().getOrthoSize(box.item));
+//                getProperties().setAxialSize(box.item, min_axial_box_size - 2*box.padding);
+                getProperties().setAxialSize(box.item, getProperties().getMinAxialSize(box.item));
+                getProperties().setOrthoSize(box.item, getProperties().getMinOrthoSize(box.item));
+                System.out.print(box.item.getClass().toString());
+                System.out.print(",");
+                System.out.print(getProperties().getOrthoSize(box.item));
+                System.out.print(",");
+                System.out.println(getProperties().getAxialSize(box.item));
             }
             
             // Axially position
@@ -252,13 +265,15 @@ public class LinearLayout extends Layout {
             else /* MAX */
                 or_pos = box.ortho - getProperties().getOrthoSize(box.item);
 
-            getProperties().setAxialPos(box.item, ax_pos + ax_offset);
-            getProperties().setOrthoPos(box.item, or_pos + or_offset);
+            getProperties().setAxialPos(box.item, ax_pos + layout_ax_pos);
+            getProperties().setOrthoPos(box.item, or_pos + layout_op_pos);
             
             // Update the offset and available axial for the next box
             offset += box.axial;
-            available_size -= box.axial;
-            --expanding_boxes;
+            if (box.expand) {
+                available_size -= box.axial;
+                --expanding_boxes;
+            }
         }
     }
 

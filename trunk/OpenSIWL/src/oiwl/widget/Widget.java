@@ -20,6 +20,10 @@ public abstract class Widget {
     private WidgetParent m_parent;
     private EventSender m_events = new EventSender();
 
+    protected EventSender getEventSender() {
+        return m_events;
+    }
+    
     /**
      * Set the WidgetParent for this Widget.  The application should have no
      * need to call this method; only the Widget or its new WidgetParent need.
@@ -54,6 +58,10 @@ public abstract class Widget {
         m_events.addListener(evl);
     }
 
+    public void removeEventListener(EventListener evl) {
+        m_events.removeListener(evl);
+    }
+
     /**
      * Get the height of this Widget.
      * @return The height of this widget
@@ -82,7 +90,7 @@ public abstract class Widget {
             int h = this.getHeight();
 
             this.m_height = height;
-            this.m_events.sendEvent(Event.RESIZED, this, new Size(w,h));
+            this.sendSizeChange(w, h);
         }
     }
 
@@ -113,7 +121,7 @@ public abstract class Widget {
             int h = this.getHeight();
 
             this.m_width = width;
-            this.m_events.sendEvent(Event.RESIZED, this, new Size(w,h));
+            this.sendSizeChange(w, h);
         }
     }
     
@@ -130,6 +138,16 @@ public abstract class Widget {
     }
 
     /**
+     * Send a resized event if the size has actually changed
+     * @param oldw The previous width
+     * @param oldh The previous height
+     */
+    protected void sendSizeChange(int oldw, int oldh) {
+        if (oldw != this.getWidth() || oldh != this.getHeight())
+            this.m_events.sendEvent(Event.RESIZED, this, new Size(oldw,oldh));
+    }
+
+    /**
      * Set the x-coordinate of this Widget object's top-left corner
      * @param aPos The  x-coordinate of this Widget object's top-left corner
      */
@@ -139,7 +157,7 @@ public abstract class Widget {
             int y = this.getYPos();
 
             m_xpos = aPos;
-            this.m_events.sendEvent(Event.MOVED, this, new Point(x,y));
+            this.sendPosChange(x, y);
         }
     }
 
@@ -161,7 +179,7 @@ public abstract class Widget {
             int y = this.getYPos();
 
             m_ypos = aPos;
-            this.m_events.sendEvent(Event.MOVED, this, new Point(x,y));
+            this.sendPosChange(x, y);
         }
     }
     
@@ -172,7 +190,7 @@ public abstract class Widget {
     public int getYPos() {
         return m_ypos;
     }
-    
+
     /**
      * Set the x- and y-coordinates of this Widget object's top-left corner
      * @param x The x-coordinate
@@ -183,6 +201,16 @@ public abstract class Widget {
         this.setYPos(y);
     }
     
+    /**
+     * Send a moved event if the size has actually changed
+     * @param oldx The previous x-position
+     * @param oldy The previous y-position
+     */
+    protected void sendPosChange(int oldx, int oldy) {
+        if (oldx != this.getXPos() || oldy != this.getYPos())
+            this.m_events.sendEvent(Event.MOVED, this, new Point(oldx,oldy));
+    }
+
     /**
      * Get the x-value of the left-most edge of the Widget
      * @return The left-most edge

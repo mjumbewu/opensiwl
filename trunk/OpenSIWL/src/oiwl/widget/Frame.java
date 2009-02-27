@@ -187,7 +187,7 @@ public abstract class Frame extends Canvas implements WidgetParent {
         this.invalidateRegion(x, y, x+w, y+h);
 //        this.invalidate();
     }
-    
+
     /**
      * Set this Frame object's Layout
      * @param aLayout The layout
