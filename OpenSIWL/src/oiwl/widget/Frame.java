@@ -188,6 +188,14 @@ public abstract class Frame extends Canvas implements WidgetParent {
 //        this.invalidate();
     }
 
+    public int getGlobalXPos() {
+        return 0;
+    }
+
+    public int getGlobalYPos() {
+        return 0;
+    }
+
     /**
      * Set this Frame object's Layout
      * @param aLayout The layout
@@ -214,19 +222,19 @@ public abstract class Frame extends Canvas implements WidgetParent {
     
     public void addPanel(Panel panel) {
         if (panel.getAttachment() == Panel.TOP) {
-            panel.setPos(this.getLayoutXPos(), this.getLayoutYPos());
+            panel.setLocalPos(this.getLayoutXPos(), this.getLayoutYPos());
             panel.setWidth(this.getLayoutWidth());
         }
         else if (panel.getAttachment() == Panel.LEFT) {
-            panel.setPos(this.getLayoutXPos(), this.getLayoutYPos());
+            panel.setLocalPos(this.getLayoutXPos(), this.getLayoutYPos());
             panel.setHeight(this.getLayoutHeight());
         }
         else if (panel.getAttachment() == Panel.RIGHT) {
-            panel.setPos(this.getLayoutXPos()+this.getLayoutWidth()-panel.getWidth(), this.getLayoutYPos());
+            panel.setLocalPos(this.getLayoutXPos()+this.getLayoutWidth()-panel.getWidth(), this.getLayoutYPos());
             panel.setHeight(this.getLayoutHeight());
         }
         else if (panel.getAttachment() == Panel.BOTTOM) {
-            panel.setPos(this.getLayoutXPos(), this.getLayoutYPos()+this.getLayoutHeight()-panel.getHeight());
+            panel.setLocalPos(this.getLayoutXPos(), this.getLayoutYPos()+this.getLayoutHeight()-panel.getHeight());
             panel.setWidth(this.getLayoutWidth());
         }
         panel.setParent(this);

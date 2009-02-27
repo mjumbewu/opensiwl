@@ -53,12 +53,12 @@ public class BasicFrame extends Frame {
             int height = widget.getHeight();
             redrawFrame(widget,
                     point.x, point.y, width, height,
-                    widget.getXPos(), widget.getYPos(), width, height);
+                    widget.getLocalXPos(), widget.getLocalYPos(), width, height);
         }
         
         void widgetSized(Widget widget, Size size) {
-            int left = widget.getXPos();
-            int top = widget.getYPos();
+            int left = widget.getLocalXPos();
+            int top = widget.getLocalYPos();
             redrawFrame(widget,
                     left, top, size.w, size.h,
                     left, top, widget.getWidth(), widget.getHeight());

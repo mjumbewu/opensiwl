@@ -280,8 +280,8 @@ public class LinearLayout extends Layout {
     class VerticalLayoutProperties extends LinearLayoutProperties {
         public VerticalLayoutProperties(LinearLayout layout)  { super(layout); }
         
-        protected int getAxialPos() { return getLayout().getYPos(); }
-        protected int getOrthoPos() { return getLayout().getXPos(); }
+        protected int getAxialPos() { return getLayout().getLocalYPos(); }
+        protected int getOrthoPos() { return getLayout().getLocalXPos(); }
 
         protected int getAxialSize() { return getLayout().getHeight(); }
         protected int getOrthoSize() { return getLayout().getWidth(); }
@@ -293,10 +293,10 @@ public class LinearLayout extends Layout {
         protected void setStretchedAxialSize(int size) { getLayout().setStretchedHeight(size); }
         protected void setStretchedOrthoSize(int size) { getLayout().setStretchedWidth(size); }
 
-        protected int getAxialPos(Widget item) { return item.getYPos(); }
-        protected int getOrthoPos(Widget item) { return item.getXPos(); }
-        protected void setAxialPos(Widget item, int pos) { item.setYPos(pos); }
-        protected void setOrthoPos(Widget item, int pos) { item.setXPos(pos); }
+        protected int getAxialPos(Widget item) { return item.getLocalYPos(); }
+        protected int getOrthoPos(Widget item) { return item.getLocalXPos(); }
+        protected void setAxialPos(Widget item, int pos) { item.setLocalYPos(pos); }
+        protected void setOrthoPos(Widget item, int pos) { item.setLocalXPos(pos); }
 
         protected int getAxialSize(Widget item) { return item.getHeight(); }
         protected int getOrthoSize(Widget item) { return item.getWidth(); }
@@ -313,8 +313,8 @@ public class LinearLayout extends Layout {
     class HorizontalLayoutProperties extends LinearLayoutProperties {
         public HorizontalLayoutProperties(LinearLayout layout)  { super(layout); }
         
-        protected int getOrthoPos() { return getLayout().getYPos(); }
-        protected int getAxialPos() { return getLayout().getXPos(); }
+        protected int getOrthoPos() { return getLayout().getLocalYPos(); }
+        protected int getAxialPos() { return getLayout().getLocalXPos(); }
 
         protected int getOrthoSize() { return getLayout().getHeight(); }
         protected int getAxialSize() { return getLayout().getWidth(); }
@@ -326,10 +326,10 @@ public class LinearLayout extends Layout {
         protected void setStretchedOrthoSize(int size) { getLayout().setStretchedHeight(size); }
         protected void setStretchedAxialSize(int size) { getLayout().setStretchedWidth(size); }
 
-        protected int getOrthoPos(Widget item) { return item.getYPos(); }
-        protected int getAxialPos(Widget item) { return item.getXPos(); }
-        protected void setOrthoPos(Widget item, int pos) { item.setYPos(pos); }
-        protected void setAxialPos(Widget item, int pos) { item.setXPos(pos); }
+        protected int getOrthoPos(Widget item) { return item.getLocalYPos(); }
+        protected int getAxialPos(Widget item) { return item.getLocalXPos(); }
+        protected void setOrthoPos(Widget item, int pos) { item.setLocalYPos(pos); }
+        protected void setAxialPos(Widget item, int pos) { item.setLocalXPos(pos); }
 
         protected int getOrthoSize(Widget item) { return item.getHeight(); }
         protected int getAxialSize(Widget item) { return item.getWidth(); }

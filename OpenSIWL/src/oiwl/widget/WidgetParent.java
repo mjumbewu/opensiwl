@@ -12,4 +12,7 @@ package oiwl.widget;
 public interface WidgetParent {
     public boolean isValidChild(Widget item);
     public void handleChildRedraw(int x, int y, int w, int h);
+
+    public int getGlobalXPos();
+    public int getGlobalYPos();
 }
