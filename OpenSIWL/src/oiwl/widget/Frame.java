@@ -354,13 +354,17 @@ public abstract class Frame extends Canvas implements WidgetParent {
         // If it's not empty, then set to the bounding box
         else {
             m_invalidated_l = Math.min(l, m_invalidated_l);
-            m_invalidated_t = Math.min(l, m_invalidated_t);
-            m_invalidated_r = Math.max(l, m_invalidated_r);
-            m_invalidated_b = Math.max(l, m_invalidated_b);
+            m_invalidated_t = Math.min(t, m_invalidated_t);
+            m_invalidated_r = Math.max(r, m_invalidated_r);
+            m_invalidated_b = Math.max(b, m_invalidated_b);
         }
         
         // Request a repaint
-        this.repaint(l,t,r-l,b-t);
+        int x = m_invalidated_l;
+        int y = m_invalidated_t;
+        int w = m_invalidated_r-x;
+        int h = m_invalidated_b-y;
+        this.repaint(x,y,w,h);
     }
     
     private void invalidate() {
