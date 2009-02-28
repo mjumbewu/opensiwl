@@ -37,6 +37,14 @@ public class LinearLayout extends Layout {
         int alignment = Alignment.HCENTER | Alignment.VCENTER;
     }
     
+    public void manage(Widget item, int index, int padding, boolean expand, boolean fill) {
+        this.manage(item, index);
+        LinearCell box = (LinearCell)this.getCell(this.getIndexOf(item));
+        box.padding = padding;
+        box.expand = expand;
+        box.fill = fill;
+    }
+    
     /**
      * Create a positioned line of text
      * @return A new positioned line of text
@@ -113,6 +121,14 @@ public class LinearLayout extends Layout {
         }
         ((LinearCell)this.getCell(aIndex)).alignment = 
                 aAlignment | this.getHAlignment(aIndex);
+    }
+    
+    public boolean doesFill(int i) {
+        return ((LinearCell)this.getCell(i)).fill;
+    }
+    
+    public void setFill(int i, boolean f) {
+        ((LinearCell)this.getCell(i)).fill = f;
     }
     
     protected abstract class LinearLayoutProperties {
