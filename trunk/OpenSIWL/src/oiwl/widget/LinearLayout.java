@@ -165,24 +165,33 @@ public class LinearLayout extends Layout {
      */
     protected synchronized void recalculateSizes() {
         int num_items = this.getWidgetCount();
-        
+
         int axial = 0;
         int ortho = 0;
-        
+
         for (int index = 0; index < num_items; ++index) {
             LinearCell box = (LinearCell)this.getCell(index);
-            
+
             axial += getProperties().getAxialSize(box.item) + 2*box.padding;
             ortho = Math.max(ortho, getProperties().getOrthoSize(box.item));
         }
-        
+
+        // We validate the sizes before actualy setting them so that we can
+        // grab the old width and old height to send in an event.  If we just
+        // tried to gram the sizes, getWidth/Height would just call this 
+        // method again (inf. loop).
         this.validateSizes();
         int oldw = this.getWidth();
         int oldh = this.getHeight();
+        
+        // Now set the stretched (minimum) sizes and reposition the contents.
         getProperties().setStretchedAxialSize(axial);
         getProperties().setStretchedOrthoSize(ortho);
-        this.getEventSender().sendEvent(Event.RESIZED, this, new Size(this.getWidth(), this.getHeight()));
         this.recalculateOffsets();
+        
+        // Finally, send the event.  Note, the size did not necessarily change
+        // (i.e. if the requested size is greater than the stretched size).
+        this.sendSizeChange(oldw, oldh);
     }
 
     /**
@@ -244,14 +253,13 @@ public class LinearLayout extends Layout {
                 getProperties().setAxialSize(box.item, box.axial - 2*box.padding);
                 getProperties().setOrthoSize(box.item, box.ortho);
             } else {
-//                getProperties().setAxialSize(box.item, min_axial_box_size - 2*box.padding);
                 getProperties().setAxialSize(box.item, getProperties().getMinAxialSize(box.item));
                 getProperties().setOrthoSize(box.item, getProperties().getMinOrthoSize(box.item));
-                System.out.print(box.item.getClass().toString());
-                System.out.print(",");
-                System.out.print(getProperties().getOrthoSize(box.item));
-                System.out.print(",");
-                System.out.println(getProperties().getAxialSize(box.item));
+//                System.out.print(box.item.getClass().toString());
+//                System.out.print(",");
+//                System.out.print(getProperties().getOrthoSize(box.item));
+//                System.out.print(",");
+//                System.out.println(getProperties().getAxialSize(box.item));
             }
             
             // Axially position

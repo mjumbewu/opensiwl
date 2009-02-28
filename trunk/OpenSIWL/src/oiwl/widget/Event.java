@@ -33,4 +33,9 @@ public class Event {
      * of the resized Item.
      */
     public static final int RESIZED = 7;
+    
+    /**
+     * For when Widget (e.g. Button) state changes.
+     */
+    public static final int STATE_CHANGED = 8;
 }

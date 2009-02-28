@@ -96,12 +96,30 @@ public abstract class Layout extends Widget
         }
     }
     
+    /**
+     * Remove the Widget from the Layout
+     * @param aIndex The index of the Widget to be removed
+     * @return The removed Widget
+     */
+    public Widget unmanage(int aIndex) {
+        Cell cell = this.getCell(aIndex);
+        Widget item = cell.item;
+        this.removeCell(cell);
+        return item;
+    }
+    
+    protected void removeCell(Cell trashCell) {
+        trashCell.item.removeEventListener(this);
+        m_cells.removeElement(trashCell);
+        this.invalidateSizes();
+    }
+    
     public boolean isValidChild(Widget item) {
         return this.getParent().isValidChild(item);
     }
     
-    public void handleChildRedraw(int x, int y, int w, int h) {
-        this.getParent().handleChildRedraw(x, y, w, h);
+    public void handleChildRedraw(Widget item, int x, int y, int w, int h) {
+        this.getParent().handleChildRedraw(item, x, y, w, h);
     }
     
     /**
@@ -119,19 +137,6 @@ public abstract class Layout extends Widget
      */
     public int getWidgetCount() {
         return m_cells.size();
-    }
-    
-    /**
-     * Remove the Widget from the Layout
-     * @param aIndex The index of the Widget to be removed
-     * @return The removed Widget
-     */
-    public Widget unmanage(int aIndex) {
-        Widget item = this.getWidget(aIndex);
-        item.removeEventListener(this);
-        m_cells.removeElementAt(aIndex);
-        this.invalidateSizes();
-        return item;
     }
     
     /**

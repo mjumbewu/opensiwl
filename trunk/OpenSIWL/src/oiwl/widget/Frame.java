@@ -36,7 +36,7 @@ import java.util.Vector;
  * <h3>Layout Management</h3>
  * @author mjumbewu
  */
-public abstract class Frame extends Canvas implements WidgetParent {
+public class Frame extends Canvas implements WidgetParent {
     /**
      * Constant for the stock light background image
      */
@@ -183,9 +183,9 @@ public abstract class Frame extends Canvas implements WidgetParent {
             return false;
     }
     
-    public void handleChildRedraw(int x, int y, int w, int h) {
-        this.invalidateRegion(x, y, x+w, y+h);
-//        this.invalidate();
+    public void handleChildRedraw(Widget item, int x, int y, int w, int h) {
+        this.invalidate(
+                item.getGlobalXPos() + x, item.getGlobalYPos() + y, w, h);
     }
 
     public int getGlobalXPos() {
@@ -238,6 +238,16 @@ public abstract class Frame extends Canvas implements WidgetParent {
             panel.setWidth(this.getLayoutWidth());
         }
         panel.setParent(this);
+        
+//        System.out.print("layout size: ");
+//        System.out.print(this.getLayoutWidth());
+//        System.out.print(",");
+//        System.out.println(this.getLayoutHeight());
+//        
+//        System.out.print("panel pos: ");
+//        System.out.print(panel.getLocalXPos());
+//        System.out.print(",");
+//        System.out.println(panel.getLocalYPos());
         m_panels.addElement(panel);
     }
     
@@ -341,34 +351,35 @@ public abstract class Frame extends Canvas implements WidgetParent {
         m_invalidated_b = 0;
     }
     
-    private synchronized void invalidateRegion(int l, int t, int r, int b) {
+    public synchronized void invalidate(int x, int y, int w, int h) {
+//        System.out.println("-invalidating the region x="
+//                + Integer.toString(l) + ", y="
+//                + Integer.toString(t) + ", w="
+//                + Integer.toString(r-l) + ", h="
+//                + Integer.toString(b-t));
         // If the invalidated region is empty, then set to the parameters
         if (m_invalidated_l == m_invalidated_r ||
             m_invalidated_t == m_invalidated_b) {
-            m_invalidated_l = l;
-            m_invalidated_t = t;
-            m_invalidated_r = r;
-            m_invalidated_b = b;
+            m_invalidated_l = x;
+            m_invalidated_t = y;
+            m_invalidated_r = x+w;
+            m_invalidated_b = y+h;
         } 
         
         // If it's not empty, then set to the bounding box
         else {
-            m_invalidated_l = Math.min(l, m_invalidated_l);
-            m_invalidated_t = Math.min(t, m_invalidated_t);
-            m_invalidated_r = Math.max(r, m_invalidated_r);
-            m_invalidated_b = Math.max(b, m_invalidated_b);
+            m_invalidated_l = Math.min(x, m_invalidated_l);
+            m_invalidated_t = Math.min(y, m_invalidated_t);
+            m_invalidated_r = Math.max(x+w, m_invalidated_r);
+            m_invalidated_b = Math.max(y+h, m_invalidated_b);
         }
         
         // Request a repaint
-        int x = m_invalidated_l;
-        int y = m_invalidated_t;
-        int w = m_invalidated_r-x;
-        int h = m_invalidated_b-y;
         this.repaint(x,y,w,h);
     }
     
-    private void invalidate() {
-        this.invalidateRegion(0, 0, this.getWidth(), this.getHeight());
+    public void invalidate() {
+        this.invalidate(0, 0, this.getWidth(), this.getHeight());
     }
     
     private void drawBackground(Graphics g, int x, int y, int w, int h) {
@@ -387,48 +398,63 @@ public abstract class Frame extends Canvas implements WidgetParent {
         g.setColor(c0);
     }
     
+    private boolean m_paintAllowed = true;
+    
+    public void suppressPaint() {
+        this.m_paintAllowed = false;
+    }
+    
+    public void allowPaint() {
+        this.m_paintAllowed = true;
+    }
+    
+    public boolean canPaint() {
+        return this.m_paintAllowed;
+    }
+    
     public void paint(Graphics g) {
-        
-        int x = m_invalidated_l;
-        int y = m_invalidated_t;
-        int r = m_invalidated_r;
-        int b = m_invalidated_b;
-        int w = r-x;
-        int h = b-y;
+        if (this.canPaint()) {
+            int x = m_invalidated_l;
+            int y = m_invalidated_t;
+            int r = m_invalidated_r;
+            int b = m_invalidated_b;
+            int w = r-x;
+            int h = b-y;
 
-        System.out.println("painting the region x="
-                + Integer.toString(x) + ", y="
-                + Integer.toString(y) + ", w="
-                + Integer.toString(w) + ", h="
-                + Integer.toString(h));
-        
-        // Draw the layout and the panels to the oriented buffer
-        Graphics buffer = this.getGraphics();
-        
-        this.drawBackground(buffer, x, y, w, h);
-        Layout layout = this.getLayout();
-        int layoutx = layout.getLocalXPos();
-        int layouty = layout.getLocalYPos();
-        layout.draw(buffer, layoutx, layouty, 
-                x - layoutx, y - layouty, w, h);
-        for (int i = 0; i < this.getNumPanels(); ++i) {
-            Panel panel = this.getPanel(i);
-            int panelx = panel.getLocalXPos();
-            int panely = panel.getLocalYPos();
-            panel.draw(buffer, panelx, panely,
-                    x - panelx, y - panely, w, h);
+//            System.out.println("painting the region x="
+//                    + Integer.toString(x) + ", y="
+//                    + Integer.toString(y) + ", w="
+//                    + Integer.toString(w) + ", h="
+//                    + Integer.toString(h));
+
+            // Draw the layout and the panels to the oriented buffer
+            Graphics buffer = this.getGraphics();
+
+            this.drawBackground(buffer, x, y, w, h);
+            Layout layout = this.getLayout();
+            int layoutx = layout.getLocalXPos();
+            int layouty = layout.getLocalYPos();
+            layout.draw(buffer, layoutx, layouty, 
+                    x - layoutx, y - layouty, w, h);
+            for (int i = 0; i < this.getNumPanels(); ++i) {
+                Panel panel = this.getPanel(i);
+                int panelx = panel.getLocalXPos();
+                int panely = panel.getLocalYPos();
+                panel.draw(buffer, panelx, panely,
+                        x - panelx, y - panely, w, h);
+            }
+
+            // Draw the oriented buffer to the screen
+            if (getOrientation() == Orientation.PORTRAIT)
+                g.drawRegion(m_orientedBuffer, x, y, w, h, 
+                        Sprite.TRANS_NONE, x, y, Graphics.TOP|Graphics.LEFT);
+
+            else /* LANDSCAPE, right-handed rotation */
+                g.drawRegion(m_orientedBuffer, x, y, w, h, 
+                        Sprite.TRANS_ROT90, x, this.getHeight()-b, Graphics.TOP|Graphics.LEFT);
+
+            resetInvalidatedRegion();
         }
-
-        // Draw the oriented buffer to the screen
-        if (getOrientation() == Orientation.PORTRAIT)
-            g.drawRegion(m_orientedBuffer, x, y, w, h, 
-                    Sprite.TRANS_NONE, x, y, Graphics.TOP|Graphics.LEFT);
-        
-        else /* LANDSCAPE, right-handed rotation */
-            g.drawRegion(m_orientedBuffer, x, y, w, h, 
-                    Sprite.TRANS_ROT90, x, this.getHeight()-b, Graphics.TOP|Graphics.LEFT);
-        
-        resetInvalidatedRegion();
     }
     
     public void pointerDown (int x, int y) {}
