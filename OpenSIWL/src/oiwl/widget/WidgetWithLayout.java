@@ -13,8 +13,8 @@ public abstract class WidgetWithLayout extends Widget implements WidgetParent {
 
     Layout m_layout;
     
-    public void handleChildRedraw(int x, int y, int w, int h) {
-        this.getParent().handleChildRedraw(x, y, w, h);
+    public void handleChildRedraw(Widget item, int x, int y, int w, int h) {
+        this.getParent().handleChildRedraw(item, x, y, w, h);
     }
     
     public void setLayout(Layout aLayout) {
@@ -22,26 +22,12 @@ public abstract class WidgetWithLayout extends Widget implements WidgetParent {
             throw new IllegalArgumentException("Layout should not be null");
         m_layout = aLayout;
         m_layout.setParent(this);
-        m_layout.setLocalPos(this.getLocalXPos(), this.getLocalYPos());
+        m_layout.setLocalPos(0, 0);
         m_layout.setSize(this.getWidth(), this.getHeight());
     }
     
     public Layout getLayout() {
         return m_layout;
-    }
-    
-    void setLocalXPos(int aPos) {
-        Layout layout = getLayout();
-        if (layout != null)
-            layout.setLocalXPos(aPos);
-        super.setLocalXPos(aPos);
-    }
-    
-    void setLocalYPos(int aPos) {
-        Layout layout = getLayout();
-        if (layout != null)
-            layout.setLocalYPos(aPos);
-        super.setLocalYPos(aPos);
     }
     
     void setWidth(int aSize) {

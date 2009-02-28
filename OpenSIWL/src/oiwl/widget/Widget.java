@@ -42,15 +42,6 @@ public abstract class Widget {
     }
 
     /**
-     * Request a redraw of this Widget.  The WidgetParent is responsible for
-     * figuring out what to do with the request.
-     */
-    protected void redraw() {
-        this.getParent().handleChildRedraw(this.getGlobalXPos(),
-                this.getGlobalYPos(), this.getWidth(), this.getHeight());
-    }
-    
-    /**
      * Add an object to the set of this Widget object's listeners.
      * @param evl The EventListener that receives events for this Widget.
      */
@@ -302,6 +293,29 @@ public abstract class Widget {
                 (t < this.getHeight()));
     }
 
+    private boolean m_canDraw = true;
+    public void supressDraw() {
+        this.m_canDraw = false;
+    }
+    
+    public void allowDraw() {
+        this.m_canDraw = true;
+    }
+    
+    public boolean canDraw() {
+        return this.m_canDraw;
+    }
+    
+    /**
+     * Request a redraw of this Widget.  The WidgetParent is responsible for
+     * figuring out what to do with the request.
+     */
+    public void redraw() {
+        if (this.canDraw())
+            this.getParent().handleChildRedraw(this, 
+                    0, 0, this.getWidth(), this.getHeight());
+    }
+    
     /**
      * Update the specified section of the widget.  The given bounds are given
      * in local coordinates
