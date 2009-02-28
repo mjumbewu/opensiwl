@@ -21,8 +21,8 @@ public class TestFrame2 extends TestFrame {
     StaticText st_hor1 = new StaticText("Hor1");
     StaticText st_hor2 = new StaticText("Hor2");
     
-    public TestFrame2(OpenSIWLTests app) {
-        super(app, "2", Orientation.PORTRAIT);
+    public TestFrame2(OpenSIWLTests app, String id) {
+        super(app, id, Orientation.PORTRAIT);
         this.setLayout(layout);
         layout.manage(st1);
         layout.manage(st2);
@@ -37,7 +37,7 @@ public class TestFrame2 extends TestFrame {
         layout.manage(st_new1);
         layout.manage(st_new2);
         
-        layout.manage(hor_new, 2);
+        ((LinearLayout)layout).manage(hor_new, 2, 0, true, true);
         hor_new.manage(st_hor1);
         hor_new.manage(st_hor2);
         

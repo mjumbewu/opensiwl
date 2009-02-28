@@ -10,8 +10,8 @@ import oiwl.widget.*;
  * @author mjumbewu
  */
 public class TestFrame1 extends TestFrame {
-    public TestFrame1(OpenSIWLTests app) {
-        super(app, "1", Orientation.PORTRAIT);
+    public TestFrame1(OpenSIWLTests app, String id) {
+        super(app, id, Orientation.PORTRAIT);
         System.out.println("initialized base");
         Layout layout = new LinearLayout(Orientation.VERTICAL);
         System.out.println("initialized layout");
