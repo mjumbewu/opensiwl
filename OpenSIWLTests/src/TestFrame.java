@@ -40,17 +40,18 @@ public abstract class TestFrame extends Frame implements Runnable {
         System.out.println("done.");
         testPanel.getLayout().unmanage(0);
         if (success) {
-            System.out.println("success!");
+            System.out.println(testID + ": success!");
             testPanel.getLayout().manage(new StaticText(testID + ": Success!",
                     Font.getDefaultFont(), 0x0000ff00));
         }
 
         else {
-            System.out.println("failure!");
+            System.out.println(testID + ": failure!");
             testPanel.getLayout().manage(new StaticText(testID + ": Failure!",
                     Font.getDefaultFont(), 0x00ff0000));
         }
         System.out.println("test over.");
+        this.invalidate();
     }
     
     public void keyPressed(int key) {

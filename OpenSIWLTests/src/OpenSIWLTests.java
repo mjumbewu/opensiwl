@@ -7,22 +7,24 @@ import javax.microedition.midlet.*;
 import javax.microedition.lcdui.*;
 
 import oiwl.widget.*;
+import java.util.Vector;
 
 /**
  * @author mjumbewu
  */
 public class OpenSIWLTests extends MIDlet {
     Display display;
-    TestFrame[] testFrames;
+    Vector testFrames;
     int currentTestIndex;
     boolean isInitialized = false;
     
     public void startApp() {
         if (!isInitialized) {
             System.out.println("Creating the frames");
-            testFrames = new TestFrame[2];
-            testFrames[0] = new TestFrame1(this);
-            testFrames[1] = new TestFrame2(this);
+            testFrames = new Vector();
+            testFrames.addElement(new TestFrame1(this, "1"));
+            testFrames.addElement(new TestFrame2(this, "2"));
+            testFrames.addElement(new TestFrame3(this, "2.5"));
             currentTestIndex = 0;
             isInitialized = true;
 
@@ -32,9 +34,9 @@ public class OpenSIWLTests extends MIDlet {
     }
     
     public void nextTest() {
-        if (currentTestIndex < testFrames.length) {
+        if (currentTestIndex < testFrames.size()) {
             System.out.println("Displaying the frame.");
-            TestFrame currentTestFrame = testFrames[currentTestIndex++];
+            TestFrame currentTestFrame = (TestFrame)testFrames.elementAt(currentTestIndex++);
             display.setCurrent(currentTestFrame);
             currentTestFrame.start();
         } else {
