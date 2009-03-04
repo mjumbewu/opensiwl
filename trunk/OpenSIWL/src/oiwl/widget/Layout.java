@@ -328,14 +328,27 @@ public abstract class Layout extends Widget
         
         int num_cells = this.getWidgetCount();
         
-        if (this.intersectsLocal(x, y, width, height))
-            for (int i = 0; i < num_cells; ++i) {
-                Widget item = this.getWidget(i);
-                int itemx = item.getLocalXPos();
-                int itemy = item.getLocalYPos();
+        for (int i = 0; i < num_cells; ++i) {
+            Widget item = this.getWidget(i);
+            int itemx = item.getLocalXPos();
+            int itemy = item.getLocalYPos();
+
+            // Only draw the Widget if it's within the draw region.
+            if (item.intersectsLocal(x-itemx, y-itemy, width, height)) {
                 g.drawRect(xoff + itemx, yoff + itemy, item.getWidth(), item.getHeight());
                 item.draw(g, xoff + itemx, yoff + itemy,
                         x - itemx, y - itemy, width, height);
             }
+        }
+    }
+    
+    public boolean handleEvent(int type, Object data) {
+        int num_cells = this.getWidgetCount();
+        for (int i = 0; i < num_cells; ++i) {
+            Widget item = this.getWidget(i);
+            if (item.handleEvent(type, data))
+                return true;
+        }
+        return false;
     }
 }

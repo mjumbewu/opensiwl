@@ -5,8 +5,6 @@
 
 package oiwl.widget;
 
-import javax.microedition.lcdui.Graphics;
-
 /**
  * If we think about it, a button is just a Widget with state.  Push buttons,
  * toggle buttons, check buttons, radio buttons, safety buttons, switch 
@@ -21,12 +19,7 @@ import javax.microedition.lcdui.Graphics;
  * a part so that just one can have an ACTIVE state at a time.
  * @author mjumbewu
  */
-public class Button extends WidgetWithLayout implements WidgetParent {
-    public static int ACTIVE = 0;
-    public static int INACTIVE = 1;
-    
-    int m_state;
-    
+public abstract class Button extends WidgetWithLayout implements WidgetParent {
     public Button() {
         super();
     }
@@ -36,32 +29,8 @@ public class Button extends WidgetWithLayout implements WidgetParent {
                 Layout.class.isInstance(item));
     }
     
-    public boolean isValidState(int state) {
-        return (state == ACTIVE || state == INACTIVE);
-    }
+    private boolean m_isPressed = false;
+    protected void setPressed(boolean p) { m_isPressed = p; }
+    public boolean isPressed() { return m_isPressed; }
     
-    public int getState() {
-        return this.m_state;
-    }
-    
-    protected void setState(int state) {
-        if (isValidState(state)) {
-            int old_state = this.getState();
-            this.m_state = state;
-            this.getEventSender().sendEvent(Event.STATE_CHANGED, this, new Integer(state));
-        } else {
-            throw new IllegalArgumentException("Invalid state for Button");
-        }    
-    }
-    
-    public void draw(Graphics g, int xoff, int yoff, int x, int y, int w, int h) {
-        if (this.intersectsLocal(x, y, w, h)) {
-            g.drawRect(xoff, yoff, this.getWidth(), this.getHeight());
-            Layout layout = this.getLayout();
-            int layoutx = layout.getLocalXPos();
-            int layouty = layout.getLocalYPos();
-            getLayout().draw(g, xoff + layoutx, yoff + layouty,
-                    x - layoutx, y - layouty, w, h);
-        }
-    }
 }

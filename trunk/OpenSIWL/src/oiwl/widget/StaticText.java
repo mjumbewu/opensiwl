@@ -8,6 +8,8 @@ package oiwl.widget;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 
+import java.util.Vector;
+
 /**
  * In this implementation of the SIWL, StaticText is an abstract class.  The 
  * PositionedTextItem class is most closely analagous to the StaticText in the
@@ -19,6 +21,10 @@ public class StaticText extends StaticWidget {
     private String m_text;
     private Font m_font;
     private int m_color;
+
+    // TODO: implement line wrapping (StaticText ignores newlines).
+    private boolean m_wrap = false;
+    private Vector m_lines = null;
 
     public StaticText(String text) {
         this(text, Font.getDefaultFont());
@@ -70,21 +76,19 @@ public class StaticText extends StaticWidget {
      * @param height The height of the region
      */
     void draw(Graphics g, int xoff, int yoff, int x, int y, int width, int height) {
-        if (this.intersectsLocal(x, y, width, height)) {
-            // Store the font and color so that we can come back to it later
-            Font f0 = g.getFont();
-            int c0 = g.getColor();
+        // Store the font and color so that we can come back to it later
+        Font f0 = g.getFont();
+        int c0 = g.getColor();
 
-            String text = this.getText();
-            Font font = this.getFont();
-            int color = this.getColor();
+        String text = this.getText();
+        Font font = this.getFont();
+        int color = this.getColor();
 
-            g.setFont(font);
-            g.setColor(color);
-            g.drawString(text, xoff, yoff, Graphics.TOP|Graphics.LEFT);
+        g.setFont(font);
+        g.setColor(color);
+        g.drawString(text, xoff, yoff, Graphics.TOP|Graphics.LEFT);
 
-            g.setFont(f0);
-            g.setColor(c0);
-        }
+        g.setFont(f0);
+        g.setColor(c0);
     }
 }
