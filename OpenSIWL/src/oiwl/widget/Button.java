@@ -19,7 +19,7 @@ package oiwl.widget;
  * a part so that just one can have an ACTIVE state at a time.
  * @author mjumbewu
  */
-public abstract class Button extends WidgetWithLayout implements WidgetParent {
+public abstract class Button extends ItemWidget implements WidgetParent {
     public Button() {
         super();
     }

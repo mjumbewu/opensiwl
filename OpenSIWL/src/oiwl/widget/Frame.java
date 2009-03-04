@@ -146,7 +146,7 @@ public class Frame extends Canvas implements WidgetParent {
         
         if (this.getOrientation() != aOrientation) {
             this.m_orientation = aOrientation;
-            this.reinitOrientedBuffer();
+            this.freeOrientedBuffer();
             this.reinitLayoutSize();
 
             // call the orientation changed callback method
@@ -155,13 +155,24 @@ public class Frame extends Canvas implements WidgetParent {
     }
     
     /**
+     * Free the image that acts as the offscreen buffer for this Frame.  This
+     * should be done when the frame is not visible so that its buffer does not
+     * take up an unnecessary amount of space in memory.
+     */
+    private void freeOrientedBuffer() {
+        m_orientedBuffer = null;
+        System.out.println("Freed Buffer Image");
+    }
+
+    /**
      * Reset the image that acts as the offscreen buffer for this Frame.  This
      * needs to be done when the Frame orientation changes.
      */
     private void reinitOrientedBuffer() {
         m_orientedBuffer = Image.createImage(getWidth(), getHeight());
+        System.out.println("Created Buffer Image");
     }
-    
+
     /**
      * Handler that is called when the Frame orientation changes.
      * @param orient The new Frame orientation
@@ -337,6 +348,9 @@ public class Frame extends Canvas implements WidgetParent {
     }
     
     protected Graphics getGraphics() {
+        if (this.m_orientedBuffer == null) {
+            this.reinitOrientedBuffer();
+        }
         return this.m_orientedBuffer.getGraphics();
     }
     
@@ -447,15 +461,16 @@ public class Frame extends Canvas implements WidgetParent {
             resetInvalidatedRegion();
         }
 
-        // Draw the oriented buffer to the screen
-        if (getOrientation() == Orientation.PORTRAIT)
-            g.drawRegion(m_orientedBuffer, x, y, w, h, 
-                    Sprite.TRANS_NONE, x, y, Graphics.TOP|Graphics.LEFT);
+        if (this.m_orientedBuffer != null) {
+            // Draw the oriented buffer to the screen
+            if (getOrientation() == Orientation.PORTRAIT)
+                g.drawRegion(m_orientedBuffer, x, y, w, h,
+                        Sprite.TRANS_NONE, x, y, Graphics.TOP|Graphics.LEFT);
 
-        else /* LANDSCAPE, right-handed rotation */
-            g.drawRegion(m_orientedBuffer, x, y, w, h, 
-                    Sprite.TRANS_ROT90, x, this.getHeight()-b, Graphics.TOP|Graphics.LEFT);
-
+            else /* LANDSCAPE, right-handed rotation */
+                g.drawRegion(m_orientedBuffer, x, y, w, h,
+                        Sprite.TRANS_ROT90, x, this.getHeight()-b, Graphics.TOP|Graphics.LEFT);
+        }
     }
     
     public void pointerDown (int x, int y) {}
@@ -477,5 +492,12 @@ public class Frame extends Canvas implements WidgetParent {
         this.getLayout().handleEvent(Event.RELEASED, new Point(x,y));
         this.pointerUp(x, y);
     }
-    
+
+    protected void hideNotify() {
+        this.freeOrientedBuffer();
+    }
+
+    protected void showNotify() {
+        this.reinitOrientedBuffer();
+    }
 }

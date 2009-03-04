@@ -28,21 +28,21 @@ public class LinearLayout extends Layout {
      */
     protected class LinearCell extends Cell {
         int offset = 0;
-        int padding = 0;
-        boolean expand = true;
-        boolean fill = false;
         int ortho = 0;
         int axial = 0;
 
+        int padding = 0;
+        boolean expand = true;
+        boolean fill = false;
         int alignment = Alignment.HCENTER | Alignment.VCENTER;
     }
     
     public void manage(Widget item, int index, int padding, boolean expand, boolean fill) {
-        this.manage(item, index);
-        LinearCell box = (LinearCell)this.getCell(this.getIndexOf(item));
+        LinearCell box = new LinearCell();
         box.padding = padding;
         box.expand = expand;
         box.fill = fill;
+        this.addCell(box, item, index);
     }
     
     /**
@@ -52,6 +52,30 @@ public class LinearLayout extends Layout {
     protected Cell makeCell() {
         LinearCell cell = new LinearCell();
         return cell;
+    }
+
+    public int getPadding(int aIndex) {
+        return ((LinearCell)this.getCell(aIndex)).padding;
+    }
+
+    public void setPadding(int aIndex, int aPadding) {
+       ((LinearCell)this.getCell(aIndex)).padding = aPadding;
+    }
+
+    public boolean getExpand(int aIndex) {
+        return ((LinearCell)this.getCell(aIndex)).expand;
+    }
+
+    public void setExpand(int aIndex, boolean aExpand) {
+       ((LinearCell)this.getCell(aIndex)).expand = aExpand;
+    }
+
+    public boolean getFill(int aIndex) {
+        return ((LinearCell)this.getCell(aIndex)).fill;
+    }
+
+    public void setFill(int aIndex, boolean aFill) {
+       ((LinearCell)this.getCell(aIndex)).fill = aFill;
     }
 
     public int getAlignment(int aIndex) {
@@ -121,14 +145,6 @@ public class LinearLayout extends Layout {
         }
         ((LinearCell)this.getCell(aIndex)).alignment = 
                 aAlignment | this.getHAlignment(aIndex);
-    }
-    
-    public boolean doesFill(int i) {
-        return ((LinearCell)this.getCell(i)).fill;
-    }
-    
-    public void setFill(int i, boolean f) {
-        ((LinearCell)this.getCell(i)).fill = f;
     }
     
     protected abstract class LinearLayoutProperties {

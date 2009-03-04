@@ -12,6 +12,32 @@ import javax.microedition.lcdui.Graphics;
  * @author mjumbewu
  */
 public class PushButton extends Button {
+    public PushButton() {
+        super();
+        this.setLayout(new LinearLayout(Orientation.HORIZONTAL));
+    }
+
+    private StaticImage image = null;
+    private StaticText label = null;
+
+    public void setLabel(StaticText st) {
+        Layout layout = this.getLayout();
+        layout.supressDraw();
+        if (label != null) layout.unmanage(label);
+        label = st;
+        if (label != null) layout.manage(label);
+        layout.allowDraw();
+    }
+
+    public void setImage(StaticImage si) {
+        Layout layout = this.getLayout();
+        layout.supressDraw();
+        if (image != null) layout.unmanage(image);
+        image = si;
+        if (image != null) layout.manage(image, 0);
+        layout.allowDraw();
+    }
+    
     protected void onTapped() {}
     
     public void tap() {
@@ -56,18 +82,18 @@ public class PushButton extends Button {
     }
     
     public void draw(Graphics g, int xoff, int yoff, int x, int y, int w, int h) {
-        int c0 = g.getColor();
-        if (!this.isPressed())
-            g.setColor(0x00000000);
-        else
-            g.setColor(0x000000ff);
-        g.drawRect(xoff, yoff, this.getWidth(), this.getHeight());
-        g.setColor(c0);
-        
-        Layout layout = this.getLayout();
-        int layoutx = layout.getLocalXPos();
-        int layouty = layout.getLocalYPos();
-        getLayout().draw(g, xoff + layoutx, yoff + layouty,
-                x - layoutx, y - layouty, w, h);
+//        int c0 = g.getColor();
+//        if (!this.isPressed())
+//            g.setColor(0x00000000);
+//        else
+//            g.setColor(0x000000ff);
+//        g.drawRect(xoff, yoff, this.getWidth(), this.getHeight());
+//        g.setColor(c0);
+//
+//        Layout layout = this.getLayout();
+//        int layoutx = layout.getLocalXPos();
+//        int layouty = layout.getLocalYPos();
+//        getLayout().draw(g, xoff + layoutx, yoff + layouty,
+//                x - layoutx, y - layouty, w, h);
     }
 }
