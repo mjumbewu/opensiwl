@@ -11,6 +11,7 @@ import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 
 import java.util.Vector;
+import java.util.Timer;
 
 /**
  * A Frame is the canvas for an OIWL-base UI.
@@ -413,14 +414,14 @@ public class Frame extends Canvas implements WidgetParent {
     }
     
     public void paint(Graphics g) {
-        if (this.canPaint()) {
-            int x = m_invalidated_l;
-            int y = m_invalidated_t;
-            int r = m_invalidated_r;
-            int b = m_invalidated_b;
-            int w = r-x;
-            int h = b-y;
+        int x = m_invalidated_l;
+        int y = m_invalidated_t;
+        int r = m_invalidated_r;
+        int b = m_invalidated_b;
+        int w = r-x;
+        int h = b-y;
 
+        if (this.canPaint()) {
 //            System.out.println("painting the region x="
 //                    + Integer.toString(x) + ", y="
 //                    + Integer.toString(y) + ", w="
@@ -443,18 +444,18 @@ public class Frame extends Canvas implements WidgetParent {
                 panel.draw(buffer, panelx, panely,
                         x - panelx, y - panely, w, h);
             }
-
-            // Draw the oriented buffer to the screen
-            if (getOrientation() == Orientation.PORTRAIT)
-                g.drawRegion(m_orientedBuffer, x, y, w, h, 
-                        Sprite.TRANS_NONE, x, y, Graphics.TOP|Graphics.LEFT);
-
-            else /* LANDSCAPE, right-handed rotation */
-                g.drawRegion(m_orientedBuffer, x, y, w, h, 
-                        Sprite.TRANS_ROT90, x, this.getHeight()-b, Graphics.TOP|Graphics.LEFT);
-
             resetInvalidatedRegion();
         }
+
+        // Draw the oriented buffer to the screen
+        if (getOrientation() == Orientation.PORTRAIT)
+            g.drawRegion(m_orientedBuffer, x, y, w, h, 
+                    Sprite.TRANS_NONE, x, y, Graphics.TOP|Graphics.LEFT);
+
+        else /* LANDSCAPE, right-handed rotation */
+            g.drawRegion(m_orientedBuffer, x, y, w, h, 
+                    Sprite.TRANS_ROT90, x, this.getHeight()-b, Graphics.TOP|Graphics.LEFT);
+
     }
     
     public void pointerDown (int x, int y) {}
@@ -463,14 +464,18 @@ public class Frame extends Canvas implements WidgetParent {
     public void pointerFlick(int x, int y) {}
     
     public void pointerPressed(int x, int y) {
+        this.getLayout().handleEvent(Event.PRESSED, new Point(x,y));
         this.pointerDown(x, y);
     }
     
     public void pointerDragged(int x, int y) {
+        this.getLayout().handleEvent(Event.DRAGGED, new Point(x,y));
         this.pointerDrag(x, y);
     }
     
     public void pointerReleased(int x, int y) {
+        this.getLayout().handleEvent(Event.RELEASED, new Point(x,y));
         this.pointerUp(x, y);
     }
+    
 }
