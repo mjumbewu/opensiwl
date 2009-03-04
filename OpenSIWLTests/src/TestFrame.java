@@ -13,6 +13,7 @@ import javax.microedition.lcdui.Font;
 public abstract class TestFrame extends Frame implements Runnable {
     Panel testPanel = new Panel(Panel.BOTTOM);
     String testID;
+    String instructions = "";
     
     OpenSIWLTests app;
     

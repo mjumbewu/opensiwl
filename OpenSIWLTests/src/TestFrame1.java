@@ -12,15 +12,16 @@ import oiwl.widget.*;
 public class TestFrame1 extends TestFrame {
     public TestFrame1(OpenSIWLTests app, String id) {
         super(app, id, Orientation.PORTRAIT);
-        System.out.println("initialized base");
+
+        this.instructions = "This is a simple test.  It consists of a Frame " +
+                "with a vertical linear layout manager.  Several StaticText" +
+                "objects are managed within the layout.  They should be " +
+                "displayed in a column on the screen.";
+
         Layout layout = new LinearLayout(Orientation.VERTICAL);
-        System.out.println("initialized layout");
         this.setLayout(layout);
-        System.out.println("set layout");
         layout.manage(new StaticText("This is a simple test.  It  "));
-        System.out.println("managed first");
         layout.manage(new StaticText("consists of a Frame with a  "));
-        System.out.println("managed second");
         layout.manage(new StaticText("vertical linear layout      "));
         layout.manage(new StaticText("manager.  Several StaticText"));
         layout.manage(new StaticText("objects are managed within  "));
@@ -28,7 +29,6 @@ public class TestFrame1 extends TestFrame {
         layout.manage(new StaticText("displayed in a column on the"));
         layout.manage(new StaticText("screen.  The default        "));
         layout.manage(new StaticText("expansion is true.  "));
-        System.out.println("managed all");
     }
     
     protected boolean runtest() {
