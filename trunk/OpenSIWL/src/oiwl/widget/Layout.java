@@ -107,6 +107,11 @@ public abstract class Layout extends Widget
         this.removeCell(cell);
         return item;
     }
+
+    public Widget unmanage(Widget item) {
+        int index = this.getIndexOf(item);
+        return unmanage(index);
+    }
     
     protected void removeCell(Cell trashCell) {
         trashCell.item.removeEventListener(this);
