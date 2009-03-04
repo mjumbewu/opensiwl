@@ -23,17 +23,26 @@ public class TestFrame3 extends TestFrame {
     
     public TestFrame3(OpenSIWLTests app, String id) {
         super(app, id, Orientation.PORTRAIT);
+        
+        this.instructions = "This test is very similar to the previous one.  " +
+                "The main difference is that painting of the frame is suppressed" +
+                "when the new Widget objects are added to the layout.  So, where" +
+                "before the frame may have been visibly updating after each " +
+                "additional managed Widget, now the Frame should update all at" +
+                "once at the end.";
+
         this.setLayout(layout);
         layout.manage(st1);
         layout.manage(st2);
-        layout.manage(new StaticText("This test is a lot like the one"));
-        layout.manage(new StaticText("before it except painting is "));
-        layout.manage(new StaticText("suppressed until the new Widget"));
-        layout.manage(new StaticText("objects are added."));
     }
     
     protected boolean runtest() {
         this.suppressPaint();
+            layout.manage(new StaticText("This test is a lot like the one"));
+            layout.manage(new StaticText("before it except painting is "));
+            layout.manage(new StaticText("suppressed until the new Widget"));
+            layout.manage(new StaticText("objects are added."));
+            
             boolean cannot_paint = !this.canPaint();
             layout.manage(st_new1);
             layout.manage(st_new2);

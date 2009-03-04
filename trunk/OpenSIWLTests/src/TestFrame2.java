@@ -23,17 +23,23 @@ public class TestFrame2 extends TestFrame {
     
     public TestFrame2(OpenSIWLTests app, String id) {
         super(app, id, Orientation.PORTRAIT);
+
+        this.instructions = "This test starts off with two text items arranged" +
+                "vertically.  Then several more are added below.  Finally, two" +
+                "more are inserted within a horizontally oriented LinearLayout" +
+                "across all of these.";
+        
         this.setLayout(layout);
         layout.manage(st1);
         layout.manage(st2);
+    }
+    
+    protected boolean runtest() {
         layout.manage(new StaticText("Then two more are added at the"));
         layout.manage(new StaticText(" bottom.  Finally, two more are "));
         layout.manage(new StaticText("inserted within a horizontally "));
         layout.manage(new StaticText("oriented LinearLayout across "));
         layout.manage(new StaticText("all of these."));
-    }
-    
-    protected boolean runtest() {
         layout.manage(st_new1);
         layout.manage(st_new2);
         
