@@ -10,9 +10,9 @@ package oiwl.widget;
  * @author mjumbewu
  */
 public class Event {
+    private static int ev_id = 1;
     protected static int NewID() {
-        int id = 1;
-        return id++;
+        return ev_id++;
     }
     
     public static final int PRESSED = NewID();

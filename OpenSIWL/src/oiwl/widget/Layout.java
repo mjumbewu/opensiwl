@@ -196,48 +196,6 @@ public abstract class Layout extends Widget
     }
 
     /**
-     * Get the minimum width of the Layout
-     * @return The width of the Layout
-     */
-    public int getSuggestedWidth() {
-        return super.getWidth();
-    }
-
-    /**
-     * Set the width minimum of the Layout
-     * @param aWidth The width of the Layout
-     */
-    protected void setSuggestedWidth(int aWidth) {
-        super.setWidth(aWidth);
-    }
-
-    /**
-     * Get the minimum height of the Layout
-     * @return The height of the Layout
-     */
-    public int getSuggestedHeight() {
-        return super.getHeight();
-    }
-
-    /**
-     * Set the minimum height of the Layout
-     * @param aHeight The height of the Layout
-     */
-    protected void setSuggestedHeight(int aHeight) {
-        super.setHeight(aHeight);
-    }
-
-    /**
-     * Set the minimum width and height of the Layout
-     * @param w The width of the Layout
-     * @param h The height of the Layout
-     */
-    protected void setSuggestedSize(int w, int h) {
-        this.setSuggestedWidth(w);
-        this.setSuggestedHeight(h);
-    }
-    
-    /**
      * Get the width of the bounding box of the Layout object's contents.  The
      * stretched size is the minimum size needed to encompas a Layout object's
      * complete contents.

@@ -52,14 +52,16 @@ public class PushButton extends Button {
         
         if (already_handled) {
             this.setPressed(false);
+            this.redraw();
             return true;
         }
         
         else if (type == Event.PRESSED) {
             pressPoint = (Point)data;
-            if (this.containsGlobal(pressPoint.x, pressPoint.y))
+            if (this.containsGlobal(pressPoint.x, pressPoint.y)) {
                 this.setPressed(true);
-            else
+                this.redraw();
+            } else
                 pressPoint = null;
             
             // Press is not the same as click.  Do not block, because other
@@ -68,11 +70,12 @@ public class PushButton extends Button {
         }
         
         else if (type == Event.RELEASED) {
+            setPressed(false);
             releasePoint = (Point)data;
             if (pressPoint != null &&
-                    pressPoint.x == releasePoint.x &&
-                    pressPoint.y == releasePoint.y) {
+                    this.containsGlobal(releasePoint.x, releasePoint.y)) {
                 tap();
+                this.redraw();
                 return true;
             }
             return false;
@@ -82,18 +85,18 @@ public class PushButton extends Button {
     }
     
     public void draw(Graphics g, int xoff, int yoff, int x, int y, int w, int h) {
-//        int c0 = g.getColor();
-//        if (!this.isPressed())
-//            g.setColor(0x00000000);
-//        else
-//            g.setColor(0x000000ff);
-//        g.drawRect(xoff, yoff, this.getWidth(), this.getHeight());
-//        g.setColor(c0);
-//
-//        Layout layout = this.getLayout();
-//        int layoutx = layout.getLocalXPos();
-//        int layouty = layout.getLocalYPos();
-//        getLayout().draw(g, xoff + layoutx, yoff + layouty,
-//                x - layoutx, y - layouty, w, h);
+        int c0 = g.getColor();
+        if (!this.isPressed())
+            g.setColor(0x0000ff00);
+        else
+            g.setColor(0x000000ff);
+        g.fillRect(xoff, yoff, this.getWidth(), this.getHeight());
+        g.setColor(c0);
+
+        Layout layout = this.getLayout();
+        int layoutx = layout.getLocalXPos();
+        int layouty = layout.getLocalYPos();
+        getLayout().draw(g, xoff + layoutx, yoff + layouty,
+                x - layoutx, y - layouty, w, h);
     }
 }
