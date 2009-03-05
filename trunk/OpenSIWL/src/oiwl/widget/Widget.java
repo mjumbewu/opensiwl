@@ -57,28 +57,40 @@ public abstract class Widget {
     }
 
     /**
-     * Get the height of this Widget.
-     * @return The height of this widget
+     * Get the minimum width of the Layout
+     * @return The width of the Layout
      */
-    public int getHeight() {
+    public int getSuggestedWidth() {
+        return this.m_width;
+    }
+
+    /**
+     * Set the width minimum of the Layout
+     * @param aWidth The width of the Layout
+     */
+    protected void setSuggestedWidth(int width) {
+        if (m_width != width) {
+            int w = this.getWidth();
+            int h = this.getHeight();
+
+            this.m_width = width;
+            this.sendSizeChange(w, h);
+        }
+    }
+
+    /**
+     * Get the minimum height of the Layout
+     * @return The height of the Layout
+     */
+    public int getSuggestedHeight() {
         return this.m_height;
     }
 
     /**
-     * Get the minimum height that this Widget desires to be.  For most Widget
-     * objects, this corresponds to its actual height.  For some (e.g. Layout)
-     * it may be smaller.
-     * @return The minimum height that this Widget desires to be
+     * Set the minimum height of the Layout
+     * @param aHeight The height of the Layout
      */
-    int getMinHeight() {
-        return this.getHeight();
-    }
-
-    /**
-     * Suggest a height for this Widget.
-     * @param height The height suggestion
-     */
-    void setHeight(int height) {
+    protected void setSuggestedHeight(int height) {
         if (m_height != height) {
             int w = this.getWidth();
             int h = this.getHeight();
@@ -89,11 +101,47 @@ public abstract class Widget {
     }
 
     /**
+     * Set the minimum width and height of the Layout
+     * @param w The width of the Layout
+     * @param h The height of the Layout
+     */
+    protected void setSuggestedSize(int w, int h) {
+        this.setSuggestedWidth(w);
+        this.setSuggestedHeight(h);
+    }
+    
+    /**
+     * Get the height of this Widget.
+     * @return The height of this widget
+     */
+    public int getHeight() {
+        return Math.max(this.getMinHeight(), this.getSuggestedHeight());
+    }
+
+    /**
+     * Get the minimum height that this Widget desires to be.  For most Widget
+     * objects, this corresponds to its actual height.  For some (e.g. Layout)
+     * it may be smaller.
+     * @return The minimum height that this Widget desires to be
+     */
+    int getMinHeight() {
+        return this.m_height;
+    }
+
+    /**
+     * Suggest a height for this Widget.
+     * @param height The height suggestion
+     */
+    void setHeight(int height) {
+        this.setSuggestedHeight(height);
+    }
+
+    /**
      * Get the width of this Widget.
      * @return The width of this widget
      */
     public int getWidth() {
-        return this.m_width;
+        return Math.max(this.getMinWidth(), this.getSuggestedWidth());
     }
     
     /**
@@ -102,7 +150,7 @@ public abstract class Widget {
      * it may be smaller.
      */
     int getMinWidth() {
-        return this.getWidth();
+        return this.m_width;
     }
 
     /**
@@ -110,13 +158,7 @@ public abstract class Widget {
      * @param width The width suggestion
      */
     void setWidth(int width) {
-        if (m_width != width) {
-            int w = this.getWidth();
-            int h = this.getHeight();
-
-            this.m_width = width;
-            this.sendSizeChange(w, h);
-        }
+        this.setSuggestedWidth(width);
     }
     
     /**

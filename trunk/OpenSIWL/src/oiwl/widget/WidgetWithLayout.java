@@ -60,6 +60,20 @@ public abstract class WidgetWithLayout extends Widget implements WidgetParent {
             layout.setHeight(this.getLayoutHeight());
     }
     
+    public int getMinWidth() {
+        Layout layout = this.getLayout();
+        if (layout != null)
+            return layout.getStretchedWidth();
+        return 10;
+    }
+    
+    public int getMinHeight() {
+        Layout layout = this.getLayout();
+        if (layout != null)
+            return layout.getStretchedHeight();
+        return 10;
+    }
+    
     public boolean handleEvent(int type, Object data) {
         return this.getLayout().handleEvent(type, data);
     }
