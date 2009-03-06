@@ -6,6 +6,90 @@
 package oiwl.widget;
 
 import javax.microedition.lcdui.Graphics;
+import java.util.Date;
+
+class TapEvent extends Event {
+    public static final int HOLDING_STATE = NewEventState();
+    
+    public TapEvent(Widget sender) {
+        super(Event.TAPPED, sender);
+    }
+    
+    public void advance(int type, Object data) {
+        int state = this.getState();
+        Widget sender = getSender();
+        
+        if (state == START_STATE) {
+            if (type == Event.PRESSED) {
+                LocationData pressPoint = (LocationData)data;
+                if (sender.containsGlobal(pressPoint.x, pressPoint.y)) {
+                    gotoState(HOLDING_STATE);
+                    sender.redraw();
+                }
+            }
+        }
+        
+        else if (state == HOLDING_STATE) {
+            // If the pointer is dragged outside of te button, cancel any 
+            // pending tapEvent events.
+            if (type == Event.DRAGGED) {
+                LocationData dragPoint = (LocationData)data;
+                if (!sender.containsGlobal(dragPoint.x, dragPoint.y)) {
+                    resetEvent();
+                    sender.redraw();
+                }
+            }
+            
+            // When the user releases the pointer inside the button, send a tapEvent 
+            // event if there is one pending.  If the release is outside of the 
+            // button then cancel any pending tapEvent events.
+            else if (type == Event.RELEASED) {
+                LocationData releasePoint = (LocationData)data;
+                if (sender.containsGlobal(releasePoint.x, releasePoint.y)) {
+                    acceptEvent();
+                } else {
+                    resetEvent();
+                }
+                sender.redraw();
+            }
+        }
+    }
+}
+
+class DoubleTapEvent extends Event {
+    private long dtap_time;
+    public static final int TAPPED_ONCE_STATE = NewEventState();
+    
+    public DoubleTapEvent(Widget sender, long dtap_time) {
+        super(Event.DTAPPED, sender);
+        this.dtap_time = dtap_time;
+    }
+    
+    private long first_tap_time;
+    public void advance(int type, Object data) {
+        int state = this.getState();
+        
+        if (state == START_STATE) {
+            if (type == Event.TAPPED) {
+                first_tap_time = (new Date()).getTime();
+                gotoState(TAPPED_ONCE_STATE);
+            }
+        }
+        
+        else if (state == TAPPED_ONCE_STATE) {
+            if (type == Event.TAPPED) {
+                long tap_time = (new Date()).getTime();
+                System.out.println(tap_time - first_tap_time);
+                if (tap_time - first_tap_time <= dtap_time) {
+                    acceptEvent();
+                } else {
+                    first_tap_time = (new Date()).getTime();
+                    gotoState(TAPPED_ONCE_STATE);
+                }
+            }
+        }
+    }
+}
 
 /**
  *
@@ -40,45 +124,32 @@ public class PushButton extends Button {
     
     protected void onTapped() {}
     
-    public void tap() {
+    public void doTap() {
         this.getEventSender().sendEvent(Event.TAPPED, this, null);
+        this.handleEvent(Event.TAPPED, null);
         this.onTapped();
     }
     
-    private Point pressPoint = null;
-    private Point releasePoint = null;
+    public void doDTap() {
+        this.getEventSender().sendEvent(Event.DTAPPED, this, null);
+        this.handleEvent(Event.DTAPPED, null);
+    }
+    
+    TapEvent tapEvent = new TapEvent(this);
+    DoubleTapEvent dtapEvent = new DoubleTapEvent(this, 300);
+    
     public boolean handleEvent(int type, Object data) {
-        boolean already_handled = super.handleEvent(type, data);
-        
-        if (already_handled) {
-            this.setPressed(false);
-            this.redraw();
+        tapEvent.advance(type, data);
+        if (tapEvent.getState() == TapEvent.ACCEPT_STATE) {
+            this.tapEvent.resetEvent();
+            this.doTap();
             return true;
         }
         
-        else if (type == Event.PRESSED) {
-            pressPoint = (Point)data;
-            if (this.containsGlobal(pressPoint.x, pressPoint.y)) {
-                this.setPressed(true);
-                this.redraw();
-            } else
-                pressPoint = null;
-            
-            // Press is not the same as click.  Do not block, because other
-            // Widget objects may need the data from the press event.
-            return false;
-        }
-        
-        else if (type == Event.RELEASED) {
-            setPressed(false);
-            releasePoint = (Point)data;
-            if (pressPoint != null &&
-                    this.containsGlobal(releasePoint.x, releasePoint.y)) {
-                tap();
-                this.redraw();
-                return true;
-            }
-            return false;
+        dtapEvent.advance(type, data);
+        if (dtapEvent.getState() == DoubleTapEvent.ACCEPT_STATE) {
+            this.dtapEvent.resetEvent();
+            return true;
         }
         
         return false;
@@ -86,7 +157,7 @@ public class PushButton extends Button {
     
     public void draw(Graphics g, int xoff, int yoff, int x, int y, int w, int h) {
         int c0 = g.getColor();
-        if (!this.isPressed())
+        if (tapEvent.getState() != TapEvent.HOLDING_STATE)
             g.setColor(0x0000ff00);
         else
             g.setColor(0x000000ff);

@@ -7,8 +7,9 @@ package oiwl.widget;
 
 import javax.microedition.lcdui.Graphics;
 
-import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Date;
+import java.util.Vector;
 
 /**
  *
@@ -21,10 +22,10 @@ public abstract class Widget {
     private int m_ypos;
 
     private WidgetParent m_parent;
-    private EventSender m_events = new EventSender();
-
+    private EventSender m_eventSender = new EventSender();
+    
     protected EventSender getEventSender() {
-        return m_events;
+        return m_eventSender;
     }
     
     /**
@@ -49,11 +50,11 @@ public abstract class Widget {
      * @param evl The EventListener that receives events for this Widget.
      */
     public void addEventListener(EventListener evl) {
-        m_events.addListener(evl);
+        m_eventSender.addListener(evl);
     }
 
     public void removeEventListener(EventListener evl) {
-        m_events.removeListener(evl);
+        m_eventSender.removeListener(evl);
     }
 
     /**
@@ -180,7 +181,7 @@ public abstract class Widget {
      */
     protected void sendSizeChange(int oldw, int oldh) {
         if (oldw != this.getWidth() || oldh != this.getHeight())
-            this.m_events.sendEvent(Event.RESIZED, this, new Size(oldw,oldh));
+            this.m_eventSender.sendEvent(Event.RESIZED, this, new SizeData(oldw,oldh));
     }
 
     /**
@@ -252,7 +253,7 @@ public abstract class Widget {
      */
     protected void sendPosChange(int oldx, int oldy) {
         if (oldx != this.getLocalXPos() || oldy != this.getLocalYPos())
-            this.m_events.sendEvent(Event.MOVED, this, new Point(oldx,oldy));
+            this.m_eventSender.sendEvent(Event.MOVED, this, new LocationData(oldx,oldy));
     }
 
     /**
@@ -398,284 +399,52 @@ public abstract class Widget {
      */
     public abstract boolean handleEvent(int type, Object data);
 
-//    ///////////////////////////////////////////////////////////////////////////
-//    ///////////////////////////////////////////////////////////////////////////
-//    // Flicking
-//    ///////////////////////////////////////////////////////////////////////////
-//    ///////////////////////////////////////////////////////////////////////////
-//
-//    public static final int X = 0;
-//    public static final int Y = 1;
-//    
-//    // How much velocity should we retain after each flick step?
-//    float[] flick_factor = {0.9f,0.9f};
-//    float[] elasticity = {0,0};
-//    
-//    // If this object has not had a moving event in longer than
-//    // 'stillness_duration_threshold', it is not considered to be moving (i.e.
-//    // it has a zero velocity).
-//    long stillness_duration_threshold = 100;
-//    // If this object has not dragged farther than 'drag_movement_threshold'
-//    // since the last moving event, and it has not moved farther than
-//    // 'flick_movement_threshold' since the last flick event, it is not 
-//    // considered to be moving.
-//    int[] drag_movement_threshold = {5,5};
-//    int[] flick_movement_threshold = {1,1};
-//    
-//    // 'is_holding' records whether the user's pointing device is pressing on 
-//    // this object.
-//    boolean is_holding = false;
-//    // 'is_dragging' records whether the user's pointing device is moving while
-//    // pressing on this object.
-//    boolean is_dragging = false;
-//    
-//    // When the user releases the pointing device and this object is moving, 
-//    // the 'flicker' timer manages the movement of the object from that point
-//    // on (unless the user replaces their pointing device on the object).
-//    Timer flicker = null;
-//    long flick_duration = 50;
-//    
-//    /*
-//     * 'Holding' means that the user's pointing device is pressed on the object.
-//     * 
-//     * 'Dragging' means that the user's pointing device is moving after having
-//     * been pressed on the object and before having been released.
-//     * 
-//     * 'Flicking' means that the frame has been flicked and has not yet 
-//     * decelerated to a stop.
-//     * 
-//     * 'Moving' means that the velocity is over the threshold for movement.
-//     * The velocity can only be calculated while the object is 'polling'.
-//     */
-//    public boolean isHolding() { return is_holding; }
-//    public boolean isDragging() { return is_dragging; }
-//    public boolean isFlicking() { return (flicker != null); }
-//    public boolean isMoving() {
-//        if (isHolding()) {
-//            // If we have been still too long, no movement.
-//            if (dragDeltaTime() > stillness_duration_threshold)
-//                return false;
-//
-//            // If we haven't dragged far enough, no movement.
-//            if (Math.abs(dragDeltaX()) < drag_movement_threshold[X] &&
-//                Math.abs(dragDeltaY()) < drag_movement_threshold[Y])
-//                return false;
-//            
-//            return true;
-//        }
-//        
-//        if (isFlicking())
-//            return true;
-//        
-//        // Otherwise, no movement.
-//        return false;
-//    }
-//    
-//    /*
-//     * The following are variables and methods for recording the position of the
-//     * user's pointing device and the time of the recording.
-//     */
-//    
-//    // prev_pos and curr_pos both refer to the position of the pointer.
-//    private int[] prev_pos = {0,0};
-//    private int[] curr_pos = {0,0};
-//    
-//    // last_move_time and current_time  refer to the time at which the screen 
-//    // was polled for the pointer position on a press or drag.
-//    private Date last_move_time;
-//    private Date current_time;
-//    
-//    // offset is the distance moved since the frame was flicked.
-//    private float[] offset = {0,0};
-//    
-//    private void resetPointerPosition(int x, int y)
-//    {
-//        offset[X] = 0;
-//        offset[Y] = 0;
-//        
-//        prev_pos[X] = curr_pos[X] = x;
-//        prev_pos[Y] = curr_pos[Y] = y;
-//        
-//        has_updated = true;
-//    }
-//    
-//    private void resetDragTime()
-//    {
-//        last_move_time = new Date(0);
-//        current_time = new Date();
-//        
-//        has_updated = true;
-//    }
-//    
-//    private void updatePointerPosition(int x, int y)
-//    {
-//        offset[X] = 0;
-//        offset[Y] = 0;
-//        
-//        prev_pos[X] = curr_pos[X];
-//        prev_pos[Y] = curr_pos[Y];
-//        
-//        curr_pos[X] = x;
-//        curr_pos[Y] = y;
-//        
-//        has_updated = true;
-//    }
-//    
-//    void updateDragTime()
-//    {
-//        last_move_time = current_time;
-//        current_time = new Date();
-//        
-//        has_updated = true;
-//    }
-//    
-//    void killFlicker()
-//    {
-//        if (flicker != null) flicker.cancel();
-//        flicker = null;
-//    }
-//    
-//    public void pointerDown(int x, int y)
-//    {
-//        System.out.print("down  ");
-//        System.out.print(x);
-//        System.out.print(", ");
-//        System.out.println(y);
-//        
-//        super.pointerDown(x, y);
-//        
-//        // Stop the auto_scrolling if it is going on.
-//        killFlicker();
-//        
-//        // Reset the velocity and time.
-//        is_holding = true;
-//        resetPointerPosition(x,y);
-//        resetDragTime();
-//    }
-//    
-//    public void pointerDrag(int x, int y)
-//    {
-//        System.out.print("drag  ");
-//        System.out.print(x);
-//        System.out.print(", ");
-//        System.out.println(y);
-//        
-//        super.pointerDrag(x, y);
-//        
-//        is_dragging = true;
-//        updatePointerPosition(x,y);
-//        updateDragTime();
-//    }
-//    
-//    private float flickDeltaX() { return (getVelocity()[X] * flick_duration); }
-//    private float flickDeltaY() { return (getVelocity()[Y] * flick_duration); }
-//    void decelerate() { velocity[X] *= flick_factor[X]; //Math.pow(flick_factor[X], flick_duration / 1000f);
-//                        velocity[Y] *= flick_factor[Y]; } //Math.pow(flick_factor[Y], flick_duration / 1000f); }
-//    
-//    public void pointerFlick(int x, int y)
-//    {
-//        System.out.print("flick ");
-//        System.out.print(x);
-//        System.out.print(", ");
-//        System.out.println(y);
-//        
-//        // This method should be overridden by any subclass that wishes to take
-//        // advantage of the flicking of this object.
-//    }
-//    
-//    public void pointerUp(int x, int y)
-//    {
-//        System.out.print("up    ");
-//        System.out.print(x);
-//        System.out.print(", ");
-//        System.out.println(y);
-//        
-//        super.pointerUp(x, y);
-//        
-//        is_holding = false;
-//        is_dragging = false;
-//        updateDragTime();
-//        
-//        flicker = new Timer();
-//        flicker.schedule(new FlickTask(this), 0, flick_duration);
-//    }
-//    
-//    class FlickTask extends TimerTask
-//    {
-//        FlickableFrame frame;
-//        
-//        public static final int X = 0;
-//        public static final int Y = 1;
-//        
-//        public FlickTask(FlickableFrame frame)
-//        {
-//            this.frame = frame;
-//        }
-//        
-//        public void run()
-//        {
-//            float dx = frame.flickDeltaX();
-//            float dy = frame.flickDeltaY();
-//            
-//            if (dx < frame.flick_movement_threshold[X] && 
-//                dy < frame.flick_movement_threshold[Y]) {
-//                frame.killFlicker();
-//                return;
-//            }
-//            
-//            frame.offset[X] += dx;
-//            frame.offset[Y] += dy;
-//            
-//            frame.pointerFlick((int)(frame.curr_pos[X]+frame.offset[X]), 
-//                               (int)(frame.curr_pos[Y]+frame.offset[Y]));
-//            frame.decelerate();
-//        }
-//    }
-//    
-//    /*
-//     * The following are tools to determine the current velocity of the frame,
-//     * and keep track of whether the frame has moved since the last calculation.
-//     * If the frame has not moved, then the functions will return their stored
-//     * values, so as not to do unnecessary floating-point calculations and 
-//     * function calls.float
-//     */
-//    boolean has_updated = false;
-//    float[] velocity = {0,0};
-//    
-//    int dragDeltaX() { return curr_pos[X] - prev_pos[X]; }
-//    int dragDeltaY() { return curr_pos[Y] - prev_pos[Y]; }
-//    long dragDeltaTime() { return current_time.getTime() - last_move_time.getTime(); }
-//    
-//    public synchronized float[] getVelocity()
-//    {
-//        // Only update the velocity if we have to (in response to a press or 
-//        // drag).
-//        if (has_updated)
-//        {
-//            if (!isMoving())
-//            {
-//                velocity[X] = velocity[Y] = 0;
-//            }
-//            else
-//            {
-//                float dx = dragDeltaX();
-//                float dy = dragDeltaY();
-//                long  dt = dragDeltaTime();
-//
-//                velocity[X] = (float) dx / dt;
-//                velocity[Y] = (float) dy / dt;
-//            }
-//        }
-//        
-////        System.out.print(velocity[X]);
-////        System.out.print(", ");
-////        System.out.println(velocity[Y]);
-//        
-//        // ::NOTE:: This 'has_updated' way of keeping track of state is vulnerable
-//        //          to race conditions.  I just hope it won't be noticed too 
-//        //          much.  And hopefully the 'synchronized' will solve it.
-//        has_updated = false;
-//        return velocity;
-//    }
-//    
+    class MoveTask extends TimerTask
+    {
+        Widget widget;
+        MovementData data;
+        float friction;
+        
+        // Rate that an object must be moving in either the x or y direction
+        // in order to still be considered moving.
+        float movement_threshold = 0.5f;
+        
+        public MoveTask(Widget widget, MovementData data, float friction)
+        {
+            this.widget = widget;
+            this.data = data;
+            this.friction = friction;
+        }
+        
+        public void run()
+        {
+            long current_time = (new Date()).getTime();
+            data.dt = current_time - data.t0;
+            float dt_in_seconds = data.dt / 1000.0f;
+            
+            // dx = int(v * dt)
+            // v  = v0 + dv
+            // dv = int(a * dt)
+            // v  = v0 + int(a * dt)
+            //    = v0 + a * t
+            // dx = int([v0 + a * t] * dt)
+            //    = int(v0 * dt) + int(a * t * dt)
+            //    = v0 * t + int(a * t * dt)
+            //    = v0 * t + 1/2 * a * t^2
+            float dv_due_to_friction = this.friction * dt_in_seconds;
+            float new_vx = data.vx + dv_due_to_friction;
+            float new_vy = data.vy + dv_due_to_friction;
+            
+            if (new_vx < movement_threshold && new_vy < movement_threshold) {
+                data.timer.cancel();
+                return;
+            }
+            
+            float dx_due_to_friction = dv_due_to_friction * dt_in_seconds / 2;
+            data.dx = (int)(data.vx * dt_in_seconds + dx_due_to_friction);
+            data.dy = (int)(data.vy * dt_in_seconds + dx_due_to_friction);
+            
+            widget.handleEvent(Event.FLICKED, data);
+        }
+    }
 }
