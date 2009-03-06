@@ -32,7 +32,7 @@ public class TestFrame4 extends TestFrame implements EventListener {
     }
     
     protected boolean runtest() {
-        button.tap();
+        button.doTap();
         String text = prompt.getText();
         
         // Check that we couldn't paint when we weren't supposed to and we
@@ -45,6 +45,14 @@ public class TestFrame4 extends TestFrame implements EventListener {
             int prompt_index = layout.getIndexOf(prompt);
             layout.unmanage(prompt);
             prompt = new StaticText("You tapped the button!");
+            layout.manage(prompt, prompt_index);
+        }
+        
+        else if (type == Event.DTAPPED && sender == this.button) {
+            int prompt_index = layout.getIndexOf(prompt);
+            layout.unmanage(prompt);
+            String str = prompt.getText();
+            prompt = new StaticText(str + "!");
             layout.manage(prompt, prompt_index);
         }
     }
