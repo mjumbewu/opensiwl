@@ -9,7 +9,7 @@ package oiwl.widget;
  *
  * @author mjumbewu
  */
-public abstract class AbsoluteLayout extends Layout {
+public class AbsoluteLayout extends Layout {
     /**
      * A line of text with a definite position.
      * @author mjumbewu

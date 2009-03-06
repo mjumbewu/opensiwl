@@ -28,9 +28,4 @@ public abstract class Button extends ItemWidget implements WidgetParent {
         return (StaticWidget.class.isInstance(item) ||
                 Layout.class.isInstance(item));
     }
-    
-    private boolean m_isPressed = false;
-    protected void setPressed(boolean p) { m_isPressed = p; }
-    public boolean isPressed() { return m_isPressed; }
-    
 }

@@ -34,6 +34,10 @@ public class StaticText extends StaticWidget {
         this(text, font, 0x00000000);
     }
     
+    public StaticText(String text, int color) {
+        this(text, Font.getDefaultFont(), color);
+    }
+    
     public StaticText(String text, Font font, int color) {
         m_text = text;
         m_font = font;

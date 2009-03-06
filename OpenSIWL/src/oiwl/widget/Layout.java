@@ -305,6 +305,16 @@ public abstract class Layout extends Widget
         }
     }
     
+    /**
+     * The method called to respond to user input or any other events passed 
+     * along from this Widget object's parent.  A Layout object's handler is 
+     * simple; it will simply pass the notification onto its managed Widget
+     * objects.
+     * @param type The type of notification passed down
+     * @param data The data that goes with the particular type of notification
+     * @return True if this Widget ends up emitting an event as a result of the
+     *         notification; false otherwise.
+     */
     public boolean handleEvent(int type, Object data) {
         int num_cells = this.getWidgetCount();
         for (int i = 0; i < num_cells; ++i) {

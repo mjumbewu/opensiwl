@@ -17,7 +17,7 @@ public abstract class WidgetWithLayout extends Widget implements WidgetParent {
         this.getParent().handleChildRedraw(item, x, y, w, h);
     }
     
-    public void setLayout(Layout aLayout) {
+    protected void setLayout(Layout aLayout) {
         if (aLayout == null)
             throw new IllegalArgumentException("Layout should not be null");
         m_layout = aLayout;
@@ -74,7 +74,17 @@ public abstract class WidgetWithLayout extends Widget implements WidgetParent {
         return 10;
     }
     
+    /**
+     * The method called to respond to user input or any other events passed 
+     * along from this Widget object's parent.  A WidgetWithLayout will first
+     * check whether its layout sends an event and proceed from there.
+     * @param type The type of notification passed down
+     * @param data The data that goes with the particular type of notification
+     * @return True if this Widget ends up emitting an event as a result of the
+     *         notification; false otherwise.
+     */
     public boolean handleEvent(int type, Object data) {
-        return this.getLayout().handleEvent(type, data);
+        boolean already_handled = this.getLayout().handleEvent(type, data);
+        return already_handled;
     }
 }
