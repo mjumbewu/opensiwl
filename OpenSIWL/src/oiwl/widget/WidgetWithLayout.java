@@ -5,6 +5,8 @@
 
 package oiwl.widget;
 
+import javax.microedition.lcdui.Graphics;
+
 /**
  *
  * @author mjumbewu
@@ -86,5 +88,13 @@ public abstract class WidgetWithLayout extends Widget implements WidgetParent {
     public boolean handleEvent(int type, Object data) {
         boolean already_handled = this.getLayout().handleEvent(type, data);
         return already_handled;
+    }
+
+    void draw(Graphics g, int xoff, int yoff, int x, int y, int width, int height) {
+        Layout layout = this.getLayout();
+        int layoutx = layout.getLocalXPos();
+        int layouty = layout.getLocalYPos();
+        getLayout().draw(g, xoff + layoutx, yoff + layouty,
+                x - layoutx, y - layouty, width, height);
     }
 }
