@@ -80,10 +80,6 @@ public class PushButton extends Button {
         g.fillRect(xoff, yoff, this.getWidth(), this.getHeight());
         g.setColor(c0);
 
-        Layout layout = this.getLayout();
-        int layoutx = layout.getLocalXPos();
-        int layouty = layout.getLocalYPos();
-        getLayout().draw(g, xoff + layoutx, yoff + layouty,
-                x - layoutx, y - layouty, w, h);
+        super.draw(g, xoff, yoff, x, y, w, h);
     }
 }
