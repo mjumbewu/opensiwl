@@ -54,6 +54,15 @@ public class Event {
     
 }
 
+class EventPath {
+    class Node {
+        int type;
+        Object data;
+        Node prev;
+    }
+
+    Node last;
+}
 /**
  * An object that stores event state/progress.  An Event object is essentially
  * a finite state machine.  Different events move it from one state to the next.
