@@ -8,6 +8,10 @@ package com.sprintpcs.lcdui.widget;
 import java.util.Vector;
 import javax.microedition.lcdui.Graphics;
 
+/**
+ * The abstract class for information about an item relevant to the layout.
+ * @author mjumbewu
+ */
 abstract class ItemInfo {
     abstract public void setItem(Object o);
     abstract public Object getItem();
@@ -26,6 +30,11 @@ abstract class ItemInfo {
     abstract public int getMinHeight();
 }
 
+/**
+ * The class for providing a layout with relevant information about ItemWidget
+ * objects.
+ * @author mjumbewu
+ */
 class ItemWidgetInfo extends ItemInfo {
     ItemWidget item;
 
@@ -52,6 +61,11 @@ class ItemWidgetInfo extends ItemInfo {
     public int getMinHeight() { return item.getHeight(); }
 }
 
+/**
+ * The class for providing a layout with relevant information about other
+ * Layout objects.
+ * @author mjumbewu
+ */
 class LayoutInfo extends ItemInfo {
     Layout layout;
 
@@ -78,6 +92,11 @@ class LayoutInfo extends ItemInfo {
     public int getMinHeight() { return layout.getMinHeight(); }
 }
 
+/**
+ * The class for providing a layout with relevant information about TextItem
+ * objects.
+ * @author mjumbewu
+ */
 class TextItemInfo extends ItemInfo {
     TextItem item;
 
@@ -113,7 +132,7 @@ public abstract class Layout extends ItemWidget {
     private int m_suggestedHeight = 0;
 
     /**
-     * The internal representation of a line of text
+     * The internal representation of a layout box or cell
      * @author mjumbewu
      */
     protected class Cell {
@@ -123,22 +142,22 @@ public abstract class Layout extends ItemWidget {
     private Vector m_cells = new Vector();
 
     /**
-     * The method used to create a new line of text
+     * The method used to create a new Cell
      * @return A new Cell object
      */
     protected abstract Cell makeCell();
     
     /**
-     * Return the Vector of Cells in the TextItem
-     * @return The Vector of Cells in the TextItem
+     * Return the Vector of Cells in the Layout
+     * @return The Vector of Cells in the Layout
      */
     protected Vector getCells() {
         return m_cells;
     }
     
     /**
-     * Return the line indexed by aCellNumber
-     * @param aIndex The index of the cell
+     * Return the Cell indexed by aCellNumber
+     * @param aIndex The index of the Cell
      * @return The Cell indexed by aCellNumber
      */
     protected Cell getCell(int aIndex) {
@@ -146,7 +165,7 @@ public abstract class Layout extends ItemWidget {
     }
     
     /**
-     * Manage an Widget with the Layout.  All unspecified parameters are set
+     * Manage an item with the Layout.  All unspecified parameters are set
      * to the default.
      * @param text The Widget
      */
@@ -155,20 +174,20 @@ public abstract class Layout extends ItemWidget {
     }
 
     /**
-     * Manage an Widget with the Layout.
-     * @param text The Widget to be managed.
-     * @param index The desired index for the Widget
+     * Manage an item with the Layout.
+     * @param item The item to be managed.
+     * @param index The desired index for the item
      */
     public void manage(Object item, int index) {
         this.addCell(this.makeCell(), item, index);
     }
 
     /**
-     * An internal method to initialized a given Cell with the given values and
+     * An internal method to initialize a given Cell with the given values and
      * insert it into the set of Cell objects
      * @param newCell The Cell to initialize
-     * @param item The Widget to put in the Cell
-     * @param index The index at which to inset the Cell; if index=-1 then the
+     * @param item The item to put in the Cell
+     * @param index The index at which to insert the Cell; if index=-1 then the
      *              Cell is appended
      */
     protected void addCell(Cell newCell, Object item, int index) {
@@ -197,17 +216,22 @@ public abstract class Layout extends ItemWidget {
     }
 
     /**
-     * Remove the Widget from the Layout
-     * @param aIndex The index of the Widget to be removed
-     * @return The removed Widget
+     * Remove the item from the Layout
+     * @param aIndex The index of the item to be removed
+     * @return The removed item
      */
     public Object unmanage(int aIndex) {
         Cell cell = this.getCell(aIndex);
-        Object item = cell.item;
+        Object item = cell.item.getItem();
         this.removeCell(cell);
         return item;
     }
 
+    /**
+     * Remove the item from the Layout
+     * @param item The item to be removed
+     * @return The removed item
+     */
     public Object unmanage(Object item) {
         int index = this.getIndexOf(item);
         return unmanage(index);
@@ -219,7 +243,7 @@ public abstract class Layout extends ItemWidget {
     }
     
     /**
-     * Get the Widget contained in a given Cell
+     * Get the item contained in a given Cell
      * @param aIndex The index of the cell
      * @return The Widget in a Cell
      */
@@ -236,9 +260,9 @@ public abstract class Layout extends ItemWidget {
     }
     
     /**
-     * Get the index of the given Widget.
-     * @param item The Widget
-     * @return The index of the Widget, or -1 if no such Widget is managed by this
+     * Get the index of the given item.
+     * @param item The item
+     * @return The index of the item, or -1 if no such item is managed by this
      *         Layout.
      */
     public int getIndexOf(Object item) {
@@ -334,20 +358,42 @@ public abstract class Layout extends ItemWidget {
         this.setStretchedWidth(w);
         this.setStretchedHeight(h);
     }
-    
+
+    /**
+     * Set the width of the Layout.  This size is ultimately only a suggestion
+     * as the Layout will take up as much room as it needs to.
+     * @param w The suggested width of the Layout
+     */
     void setWidth(int w) {
         m_suggestedWidth = w;
     }
 
+    /**
+     * Set the height of the Layout.  This size is ultimately only a suggestion
+     * as the Layout will take up as much room as it needs to.
+     * @param h The suggested height of the Layout
+     */
     void setHeight(int h) {
         m_suggestedHeight = h;
     }
 
+    /**
+     * Set the size of the Layout.  This size is ultimately only a suggestion
+     * as the Layout will take up as much room as it needs to.
+     * @param w The suggested witdth of the Layout
+     * @param h The suggested height of the Layout
+     */
     public void setSize(int w, int h) {
         setWidth(w);
         setHeight(h);
+        this.invalidateSizes();
+        this.recalculateSizes();
     }
 
+    /**
+     * Set the size of the Layout according to the size of the given Widget.
+     * @param wid The Widget to match the size of
+     */
     public void setSizeToWidget(Widget wid) {
         this.setPosition(0, 0);
         this.setSize(wid.getWidth(), wid.getHeight());
@@ -372,23 +418,27 @@ public abstract class Layout extends ItemWidget {
     public int getHeight() {
         return Math.max(m_suggestedHeight, this.getStretchedHeight());
     }
-    
+
+    /**
+     * Get the minimum (stretched) width of the layout
+     * @return The stretched width
+     */
     public int getMinWidth() {
         return this.getStretchedWidth();
     }
-    
+
+    /**
+     * Get the minimym (stretched) height of the layout
+     * @return The stretched height
+     */
     public int getMinHeight() {
         return this.getStretchedHeight();
     }
     
     /**
-     * Draw the specified region (given in parent coordinates, not local) of
-     * the Layout.
-     * @param g The target Graphic context
-     * @param x The left edge of the region
-     * @param y The top of the region
-     * @param width The width of the region
-     * @param height The height of the region
+     * "Draw" the layout.  This method will simply perform some operations that
+     * need to be performed in order for the layout to display correctly.
+     * @param g The target Graphics context
      */
     public void draw(Graphics g) {
         this.invalidateSizes();

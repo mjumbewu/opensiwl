@@ -7,12 +7,16 @@ package com.sprintpcs.lcdui.widget;
 
 
 /**
- *
+ * A Layout for arranging items in a single row or column
  * @author mjumbewu
  */
 public class LinearLayout extends Layout {
     private LinearLayoutProperties m_props;
 
+    /**
+     * Create a LinearLayout of with the specified orientation
+     * @param orient The orientation (VERTICAL or HORIZONTAL) of the layout
+     */
     public LinearLayout(int orient) {
         if (orient == Orientation.VERTICAL)
             m_props = new VerticalLayoutProperties(this);
@@ -38,7 +42,19 @@ public class LinearLayout extends Layout {
         int alignment = Alignment.HCENTER | Alignment.VCENTER;
     }
 
-    public void manage(ItemWidget item, int index, int padding, boolean expand, boolean fill) {
+    /**
+     * Insert the given item with the given box properties
+     * @param item The item to manage
+     * @param index The position where the item should be inserted;
+     *              an index of -1 will append the item
+     * @param padding The padding around the item
+     * @param expand Whether the item's box/cell should expand to fill the
+     *               available space.
+     * @param fill Whether the item should expand to fill the available space
+     *             in its box/cell; only used for items whose size is variable
+     *             (like Layout objects).
+     */
+    public void manage(Object item, int index, int padding, boolean expand, boolean fill) {
         LinearCell box = new LinearCell();
         box.padding = padding;
         box.expand = expand;
@@ -46,10 +62,6 @@ public class LinearLayout extends Layout {
         this.addCell(box, item, index);
     }
 
-    /**
-     * Create a positioned line of text
-     * @return A new positioned line of text
-     */
     protected Cell makeCell() {
         LinearCell cell = new LinearCell();
         return cell;
@@ -148,6 +160,10 @@ public class LinearLayout extends Layout {
                 aAlignment | this.getHAlignment(aIndex);
     }
 
+    /**
+     * General class for getting certain orientation-dependent information
+     * notwithstanding actual orientation.
+     */
     protected abstract class LinearLayoutProperties {
         private LinearLayout m_layout;
         public LinearLayoutProperties(LinearLayout layout) {
@@ -193,8 +209,11 @@ public class LinearLayout extends Layout {
     }
 
     /**
-     * Calculate the ortho and the axial as the ortho of the widest line and
-     * the sum of the heights of the lines, respectively, in this TextItem.
+     * Calculate the orthogonal and the axial size.  A layouts axial direction
+     * is the direction that corresponds to its orientation; e.g. for a VERTICAL
+     * Layout, the axial size is the height, and the orthogonal size is the 
+     * width.  The orthogonal size is the size of the "widest" item, and the
+     * axial size is the sum of the "heights" of the items.
      */
     protected synchronized void recalculateSizes() {
         int num_items = this.getItemCount();
@@ -231,10 +250,9 @@ public class LinearLayout extends Layout {
     }
 
     /**
-     * Calculate the relative positions of the tops of the lines in this
-     * TextItem.  The offset-most line always has a offset=0.  Every offset from there
-     * on is the offset of the previous line offset by the axial of the previous
-     * line.
+     * Calculate the relative positions of the items in this Layout.  The first
+     * item always has an offset=0.  Every offset from there on is the position
+     * of the previous item offset by the axial size of the previous item.
      */
     protected synchronized void recalculateOffsets() {
         int num_items = this.getItemCount();
@@ -393,10 +411,5 @@ public class LinearLayout extends Layout {
 
         protected int getOrthoAlign(int index) { return getLayout().getVAlignment(index) << 3; }
         protected int getAxialAlign(int index) { return getLayout().getHAlignment(index) << 6; }
-    }
-
-    public void draw(javax.microedition.lcdui.Graphics g) {
-        this.invalidateSizes();
-        this.recalculateSizes();
     }
 }
