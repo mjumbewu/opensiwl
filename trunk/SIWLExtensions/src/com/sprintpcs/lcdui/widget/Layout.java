@@ -9,122 +9,6 @@ import java.util.Vector;
 import javax.microedition.lcdui.Graphics;
 
 /**
- * The abstract class for information about an item relevant to the item.
- * @author mjumbewu
- */
-abstract class ItemInfo {
-    abstract public void setItem(Object o);
-    abstract public Object getItem();
-
-    abstract public int getXPos();
-    abstract public int getYPos();
-    abstract public void setXPos(int x);
-    abstract public void setYPos(int y);
-
-    abstract public int getWidth();
-    abstract public int getHeight();
-    abstract public void setWidth(int w);
-    abstract public void setHeight(int h);
-
-    abstract public int getMinWidth();
-    abstract public int getMinHeight();
-}
-
-/**
- * The class for providing a item with relevant information about ItemWidget
- * objects.
- * @author mjumbewu
- */
-class ItemWidgetInfo extends ItemInfo {
-    ItemWidget item;
-
-    public void setItem(Object o) {
-        if (ItemWidget.class.isInstance(o))
-            item = (ItemWidget)o;
-        else
-            throw new IllegalArgumentException();
-    }
-
-    public Object getItem() { return item; }
-
-    public int getXPos() { return item.getXPos(); }
-    public int getYPos() { return item.getYPos(); }
-    public void setXPos(int x) { item.setXPos(x); }
-    public void setYPos(int y) { item.setYPos(y); }
-
-    public int getWidth() { return item.getWidth(); }
-    public int getHeight() { return item.getHeight(); }
-    public void setWidth(int w) {}
-    public void setHeight(int h) {}
-
-    public int getMinWidth() { return item.getWidth(); }
-    public int getMinHeight() { return item.getHeight(); }
-}
-
-
-/**
- * The class for providing a item with relevant information about other
- * Layout objects.
- * @author mjumbewu
- */
-class ResizableWidgetInfo extends ItemInfo {
-    DynamicallySizedWidget item;
-
-    public void setItem(Object o) {
-        if (DynamicallySizedWidget.class.isInstance(o))
-            item = (DynamicallySizedWidget)o;
-        else
-            throw new IllegalArgumentException();
-    }
-
-    public Object getItem() { return item; }
-
-    public int getXPos() { return item.getXPos(); }
-    public int getYPos() { return item.getYPos(); }
-    public void setXPos(int x) { item.setXPos(x); }
-    public void setYPos(int y) { item.setYPos(y); }
-
-    public int getWidth() { return item.getWidth(); }
-    public int getHeight() { return item.getHeight(); }
-    public void setWidth(int w) { item.setWidth(w); }
-    public void setHeight(int h) { item.setHeight(h); }
-
-    public int getMinWidth() { return item.getMinWidth(); }
-    public int getMinHeight() { return item.getMinHeight(); }
-}
-
-/**
- * The class for providing a item with relevant information about TextItem
- * objects.
- * @author mjumbewu
- */
-class TextItemInfo extends ItemInfo {
-    TextItem item;
-
-    public void setItem(Object o) {
-        if (TextItem.class.isInstance(o))
-            item = (TextItem)o;
-        else
-            throw new IllegalArgumentException();
-    }
-
-    public Object getItem() { return item; }
-
-    public int getXPos() { return item.getX(0); }
-    public int getYPos() { return item.getY(0); }
-    public void setXPos(int x) { item.setCoordinates(0, x, item.getY(0)); }
-    public void setYPos(int y) { item.setCoordinates(0, item.getX(0), y); }
-
-    public int getWidth() { return item.getFont(0).stringWidth(item.getText(0)); }
-    public int getHeight() { return item.getFont(0).getHeight(); }
-    public void setWidth(int w) {}
-    public void setHeight(int h) {}
-
-    public int getMinWidth() { return getWidth(); }
-    public int getMinHeight() { return getHeight(); }
-}
-
-/**
  *
  * @author mjumbewu
  */
@@ -193,20 +77,7 @@ public abstract class Layout extends ItemWidget
      *              Cell is appended
      */
     protected void addCell(Cell newCell, Object item, int index) {
-        // ::NOTE:: I don't want to hard code the item types, but I'm going to
-        //          until I can think of a better solution.
-        if (DynamicallySizedWidget.class.isInstance(item))
-            newCell.item = new ResizableWidgetInfo();
-        else if (TextItem.class.isInstance(item))
-            newCell.item = new TextItemInfo();
-        else if (ItemWidget.class.isInstance(item))
-            newCell.item = new ItemWidgetInfo();
-        else {
-            System.out.println("Cannot add a " + item.getClass().toString());
-            throw new IllegalArgumentException("Cannot add a " + item.getClass().toString());
-        }
-
-        newCell.item.setItem(item);
+        newCell.item = ItemInfo.create(item);
 
         if (index == -1)
             m_cells.addElement(newCell);
