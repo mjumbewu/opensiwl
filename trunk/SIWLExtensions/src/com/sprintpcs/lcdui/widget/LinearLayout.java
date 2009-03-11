@@ -27,14 +27,29 @@ public class LinearLayout extends Layout {
                     + Integer.toString(orient));
     }
 
-    public LinearLayout(int orient, boolean dfill, boolean dexpand) {
+    public LinearLayout(int orient, boolean dfill, boolean dexpand, int dalign) {
         this(orient);
         m_defaultFill = dfill;
         m_defaultExpand = dexpand;
+        m_defaultAlignment = dalign;
     }
 
     private boolean m_defaultFill = false;
     private boolean m_defaultExpand = true;
+    private int m_defaultAlignment = Alignment.HCENTER | Alignment.VCENTER;
+
+    public void setDefaultFill(boolean dfill) {
+        m_defaultFill = dfill;
+    }
+
+    public void setDefaultExpand(boolean dexpand) {
+        m_defaultExpand = dexpand;
+    }
+
+    public void setDefaultAlignment(int dalign) {
+        m_defaultAlignment = dalign;
+    }
+    
     /**
      * 
      * @author mjumbewu
@@ -47,7 +62,7 @@ public class LinearLayout extends Layout {
         int padding = 0;
         boolean expand = m_defaultExpand;
         boolean fill = m_defaultFill;
-        int alignment = Alignment.HCENTER | Alignment.VCENTER;
+        int alignment = m_defaultAlignment;
     }
 
     /**
@@ -168,6 +183,54 @@ public class LinearLayout extends Layout {
                 aAlignment | this.getHAlignment(aIndex);
     }
 
+    public int getPadding(Object item) {
+        return this.getPadding(this.getIndexOf(item));
+    }
+
+    public void setPadding(Object item, int aPadding) {
+       this.setPadding(this.getIndexOf(item), aPadding);
+    }
+
+    public boolean getExpand(Object item) {
+        return this.getExpand(this.getIndexOf(item));
+    }
+
+    public void setExpand(Object item, boolean aExpand) {
+       this.setExpand(this.getIndexOf(item), aExpand);
+    }
+
+    public boolean getFill(Object item) {
+        return this.getFill(this.getIndexOf(item));
+    }
+
+    public void setFill(Object item, boolean aFill) {
+       this.setFill(this.getIndexOf(item), aFill);
+    }
+
+    public int getAlignment(Object item) {
+        return this.getAlignment(this.getIndexOf(item));
+    }
+
+    public int getHAlignment(Object item) {
+        return this.getHAlignment(this.getIndexOf(item));
+    }
+
+    public int getVAlignment(Object item) {
+        return this.getVAlignment(this.getIndexOf(item));
+    }
+
+    public void setAlignment(Object item, int aAlignment) {
+        this.setAlignment(this.getIndexOf(item), aAlignment);
+    }
+
+    public void setHAlignment(Object item, int aAlignment) {
+        this.setHAlignment(this.getIndexOf(item), aAlignment);
+    }
+
+    public void setVAlignment(Object item, int aAlignment) {
+        this.setVAlignment(this.getIndexOf(item), aAlignment);
+    }
+
     /**
      * General class for getting certain orientation-dependent information
      * notwithstanding actual orientation.
@@ -233,7 +296,7 @@ public class LinearLayout extends Layout {
             LinearCell box = (LinearCell)this.getCell(index);
 
             axial += getProperties().getAxialSize(box.item) + 2*box.padding;
-            ortho = Math.max(ortho, getProperties().getOrthoSize(box.item));
+            ortho = Math.max(ortho, getProperties().getOrthoSize(box.item) + 2*box.padding);
         }
 
         // We validate the sizes before actualy setting them so that we can
