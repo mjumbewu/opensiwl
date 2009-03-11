@@ -53,7 +53,7 @@ public class StaticText extends ItemWidget implements DynamicallySizedWidget {
     
     private boolean m_wrap = false;
 
-    private Layout m_layout = new LinearLayout(Orientation.VERTICAL, false, false);
+    private Layout m_layout = new LinearLayout(Orientation.VERTICAL, false, false, Alignment.HCENTER|Alignment.VCENTER);
     private Vector m_textItems = new Vector();
     
     public StaticText() {
@@ -104,6 +104,13 @@ public class StaticText extends ItemWidget implements DynamicallySizedWidget {
     public void setWrap(boolean wrap) {
         m_wrap = wrap;
         updateText();
+    }
+
+    public void setAlignment(int alignment) {
+        int num_lines = m_layout.getItemCount();
+        for (int i = 0; i < num_lines; ++i)
+            ((LinearLayout)m_layout).setHAlignment(i, alignment);
+        ((LinearLayout)m_layout).setDefaultAlignment(alignment|Alignment.VCENTER);
     }
 
     public int getNumLines() {
