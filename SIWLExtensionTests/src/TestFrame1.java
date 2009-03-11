@@ -82,6 +82,8 @@ public class TestFrame1 extends TestFrame {
         LinearLayout capLayout = new LinearLayout(Orientation.VERTICAL);
         capLayout.setSizeToWidget(tb);
         capLayout.manage(cap);
+        // Force a layout recalculation
+        capLayout.recalculateSizes();
         tb.setTitle(cap);
 
         this.setTitleBar(tb);
