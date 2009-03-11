@@ -85,7 +85,6 @@ public abstract class Layout extends ItemWidget
             m_cells.insertElementAt(newCell, index);
 
         this.invalidateSizes();
-        this.recalculateSizes();
     }
 
     /**
@@ -160,7 +159,7 @@ public abstract class Layout extends ItemWidget
      * getHeight.  Only classes derived from Layout should ever need to
      * call recalculateSizes.
      */
-    protected abstract void recalculateSizes();
+    public abstract void recalculateSizes();
 
     /**
      * Check whether the values reported by getWidth and getHeight are
@@ -319,7 +318,6 @@ public abstract class Layout extends ItemWidget
      * @param g The target Graphics context
      */
     public void draw(Graphics g) {
-        this.invalidateSizes();
         this.recalculateSizes();
     }
 }
