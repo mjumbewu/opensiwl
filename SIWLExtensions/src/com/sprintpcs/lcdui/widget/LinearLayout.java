@@ -278,7 +278,7 @@ public class LinearLayout extends Layout {
             LinearCell box = (LinearCell)this.getCell(index);
             if (!box.expand) {
                 --expanding_boxes;
-                available_size -= getProperties().getMinAxialSize(box.item) - 2*box.padding;
+                available_size -= getProperties().getMinAxialSize(box.item) + 2*box.padding;
             }
         }
 
