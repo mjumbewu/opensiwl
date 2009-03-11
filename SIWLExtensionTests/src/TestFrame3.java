@@ -10,15 +10,15 @@ import javax.microedition.lcdui.Font;
  *
  * @author mjumbewu
  */
-public class TestFrame2 extends TestFrame {
-    public TestFrame2(SIWLExtensionTests app, String id) {
+public class TestFrame3 extends TestFrame {
+    public TestFrame3(SIWLExtensionTests app, String id) {
         super(app, id);
 
         this.instructions = "This is also a very simple frame.  It consists " +
                 "of a textual description with a large button below it.  The " +
-                "textual description is wrapped and centered using the " +
-                "StaticText widget.  Press a phone button (e.g. the voice " +
-                "command button on the side of the phone) to continue.";
+                "point of this test is to show that widgets can be padded " +
+                "from the edges of layouts.  Press a phone button (e.g. the " +
+                "voice command button on the side of the phone) to continue.";
 
         // First, I initialize all my Widgets
         PushButton lbutton = new PushButton(PushButton.BIG_BLACK_BUTTON_TYPE,0,0);
@@ -44,6 +44,18 @@ public class TestFrame2 extends TestFrame {
         // Add the large button and the row layouts to the main layout
         mainlayout.manage(wtext);
         mainlayout.manage(lbutton);
+
+        // Make the wrapped text take up as much of the width of the frame as
+        // possible (i.e. have it "fill" the layout).  A layout item's fill
+        // property is set to false by default.
+        ((LinearLayout)mainlayout).setFill(mainlayout.getIndexOf(wtext), true);
+        ((LinearLayout)mainlayout).setPadding(mainlayout.getIndexOf(wtext), 10);
+
+        // Make the button's box take up as little room as possible (i.e. have
+        // the box not "expand" in the layout).  A layout item's expand property
+        // is set to true by default.
+        ((LinearLayout)mainlayout).setExpand(mainlayout.getIndexOf(lbutton), false);
+        ((LinearLayout)mainlayout).setPadding(mainlayout.getIndexOf(lbutton), 10);
 
         // Be sure to set the desired orientation, position, and size.
         mainlayout.setPosition(0, 0);
