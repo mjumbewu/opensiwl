@@ -31,6 +31,7 @@ public class SIWLExtensionTests extends MIDlet {
             testFrames.addElement(new TestFrame2(this, "2"));
             testFrames.addElement(new TestFrame3(this, "3"));
             testFrames.addElement(new TestFrame4(this, "4"));
+            testFrames.addElement(new TestFrame5(this, "5"));
             currentTestIndex = 0;
             isInitialized = true;
 
