@@ -27,6 +27,14 @@ public class LinearLayout extends Layout {
                     + Integer.toString(orient));
     }
 
+    public LinearLayout(int orient, boolean dfill, boolean dexpand) {
+        this(orient);
+        m_defaultFill = dfill;
+        m_defaultExpand = dexpand;
+    }
+
+    private boolean m_defaultFill = false;
+    private boolean m_defaultExpand = true;
     /**
      * 
      * @author mjumbewu
@@ -37,8 +45,8 @@ public class LinearLayout extends Layout {
         int axial = 0;
 
         int padding = 0;
-        boolean expand = true;
-        boolean fill = false;
+        boolean expand = m_defaultExpand;
+        boolean fill = m_defaultFill;
         int alignment = Alignment.HCENTER | Alignment.VCENTER;
     }
 
@@ -302,7 +310,7 @@ public class LinearLayout extends Layout {
             // Make sure the Widget is properly sized
             if (box.fill) {
                 getProperties().setAxialSize(box.item, box.axial - 2*box.padding);
-                getProperties().setOrthoSize(box.item, box.ortho);
+                getProperties().setOrthoSize(box.item, box.ortho - 2*box.padding);
             } else {
                 getProperties().setAxialSize(box.item, getProperties().getMinAxialSize(box.item));
                 getProperties().setOrthoSize(box.item, getProperties().getMinOrthoSize(box.item));
@@ -329,11 +337,11 @@ public class LinearLayout extends Layout {
             int or_pos;
 
             if ((or_align & Alignment.MIN) != 0)
-                or_pos = 0;
+                or_pos = box.padding;
             else if ((or_align & Alignment.CENTER) != 0)
                 or_pos = (box.ortho - getProperties().getOrthoSize(box.item))/2;
             else /* MAX */
-                or_pos = box.ortho - getProperties().getOrthoSize(box.item);
+                or_pos = box.ortho - box.padding - getProperties().getOrthoSize(box.item);
 
             getProperties().setAxialPos(box.item, ax_pos + getProperties().getAxialPos());
             getProperties().setOrthoPos(box.item, or_pos + getProperties().getOrthoPos());

@@ -9,7 +9,7 @@ import java.util.Vector;
 import javax.microedition.lcdui.Graphics;
 
 /**
- * The abstract class for information about an item relevant to the layout.
+ * The abstract class for information about an item relevant to the item.
  * @author mjumbewu
  */
 abstract class ItemInfo {
@@ -31,7 +31,7 @@ abstract class ItemInfo {
 }
 
 /**
- * The class for providing a layout with relevant information about ItemWidget
+ * The class for providing a item with relevant information about ItemWidget
  * objects.
  * @author mjumbewu
  */
@@ -61,39 +61,40 @@ class ItemWidgetInfo extends ItemInfo {
     public int getMinHeight() { return item.getHeight(); }
 }
 
+
 /**
- * The class for providing a layout with relevant information about other
+ * The class for providing a item with relevant information about other
  * Layout objects.
  * @author mjumbewu
  */
-class LayoutInfo extends ItemInfo {
-    Layout layout;
+class ResizableWidgetInfo extends ItemInfo {
+    DynamicallySizedWidget item;
 
     public void setItem(Object o) {
-        if (Layout.class.isInstance(o))
-            layout = (Layout)o;
+        if (DynamicallySizedWidget.class.isInstance(o))
+            item = (DynamicallySizedWidget)o;
         else
             throw new IllegalArgumentException();
     }
 
-    public Object getItem() { return layout; }
+    public Object getItem() { return item; }
 
-    public int getXPos() { return layout.getXPos(); }
-    public int getYPos() { return layout.getYPos(); }
-    public void setXPos(int x) { layout.setXPos(x); }
-    public void setYPos(int y) { layout.setYPos(y); }
+    public int getXPos() { return item.getXPos(); }
+    public int getYPos() { return item.getYPos(); }
+    public void setXPos(int x) { item.setXPos(x); }
+    public void setYPos(int y) { item.setYPos(y); }
 
-    public int getWidth() { return layout.getWidth(); }
-    public int getHeight() { return layout.getHeight(); }
-    public void setWidth(int w) { layout.setWidth(w); }
-    public void setHeight(int h) { layout.setHeight(h); }
+    public int getWidth() { return item.getWidth(); }
+    public int getHeight() { return item.getHeight(); }
+    public void setWidth(int w) { item.setWidth(w); }
+    public void setHeight(int h) { item.setHeight(h); }
 
-    public int getMinWidth() { return layout.getMinWidth(); }
-    public int getMinHeight() { return layout.getMinHeight(); }
+    public int getMinWidth() { return item.getMinWidth(); }
+    public int getMinHeight() { return item.getMinHeight(); }
 }
 
 /**
- * The class for providing a layout with relevant information about TextItem
+ * The class for providing a item with relevant information about TextItem
  * objects.
  * @author mjumbewu
  */
@@ -132,7 +133,7 @@ public abstract class Layout extends ItemWidget {
     private int m_suggestedHeight = 0;
 
     /**
-     * The internal representation of a layout box or cell
+     * The internal representation of a item box or cell
      * @author mjumbewu
      */
     protected class Cell {
@@ -193,8 +194,8 @@ public abstract class Layout extends ItemWidget {
     protected void addCell(Cell newCell, Object item, int index) {
         // ::NOTE:: I don't want to hard code the item types, but I'm going to
         //          until I can think of a better solution.
-        if (Layout.class.isInstance(item))
-            newCell.item = new LayoutInfo();
+        if (DynamicallySizedWidget.class.isInstance(item))
+            newCell.item = new ResizableWidgetInfo();
         else if (TextItem.class.isInstance(item))
             newCell.item = new TextItemInfo();
         else if (ItemWidget.class.isInstance(item))
@@ -235,6 +236,11 @@ public abstract class Layout extends ItemWidget {
     public Object unmanage(Object item) {
         int index = this.getIndexOf(item);
         return unmanage(index);
+    }
+
+    public void unmanageAll() {
+        m_cells.removeAllElements();
+        this.invalidateSizes();
     }
     
     protected void removeCell(Cell trashCell) {
@@ -420,7 +426,7 @@ public abstract class Layout extends ItemWidget {
     }
 
     /**
-     * Get the minimum (stretched) width of the layout
+     * Get the minimum (stretched) width of the item
      * @return The stretched width
      */
     public int getMinWidth() {
@@ -428,7 +434,7 @@ public abstract class Layout extends ItemWidget {
     }
 
     /**
-     * Get the minimym (stretched) height of the layout
+     * Get the minimym (stretched) height of the item
      * @return The stretched height
      */
     public int getMinHeight() {
@@ -436,8 +442,8 @@ public abstract class Layout extends ItemWidget {
     }
     
     /**
-     * "Draw" the layout.  This method will simply perform some operations that
-     * need to be performed in order for the layout to display correctly.
+     * "Draw" the item.  This method will simply perform some operations that
+     * need to be performed in order for the item to display correctly.
      * @param g The target Graphics context
      */
     public void draw(Graphics g) {
