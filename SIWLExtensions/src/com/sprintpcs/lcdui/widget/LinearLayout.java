@@ -286,7 +286,7 @@ public class LinearLayout extends Layout {
      * width.  The orthogonal size is the size of the "widest" item, and the
      * axial size is the sum of the "heights" of the items.
      */
-    protected synchronized void recalculateSizes() {
+    public synchronized void recalculateSizes() {
         int num_items = this.getItemCount();
 
         int axial = 0;
