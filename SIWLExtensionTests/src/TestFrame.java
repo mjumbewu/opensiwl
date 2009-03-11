@@ -10,7 +10,7 @@ import javax.microedition.lcdui.Font;
  *
  * @author mjumbewu
  */
-public abstract class TestFrame extends BasicFrame implements Runnable {
+public abstract class TestFrame extends FlickableFrame implements Runnable {
 //    Panel testPanel = new Panel(Panel.BOTTOM);
     String testID;
     String instructions = "";

@@ -19,9 +19,7 @@ public class TestFrame4 extends TestFrame {
                 "to opposite edges of the screen.  This is because there are " +
                 "three widgets, the middle one being a spacer.  A spacer " +
                 "is a dynamically resizing widget that will expand to take " +
-                "as much space as it is allowed.  Note that this could also " +
-                "be achieved by aligning each button to the left and right of" +
-                "their cells: setHAlignment(button, Ailgnment.RIGHT).";
+                "as much space as it is allowed.";
 
         // First, I initialize all my Widgets
         PushButton xsbutton1 = new PushButton(PushButton.XSMALL_BLACK_BUTTON_TYPE,0,0);
