@@ -28,6 +28,7 @@ public class SIWLExtensionTests extends MIDlet {
             System.out.println("Creating the frames");
             testFrames = new Vector();
             testFrames.addElement(new TestFrame1(this, "1"));
+            testFrames.addElement(new TestFrame2(this, "2"));
             currentTestIndex = 0;
             isInitialized = true;
 
