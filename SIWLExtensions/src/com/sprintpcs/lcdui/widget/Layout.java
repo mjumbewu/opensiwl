@@ -128,7 +128,8 @@ class TextItemInfo extends ItemInfo {
  *
  * @author mjumbewu
  */
-public abstract class Layout extends ItemWidget {
+public abstract class Layout extends ItemWidget 
+        implements DynamicallySizedWidget {
     private int m_suggestedWidth = 0;
     private int m_suggestedHeight = 0;
 
@@ -370,7 +371,7 @@ public abstract class Layout extends ItemWidget {
      * as the Layout will take up as much room as it needs to.
      * @param w The suggested width of the Layout
      */
-    void setWidth(int w) {
+    public void setWidth(int w) {
         m_suggestedWidth = w;
     }
 
@@ -379,7 +380,7 @@ public abstract class Layout extends ItemWidget {
      * as the Layout will take up as much room as it needs to.
      * @param h The suggested height of the Layout
      */
-    void setHeight(int h) {
+    public void setHeight(int h) {
         m_suggestedHeight = h;
     }
 
