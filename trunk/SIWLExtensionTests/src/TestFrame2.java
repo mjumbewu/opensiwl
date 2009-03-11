@@ -45,6 +45,11 @@ public class TestFrame2 extends TestFrame {
         mainlayout.manage(wtext);
         mainlayout.manage(lbutton);
 
+        // Make the wrapped text take up as much of the width of the frame as
+        // possible (i.e. have it "fill" the layout).  A layout item's fill
+        // property is set to false by default.
+        ((LinearLayout)mainlayout).setFill(mainlayout.getIndexOf(wtext), true);
+
         // Be sure to set the desired orientation, position, and size.
         mainlayout.setPosition(0, 0);
         mainlayout.setSize(this.getWidth(), this.getDrawableHeight());

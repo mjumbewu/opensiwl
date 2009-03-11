@@ -77,7 +77,7 @@ public class TestFrame1 extends TestFrame {
         // Now I want a title bar, so lets put one on.  We can manage the
         // text item in the title bar with a layout as well.
         TitleBar tb = new TitleBar();
-        TextItem cap = new TextItem("Caption", Font.getDefaultFont(), 0x00ffff00);
+        TextItem cap = new TextItem("Voice-command to continue", Font.getDefaultFont(), 0x00ffff00);
 
         LinearLayout capLayout = new LinearLayout(Orientation.VERTICAL);
         capLayout.setSizeToWidget(tb);
