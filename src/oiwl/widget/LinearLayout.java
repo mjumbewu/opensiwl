@@ -21,6 +21,10 @@ public class LinearLayout extends Layout {
             throw new IllegalArgumentException("Invalid orientation argument: "
                     + Integer.toString(orient));
     }
+
+    public void manage(Widget item) {
+        this.manage(item, -1, 0, true, false);
+    }
     
     /**
      * A line of text with a definite position.
@@ -195,7 +199,7 @@ public class LinearLayout extends Layout {
      * Calculate the ortho and the axial as the ortho of the widest line and
      * the sum of the heights of the lines, respectively, in this TextItem.
      */
-    protected synchronized void recalculateSizes() {
+    protected synchronized void recalculateLayout() {
         int num_items = this.getWidgetCount();
 
         int axial = 0;

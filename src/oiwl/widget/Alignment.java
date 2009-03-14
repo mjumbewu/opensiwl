@@ -55,6 +55,12 @@ public class Alignment {
      */
     public static int MAX = 256;
 
+    /**
+     * Constant for spread or justified alignment
+     */
+    public static int SPREAD = 512;
+    public static int JUSTIFY = SPREAD;
+
     static int HCOMPONENT = 
             Alignment.LEFT|Alignment.HCENTER|Alignment.RIGHT;
     static int VCOMPONENT = 
