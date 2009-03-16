@@ -88,7 +88,7 @@ public class ScrollViewWidget extends WidgetWithLayout {
 
             else if (type == Event.RELEASED) {
                 if (pointer.getXVel() > 0 || pointer.getYVel() > 0) {
-                    scrollTask = new MoveTask(this, pointer, 0.5f,this);
+                    scrollTask = new MoveTask(this, pointer, 0.5f);
                     Thread flick_thread = new Thread(scrollTask);
                     flick_thread.start();
                 }
