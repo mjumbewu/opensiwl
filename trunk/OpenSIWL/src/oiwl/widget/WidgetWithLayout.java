@@ -8,12 +8,17 @@ package oiwl.widget;
 import javax.microedition.lcdui.Graphics;
 
 /**
- *
+ * I would just have classes that derive from WidgetWithLayout derive directly
+ * from Layout, except that would limit the type of layout that those widgets
+ * could have.  For example, a list item would be a widget with a layout because
+ * it could be layed out horizontally, vertically, etc.  If the list item
+ * derived from layout, there would have to be a different type of list item
+ * for each type of layout.
  * @author mjumbewu
  */
 public abstract class WidgetWithLayout extends Widget implements WidgetParent {
 
-    Layout m_layout;
+    Layout m_layout = null;
     
     public void handleChildRedraw(Widget item, int x, int y, int w, int h) {
         this.getParent().handleChildRedraw(item, x, y, w, h);
@@ -24,27 +29,27 @@ public abstract class WidgetWithLayout extends Widget implements WidgetParent {
             throw new IllegalArgumentException("Layout should not be null");
         m_layout = aLayout;
         m_layout.setParent(this);
-        m_layout.setLocalPos(this.getLayoutXPos(), this.getLayoutYPos());
-        m_layout.setSize(this.getLayoutWidth(), this.getLayoutHeight());
+        m_layout.setLocalPos(this.getDefaultLayoutXPos(), this.getDefaultLayoutYPos());
+        m_layout.setSize(this.getDefaultLayoutWidth(), this.getDefaultLayoutHeight());
     }
     
     public Layout getLayout() {
         return m_layout;
     }
     
-    public int getLayoutXPos() {
+    protected int getDefaultLayoutXPos() {
         return 0;
     }
     
-    public int getLayoutYPos() {
+    protected int getDefaultLayoutYPos() {
         return 0;
     }
     
-    public int getLayoutWidth() {
+    protected int getDefaultLayoutWidth() {
         return this.getWidth();
     }
     
-    public int getLayoutHeight() {
+    protected int getDefaultLayoutHeight() {
         return this.getHeight();
     }
     
@@ -52,28 +57,28 @@ public abstract class WidgetWithLayout extends Widget implements WidgetParent {
         super.setWidth(aSize);
         Layout layout = getLayout();
         if (layout != null)
-            layout.setWidth(this.getLayoutWidth());
+            layout.setWidth(this.getDefaultLayoutWidth());
     }
     
     void setHeight(int aSize) {
         super.setHeight(aSize);
         Layout layout = getLayout();
         if (layout != null)
-            layout.setHeight(this.getLayoutHeight());
+            layout.setHeight(this.getDefaultLayoutHeight());
     }
     
     public int getMinWidth() {
         Layout layout = this.getLayout();
         if (layout != null)
             return layout.getStretchedWidth();
-        return 10;
+        return 0;
     }
     
     public int getMinHeight() {
         Layout layout = this.getLayout();
         if (layout != null)
             return layout.getStretchedHeight();
-        return 10;
+        return 0;
     }
     
     /**
@@ -85,11 +90,20 @@ public abstract class WidgetWithLayout extends Widget implements WidgetParent {
      * @return True if this Widget ends up emitting an event as a result of the
      *         notification; false otherwise.
      */
-    public boolean handleEvent(int type, Object data) {
-        boolean already_handled = this.getLayout().handleEvent(type, data);
+    public boolean handlePointerEvent(int type, PointerTracker pointer) {
+        boolean already_handled = this.getLayout().handlePointerEvent(type, pointer);
         return already_handled;
     }
 
+    public void cancelPointerEvents() {
+        super.cancelPointerEvents();
+        this.cancelLayoutPointerEvents();
+    }
+
+    public void cancelLayoutPointerEvents() {
+        this.getLayout().cancelPointerEvents();
+    }
+    
     void draw(Graphics g, int xoff, int yoff, int x, int y, int width, int height) {
         Layout layout = this.getLayout();
         int layoutx = layout.getLocalXPos();
