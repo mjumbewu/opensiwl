@@ -94,9 +94,15 @@ public abstract class Layout extends Widget
      * @param text The Widget
      */
     abstract public void manage(Widget item);
+
+    /**
+     * Remove a Widget from the set managed by this layout.
+     * @param item The Widget
+     */
+    abstract public void unmanage(Widget item);
     
     public void onEvent(int type, Widget sender, Object data) {
-//        if (type == Event.RESIZED)
+        if (type == Widget.RESIZED_EVENT || type == Widget.MOVED_EVENT)
             invalidateSizes();
     }
     
@@ -254,7 +260,79 @@ public abstract class Layout extends Widget
             }
         }
     }
-    
+
+    /**
+     * Find the widgets in this layout containing the point (x,y), specified in
+     * local coordinates.  This is a naieve implementation and should be
+     * overridden by derived Layout classes that have better knowledge of how
+     * their items are arranged.
+     * @param x The local x coordinate
+     * @param y The local y coordinate
+     * @return A Vector of Widget objects that intersect with the given point
+     */
+    Vector getWidgetsContainingLocal(int x, int y) {
+        // For the generic layout, this is a rather naive implementation.
+        // More specific layouts should do better.
+        Vector containing_widgets = new Vector();
+
+        int num_items = this.getWidgetCount();
+        for (int i = 0; i < num_items; ++i) {
+            Widget item = this.getWidget(i);
+            int item_x = item.getLocalXPos();
+            int item_y = item.getLocalYPos();
+            if (item.containsLocal(x - item_x, y - item_y))
+                containing_widgets.addElement(item);
+        }
+
+        return containing_widgets;
+    }
+
+    Vector getWidgetsContainingGlobal(int x, int y) {
+        return getWidgetsContainingLocal(x - this.getLocalXPos(),
+                y - this.getLocalYPos());
+    }
+
+    private Vector m_active_items = new Vector();
+
+    protected Vector getActiveWidgets() {
+        return m_active_items;
+    }
+
+    /**
+     * Cancel all pointer events for this Widget and return it to an inactive
+     * state.
+     */
+    void cancelPointerEvents() {
+        this.cancelPointerEvents(null);
+    }
+
+    /**
+     * Cancel all pointer events for this Widget and its managed items except
+     * the one specified.
+     * @param exception The Widget to leave active, if it is active
+     */
+    void cancelPointerEvents(Widget exception) {
+        int num_items = m_active_items.size();
+        for (int i = 0; i < num_items; ++i) {
+            Widget item = (Widget)m_active_items.elementAt(i);
+            if (item != exception) {
+                item.cancelPointerEvents();
+                m_active_items.removeElement(item);
+            }
+        }
+
+        super.cancelPointerEvents();
+    }
+
+    /**
+     * Get the activity state for this Widget.  A Layout is active if and only
+     * if any of its managed items are active.
+     * @return The activity state of this Widget
+     */
+    public boolean isActive() {
+        return (!m_active_items.isEmpty());
+    }
+
     /**
      * The method called to respond to user input or any other events passed 
      * along from this Widget object's parent.  A Layout object's handler is 
@@ -265,13 +343,63 @@ public abstract class Layout extends Widget
      * @return True if this Widget ends up emitting an event as a result of the
      *         notification; false otherwise.
      */
-    public boolean handleEvent(int type, Object data) {
-        int num_items = this.getWidgetCount();
-        for (int i = 0; i < num_items; ++i) {
-            Widget item = this.getWidget(i);
-            if (item.handleEvent(type, data))
+    public boolean handlePointerEvent(int type, PointerTracker pointer) {
+        // Only send the events to children if (1) the pointer position is
+        // contained within the child Widget or (2) the child Widget is active.
+
+        boolean is_handled = false;
+
+        //-------------------------------------------------
+        // Check the active widgets first
+        int num_active_items = m_active_items.size();
+        for (int i = 0; i < num_active_items; ++i) {
+            Widget item = (Widget)m_active_items.elementAt(i);
+
+            // Check whether the item blocks the event
+            if (item.handlePointerEvent(type, pointer))
+                is_handled = true;
+
+            // Check whether the item's activation state changed
+            if (!item.isActive())
+                m_active_items.removeElement(item);
+
+            // If the item did block the event, cancel everything else and
+            // return true
+            if (is_handled) {
+                this.cancelPointerEvents(item);
                 return true;
+            }
         }
+
+        //-------------------------------------------------
+        // Next, check the widgets containing the pointer
+        int layout_x = this.getGlobalXPos();
+        int layout_y = this.getGlobalYPos();
+
+        Vector containing_widgets =
+                this.getWidgetsContainingLocal(pointer.getXPos() - layout_x,
+                                               pointer.getYPos() - layout_y);
+
+        int num_containing_items = containing_widgets.size();
+        for (int i = 0; i < num_containing_items; ++i) {
+            Widget item = (Widget)containing_widgets.elementAt(i);
+
+            // Check whether the item blocks the event
+            if (item.handlePointerEvent(type, pointer))
+                is_handled = true;
+
+            // Check whether the item's activation state changed
+            if (item.isActive())
+                m_active_items.addElement(item);
+
+            // If the item did block the event, cancel everything else and
+            // return true
+            if (is_handled) {
+                this.cancelPointerEvents(item);
+                return true;
+            }
+        }
+
         return false;
     }
 }
