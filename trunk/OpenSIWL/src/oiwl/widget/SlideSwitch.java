@@ -43,13 +43,43 @@ public class SlideSwitch extends StatefulButton {
     }
     
     public void toggleState() {
-        if (this.getPointerState() == ACTIVE)
-            this.setPointerState(INACTIVE);
+        if (this.getState() == ACTIVE)
+            this.setState(INACTIVE);
         else
-            this.setPointerState(ACTIVE);
+            this.setState(ACTIVE);
     }
     
-    public boolean handlePointerEvent(int type, PointerTracker pointer) {
+    public boolean handleEvent(int type, Object data) {
+        boolean already_handled = super.handleEvent(type, data);
+        
+        // If the event has somehow been handled, bail.
+        if (already_handled) {
+            return true;
+        }
+        
+        // A press event is the beginning of a state-change (from a user's
+        // standpoint anyway).
+        else if (type == Event.PRESSED) {
+            LocationData pressPoint = (LocationData)data;
+            if (this.m_switch.containsGlobal(pressPoint.x, pressPoint.y)) {
+//                this.startStateChange();
+            }
+            
+            // Press is not the same as click.  Do not block, because other
+            // Widget objects may need the data from the press event.
+            return false;
+        }
+        
+        // If the pointer leaves the widget, cancel the state change.
+        else if (type == Event.RELEASED) {
+            LocationData releasePoint = (LocationData)data;
+            if (this.containsGlobal(releasePoint.x, releasePoint.y)) {
+                this.toggleState();
+                return true;
+            }
+            return false;
+        }
+        
         return false;
     }
     
