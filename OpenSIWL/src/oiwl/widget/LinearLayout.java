@@ -5,12 +5,15 @@
 
 package oiwl.widget;
 
+import java.util.Vector;
+
 /**
  *
  * @author mjumbewu
  */
 public class LinearLayout extends Layout {
     private LinearLayoutProperties m_props;
+    private Vector m_cells = new Vector();
     
     public LinearLayout(int orient) {
         if (orient == Orientation.VERTICAL)
@@ -26,7 +29,8 @@ public class LinearLayout extends Layout {
      * A line of text with a definite position.
      * @author mjumbewu
      */
-    protected class LinearCell extends Cell {
+    protected class LinearCell {
+        Widget item;
         int offset = 0;
         int ortho = 0;
         int axial = 0;
@@ -39,19 +43,34 @@ public class LinearLayout extends Layout {
     
     public void manage(Widget item, int index, int padding, boolean expand, boolean fill) {
         LinearCell box = new LinearCell();
+        box.item = item;
         box.padding = padding;
         box.expand = expand;
         box.fill = fill;
-        this.addCell(box, item, index);
+
+        // Must add the cell before the widget, because adding the widget may
+        // cause a redraw, in turn causing a recalculateLayout, which needs the
+        // cell size.
+        if (index == -1)
+            this.m_cells.addElement(box);
+        else
+            this.m_cells.insertElementAt(box, index);
+        this.addWidgetSafely(item, index);
     }
     
-    /**
-     * Create a positioned line of text
-     * @return A new positioned line of text
-     */
-    protected Cell makeCell() {
-        LinearCell cell = new LinearCell();
-        return cell;
+    public void unmanage(Widget item) {
+        int index = this.getIndexOf(item);
+        this.removeWidget(item);
+        m_cells.removeElementAt(index);
+    }
+
+    public void unmanageAll() {
+        this.clearWidgets();
+        m_cells.removeAllElements();
+    }
+
+    protected LinearCell getCell(int index) {
+        return (LinearCell)m_cells.elementAt(index);
     }
 
     public int getPadding(int aIndex) {

@@ -68,4 +68,16 @@ public class AbsoluteLayout extends Layout {
         this.validateSizes();
     }
 
+    public void manage(Widget item) {
+        this.manage(item, 0, 0);
+    }
+
+    public void manage(Widget item, int x, int y) {
+        this.addWidgetSafely(item, -1);
+        item.setLocalPos(x, y);
+    }
+
+    public void unmanage(Widget item) {
+        this.removeWidget(item);
+    }
 }
