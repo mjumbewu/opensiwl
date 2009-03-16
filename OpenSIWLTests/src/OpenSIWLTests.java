@@ -20,17 +20,22 @@ public class OpenSIWLTests extends MIDlet {
     
     public void startApp() {
         if (!isInitialized) {
-            System.out.println("Creating the frames");
-            testFrames = new Vector();
-            testFrames.addElement(new TestFrame1(this, "1"));
-            testFrames.addElement(new TestFrame2(this, "2"));
-            testFrames.addElement(new TestFrame3(this, "3"));
-            testFrames.addElement(new TestFrame4(this, "4"));
-            currentTestIndex = 0;
-            isInitialized = true;
+            try {
+                System.out.println("Creating the frames");
+                testFrames = new Vector();
+                testFrames.addElement(new TestFrame1(this, "1"));
+                testFrames.addElement(new TestFrame2(this, "2"));
+                testFrames.addElement(new TestFrame3(this, "3"));
+                testFrames.addElement(new TestFrame4(this, "4"));
+                currentTestIndex = 0;
+                isInitialized = true;
 
-            display = Display.getDisplay(this);
-            nextTest();
+                display = Display.getDisplay(this);
+                nextTest();
+            } catch (Exception e) {
+                System.out.println("Exception: " + e.toString());
+                e.printStackTrace();
+            }
         }
     }
     

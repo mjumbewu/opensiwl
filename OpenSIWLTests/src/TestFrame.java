@@ -14,6 +14,8 @@ public abstract class TestFrame extends Frame implements Runnable {
     Panel testPanel = new Panel(Panel.BOTTOM);
     String testID;
     String instructions = "";
+
+    StaticText statusText;
     
     OpenSIWLTests app;
     
@@ -24,7 +26,8 @@ public abstract class TestFrame extends Frame implements Runnable {
         System.out.println("initialized super-base");
         this.addPanel(testPanel);
         System.out.println("added panel");
-        testPanel.getLayout().manage(new StaticText(testID + ": Performing test...", Font.getDefaultFont(), 0x000000ff));
+        statusText = new StaticText(testID + ": Performing test...", Font.getDefaultFont(), 0x000000ff);
+        testPanel.getLayout().manage(statusText);
         System.out.println("managed first in panel");
     }
     
@@ -39,18 +42,20 @@ public abstract class TestFrame extends Frame implements Runnable {
         System.out.print("testing...");
         boolean success = runtest();
         System.out.println("done.");
-        testPanel.getLayout().unmanage(0);
+        testPanel.getLayout().unmanage(statusText);
         if (success) {
             System.out.println(testID + ": success!");
-            testPanel.getLayout().manage(new StaticText(testID + ": Success!",
-                    Font.getDefaultFont(), 0x0000ff00));
+            statusText = new StaticText(testID + ": Success!",
+                    Font.getDefaultFont(), 0x0000ff00);
+            
         }
 
         else {
             System.out.println(testID + ": failure!");
-            testPanel.getLayout().manage(new StaticText(testID + ": Failure!",
-                    Font.getDefaultFont(), 0x00ff0000));
+            statusText = new StaticText(testID + ": Failure!",
+                    Font.getDefaultFont(), 0x00ff0000);
         }
+        testPanel.getLayout().manage(statusText);
         System.out.println("test over.");
         this.invalidate();
     }
