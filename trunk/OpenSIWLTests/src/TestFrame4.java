@@ -10,7 +10,7 @@ import oiwl.widget.*;
  * @author mjumbewu
  */
 public class TestFrame4 extends TestFrame implements EventListener {
-    Layout layout = new LinearLayout(Orientation.VERTICAL);
+    LinearLayout layout = new LinearLayout(Orientation.VERTICAL);
     StaticText prompt = new StaticText("Tap the button!");
 
     PushButton button = new PushButton();
@@ -32,7 +32,7 @@ public class TestFrame4 extends TestFrame implements EventListener {
     }
     
     protected boolean runtest() {
-        button.doTap();
+        button.tap();
         String text = prompt.getText();
         
         // Check that we couldn't paint when we weren't supposed to and we
@@ -41,19 +41,19 @@ public class TestFrame4 extends TestFrame implements EventListener {
     }
 
     public void onEvent(int type, Widget sender, Object data) {
-        if (type == Event.TAPPED && sender == this.button) {
+        if (type == PushButton.TAPPED_EVENT && sender == this.button) {
             int prompt_index = layout.getIndexOf(prompt);
             layout.unmanage(prompt);
             prompt = new StaticText("You tapped the button!");
-            layout.manage(prompt, prompt_index);
+            layout.manage(prompt, prompt_index, 0, true, false);
         }
         
-        else if (type == Event.DTAPPED && sender == this.button) {
+        else if (type == PushButton.DTAPPED_EVENT && sender == this.button) {
             int prompt_index = layout.getIndexOf(prompt);
             layout.unmanage(prompt);
             String str = prompt.getText();
             prompt = new StaticText(str + "!");
-            layout.manage(prompt, prompt_index);
+            layout.manage(prompt, prompt_index, 0, true, false);
         }
     }
 }
