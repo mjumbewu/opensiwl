@@ -14,109 +14,96 @@ import javax.microedition.lcdui.Graphics;
  */
 public abstract class Layout extends Widget 
         implements WidgetParent, EventListener {
-    /**
-     * The internal representation of a line of text
-     * @author mjumbewu
-     */
-    protected class Cell {
-        Widget item = null;
-    }
-    
-    private Vector m_cells = new Vector();
-    
-    /**
-     * The method used to create a new line of text
-     * @return A new Cell object
-     */
-    protected abstract Cell makeCell();
-    
-    /**
-     * Return the Vector of Cells in the TextItem
-     * @return The Vector of Cells in the TextItem
-     */
-    protected Vector getCells() {
-        return m_cells;
-    }
-    
-    /**
-     * Return the line indexed by aCellNumber
-     * @param aIndex The index of the cell
-     * @return The Cell indexed by aCellNumber
-     */
-    protected Cell getCell(int aIndex) {
-        return (Cell)m_cells.elementAt(aIndex);
-    }
-    
-    /**
-     * Manage an Widget with the Layout.  All unspecified parameters are set
-     * to the default.
-     * @param text The Widget
-     */
-    public void manage(Widget item) {
-        this.manage(item, -1);
-    }
-    
-    /**
-     * Manage an Widget with the Layout.
-     * @param text The Widget to be managed.
-     * @param index The desired index for the Widget
-     */
-    public void manage(Widget item, int index) {
-        this.addCell(this.makeCell(), item, index);
-    }
 
-    public void onEvent(int type, Widget sender, Object data) {
-//        if (type == Event.RESIZED)
-            invalidateSizes();
-    }
-    
-    /**
-     * An internal method to initialized a given Cell with the given values and
-     * insert it into the set of Cell objects
-     * @param newCell The Cell to initialize
-     * @param item The Widget to put in the Cell
-     * @param index The index at which to inset the Cell; if index=-1 then the
-     *              Cell is appended
-     */
-    protected void addCell(Cell newCell, Widget item, int index) {
+    private Vector m_widgets = new Vector();
+
+    protected void addWidgetSafely(Widget item, int index) {
         if (this.isValidChild(item)) {
             item.setParent(this);
             item.addEventListener(this);
-            newCell.item = item;
-
-            if (index == -1)
-                m_cells.addElement(newCell);
-            else
-                m_cells.insertElementAt(newCell, index);
-            
-            this.invalidateSizes();
+            this.addWidget(item, index);
         } else {
             throw new java.lang.IllegalArgumentException("Cannot add Item of" +
                     "type " + item.getClass().getName() + " to Layout");
         }
     }
-    
-    /**
-     * Remove the Widget from the Layout
-     * @param aIndex The index of the Widget to be removed
-     * @return The removed Widget
-     */
-    public Widget unmanage(int aIndex) {
-        Cell cell = this.getCell(aIndex);
-        Widget item = cell.item;
-        this.removeCell(cell);
-        return item;
+
+    protected void addWidget(Widget item, int index) {
+        if (index == -1) m_widgets.addElement(item);
+        else             m_widgets.insertElementAt(item, index);
+        this.invalidateSizes();
     }
 
-    public Widget unmanage(Widget item) {
-        int index = this.getIndexOf(item);
-        return unmanage(index);
-    }
-    
-    protected void removeCell(Cell trashCell) {
-        trashCell.item.removeEventListener(this);
-        m_cells.removeElement(trashCell);
+    protected void removeWidget(Widget item) {
+        m_widgets.removeElement(item);
         this.invalidateSizes();
+    }
+
+    protected void clearWidgets() {
+        m_widgets.removeAllElements();
+        this.invalidateSizes();
+    }
+
+    /**
+     * Get the Widget contained in a given Cell
+     * @param index The index of the cell
+     * @return The Widget in a Cell
+     */
+    public Widget getWidget(int index) {
+        return (Widget)m_widgets.elementAt(index);
+    }
+
+    public Widget getFirstWidget() {
+        return (Widget)m_widgets.firstElement();
+    }
+
+    public Widget getLastWidget() {
+        return (Widget)m_widgets.lastElement();
+    }
+
+    /**
+     * Get the index of the given Widget.
+     * @param item The Widget
+     * @return The index of the Widget, or -1 if no such Widget is managed by this
+     *         Layout.
+     */
+    public int getIndexOf(Widget item) {
+        return m_widgets.indexOf(item);
+    }
+
+    protected void replaceWidget(int index, Widget newItem) {
+        m_widgets.setElementAt(newItem, index);
+        this.invalidateSizes();
+    }
+
+    protected void replaceWidget(Widget oldItem, Widget newItem) {
+        this.replaceWidget(this.getIndexOf(oldItem), newItem);
+    }
+
+    /**
+     * Get the number of Widget objects in the Layout
+     * @return The number of objects in the Layout
+     */
+    public int getWidgetCount() {
+        return m_widgets.size();
+    }
+
+    /**
+     * Manage an Widget with the Layout.  All unspecified parameters are set
+     * to the default.
+     * @param text The Widget
+     */
+    abstract public void manage(Widget item);
+
+    /**
+     * Remove a Widget from the set managed by this layout.
+     * @param item The Widget
+     */
+    abstract public void unmanage(Widget item);
+    
+    public void onEvent(int type, Widget sender, Object data) {
+        if (type == Widget.RESIZED_EVENT || type == Widget.MOVED_EVENT)
+            invalidateSizes();
     }
     
     public boolean isValidChild(Widget item) {
@@ -127,47 +114,16 @@ public abstract class Layout extends Widget
         this.getParent().handleChildRedraw(item, x, y, w, h);
     }
     
-    /**
-     * Get the Widget contained in a given Cell
-     * @param aIndex The index of the cell
-     * @return The Widget in a Cell
-     */
-    public Widget getWidget(int aIndex) {
-        return ((Cell)m_cells.elementAt(aIndex)).item;
-    }
-    
-    /**
-     * Get the number of Widget objects in the Layout
-     * @return The number of objects in the Layout
-     */
-    public int getWidgetCount() {
-        return m_cells.size();
-    }
-    
-    /**
-     * Get the index of the given Widget.
-     * @param item The Widget
-     * @return The index of the Widget, or -1 if no such Widget is managed by this
-     *         Layout.
-     */
-    public int getIndexOf(Widget item) {
-        int num_item = this.getWidgetCount();
-        for (int i = 0; i < num_item; ++i)
-            if (this.getWidget(i) == item)
-                return i;
-        return -1;
-    }
-    
     private boolean m_areSizesValid = false;
     private int m_stretched_width;
     private int m_stretched_height;
     
     /**
-     * Call recalculateSizes to update the values reported by getWidth and
+     * Call recalculateLayout to update the values reported by getWidth and
      * getHeight.  Only classes derived from Layout should ever need to
-     * call recalculateSizes.
+     * call recalculateLayout.
      */
-    protected abstract void recalculateSizes();
+    protected abstract void recalculateLayout();
 
     /**
      * Check whether the values reported by getWidth and getHeight are
@@ -202,7 +158,7 @@ public abstract class Layout extends Widget
      * @return The width of the bounding box
      */
     public int getStretchedWidth() {
-        if (!m_areSizesValid) this.recalculateSizes();
+        if (!m_areSizesValid) this.recalculateLayout();
         return m_stretched_width;
     }
     
@@ -221,7 +177,7 @@ public abstract class Layout extends Widget
      * @return The height of the bounding box
      */
     public int getStretchedHeight() {
-        if (!m_areSizesValid) this.recalculateSizes();
+        if (!m_areSizesValid) this.recalculateLayout();
         return m_stretched_height;
     }
     
@@ -289,9 +245,9 @@ public abstract class Layout extends Widget
         //          each time, but only when you need a different portion of 
         //          the image.
         
-        int num_cells = this.getWidgetCount();
+        int num_items = this.getWidgetCount();
         
-        for (int i = 0; i < num_cells; ++i) {
+        for (int i = 0; i < num_items; ++i) {
             Widget item = this.getWidget(i);
             int itemx = item.getLocalXPos();
             int itemy = item.getLocalYPos();
@@ -304,7 +260,79 @@ public abstract class Layout extends Widget
             }
         }
     }
-    
+
+    /**
+     * Find the widgets in this layout containing the point (x,y), specified in
+     * local coordinates.  This is a naieve implementation and should be
+     * overridden by derived Layout classes that have better knowledge of how
+     * their items are arranged.
+     * @param x The local x coordinate
+     * @param y The local y coordinate
+     * @return A Vector of Widget objects that intersect with the given point
+     */
+    Vector getWidgetsContainingLocal(int x, int y) {
+        // For the generic layout, this is a rather naive implementation.
+        // More specific layouts should do better.
+        Vector containing_widgets = new Vector();
+
+        int num_items = this.getWidgetCount();
+        for (int i = 0; i < num_items; ++i) {
+            Widget item = this.getWidget(i);
+            int item_x = item.getLocalXPos();
+            int item_y = item.getLocalYPos();
+            if (item.containsLocal(x - item_x, y - item_y))
+                containing_widgets.addElement(item);
+        }
+
+        return containing_widgets;
+    }
+
+    Vector getWidgetsContainingGlobal(int x, int y) {
+        return getWidgetsContainingLocal(x - this.getLocalXPos(),
+                y - this.getLocalYPos());
+    }
+
+    private Vector m_active_items = new Vector();
+
+    protected Vector getActiveWidgets() {
+        return m_active_items;
+    }
+
+    /**
+     * Cancel all pointer events for this Widget and return it to an inactive
+     * state.
+     */
+    void cancelPointerEvents() {
+        this.cancelPointerEvents(null);
+    }
+
+    /**
+     * Cancel all pointer events for this Widget and its managed items except
+     * the one specified.
+     * @param exception The Widget to leave active, if it is active
+     */
+    void cancelPointerEvents(Widget exception) {
+        int num_items = m_active_items.size();
+        for (int i = 0; i < num_items; ++i) {
+            Widget item = (Widget)m_active_items.elementAt(i);
+            if (item != exception) {
+                item.cancelPointerEvents();
+                m_active_items.removeElement(item);
+            }
+        }
+
+        super.cancelPointerEvents();
+    }
+
+    /**
+     * Get the activity state for this Widget.  A Layout is active if and only
+     * if any of its managed items are active.
+     * @return The activity state of this Widget
+     */
+    public boolean isActive() {
+        return (!m_active_items.isEmpty());
+    }
+
     /**
      * The method called to respond to user input or any other events passed 
      * along from this Widget object's parent.  A Layout object's handler is 
@@ -315,13 +343,63 @@ public abstract class Layout extends Widget
      * @return True if this Widget ends up emitting an event as a result of the
      *         notification; false otherwise.
      */
-    public boolean handleEvent(int type, Object data) {
-        int num_cells = this.getWidgetCount();
-        for (int i = 0; i < num_cells; ++i) {
-            Widget item = this.getWidget(i);
-            if (item.handleEvent(type, data))
+    public boolean handlePointerEvent(int type, PointerTracker pointer) {
+        // Only send the events to children if (1) the pointer position is
+        // contained within the child Widget or (2) the child Widget is active.
+
+        boolean is_handled = false;
+
+        //-------------------------------------------------
+        // Check the active widgets first
+        int num_active_items = m_active_items.size();
+        for (int i = 0; i < num_active_items; ++i) {
+            Widget item = (Widget)m_active_items.elementAt(i);
+
+            // Check whether the item blocks the event
+            if (item.handlePointerEvent(type, pointer))
+                is_handled = true;
+
+            // Check whether the item's activation state changed
+            if (!item.isActive())
+                m_active_items.removeElement(item);
+
+            // If the item did block the event, cancel everything else and
+            // return true
+            if (is_handled) {
+                this.cancelPointerEvents(item);
                 return true;
+            }
         }
+
+        //-------------------------------------------------
+        // Next, check the widgets containing the pointer
+        int layout_x = this.getGlobalXPos();
+        int layout_y = this.getGlobalYPos();
+
+        Vector containing_widgets =
+                this.getWidgetsContainingLocal(pointer.getXPos() - layout_x,
+                                               pointer.getYPos() - layout_y);
+
+        int num_containing_items = containing_widgets.size();
+        for (int i = 0; i < num_containing_items; ++i) {
+            Widget item = (Widget)containing_widgets.elementAt(i);
+
+            // Check whether the item blocks the event
+            if (item.handlePointerEvent(type, pointer))
+                is_handled = true;
+
+            // Check whether the item's activation state changed
+            if (item.isActive())
+                m_active_items.addElement(item);
+
+            // If the item did block the event, cancel everything else and
+            // return true
+            if (is_handled) {
+                this.cancelPointerEvents(item);
+                return true;
+            }
+        }
+
         return false;
     }
 }
