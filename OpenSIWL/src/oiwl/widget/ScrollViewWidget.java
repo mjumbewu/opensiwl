@@ -7,6 +7,15 @@ package oiwl.widget;
 
 import javax.microedition.lcdui.Graphics;
 
+class ScrollEventMachine extends EventMachine {
+    public static final int SCROLLING_STATE = NewEventState();
+
+    public ScrollEventMachine() {
+        super(Event.CLICKED);
+    }
+
+
+}
 /**
  *
  * @author mjumbewu
@@ -25,89 +34,19 @@ public class ScrollViewWidget extends WidgetWithLayout {
         return this.getParent().isValidChild(item);
     }
 
-    MoveTask scrollTask = null;
+    ScrollEventMachine scrollEvent = new ScrollEventMachine();
 
-    public static final int HOLDING_STATE = NewWidgetState();
-    public static final int SCROLLING_STATE = NewWidgetState();
-
-    public void cancelPointerEvents() {
-        if (scrollTask != null) {
-            scrollTask.cancel();
-            scrollTask = null;
-        }
-        super.cancelPointerEvents();
-    }
-    
-    public boolean handlePointerEvent(int type, PointerTracker pointer) {
+    public boolean handleEvent(int type, Object data) {
         boolean already_handled = false;
 
-        if (getPointerState() == INACTIVE_STATE) {
-            if (type == Event.PRESSED) {
-                // Does the layout want to handle it?
-                already_handled = super.handlePointerEvent(type, pointer);
-
-                // If not, go to the next state
-                if (!already_handled) {
-                    setPointerState(HOLDING_STATE);
-                }
-
-                // Do not block events (unless the layout does)
-                return already_handled;
-            }
-        }
-        
-        else if (getPointerState() == HOLDING_STATE) {
-            if (type == Event.DRAGGED) {
-
-                // If we're moving then: yay, we're scrolling!
-                if (pointer.isMoving()) {
-                    setPointerState(SCROLLING_STATE);
-                    cancelLayoutPointerEvents();
-                    getLayout().offsetBy(pointer.dragDeltaX(), pointer.dragDeltaY());
-                    return true;
-                }
-            }
-            
-            // Otherwise, just check the children.
-            else {
-                already_handled = super.handlePointerEvent(type, pointer);
-                return already_handled;
-            }
+        // Don't send pointer events to
+        if (scrollEvent.getState() != ScrollEventMachine.SCROLLING_STATE) {
+            already_handled = super.handleEvent(type, data);
         }
 
-        else if (getPointerState() == SCROLLING_STATE) {
-            if (type == Event.FLICKED && pointer.dragDeltaX() < 1 &&
-                    pointer.dragDeltaY() < 1) {
-                this.cancelPointerEvents();
-            }
-            
-            if (type == Event.DRAGGED || type == Event.FLICKED) {
-                getLayout().offsetBy(pointer.dragDeltaX(), pointer.dragDeltaY());
-                return true;
-            }
-
-            else if (type == Event.RELEASED) {
-                if (pointer.getXVel() > 0 || pointer.getYVel() > 0) {
-                    scrollTask = new MoveTask(this, pointer, 0.5f,this);
-                    Thread flick_thread = new Thread(scrollTask);
-                    flick_thread.start();
-                }
-            }
-
-            else if (type == Event.PRESSED) {
-                cancelPointerEvents();
-                
-                // Does the layout want to handle it?
-                already_handled = super.handlePointerEvent(type, pointer);
-
-                // If not, go to the next state
-                if (!already_handled) {
-                    setPointerState(HOLDING_STATE);
-                }
-
-                // Do not block events (unless the layout does)
-                return already_handled;
-            }
+        if (already_handled) {
+            scrollEvent.reset();
+            return true;
         }
 
         return false;

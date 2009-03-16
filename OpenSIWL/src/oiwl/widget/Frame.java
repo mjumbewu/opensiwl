@@ -11,6 +11,8 @@ import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 
 import java.util.Vector;
+import java.util.Timer;
+import java.util.Date;
 
 /**
  * A Frame is the canvas for an OIWL-base UI.
@@ -251,9 +253,9 @@ public class Frame extends Canvas implements WidgetParent {
         panel.setParent(this);
         
 //        System.out.print("layout size: ");
-//        System.out.print(this.getDefaultLayoutWidth());
+//        System.out.print(this.getLayoutWidth());
 //        System.out.print(",");
-//        System.out.println(this.getDefaultLayoutHeight());
+//        System.out.println(this.getLayoutHeight());
 //        
 //        System.out.print("panel pos: ");
 //        System.out.print(panel.getLocalXPos());
@@ -487,13 +489,73 @@ public class Frame extends Canvas implements WidgetParent {
 
     ///////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////
-    // Pointer Events
+    // Flicking
     ///////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////
 
-    PointerTracker pointer = new PointerTracker();
-
+    // If this object has not had a moving event in longer than
+    // 'stillness_duration_threshold', it is not considered to be moving (i.e.
+    // it has a zero velocity).
+    long stillness_duration_threshold = 100;
+    
+    // If this object has not been dragged more than 'drag_movement_threshold'
+    // pixels/second, it is not considered to be moving (i.e. it has a zero 
+    // velocity).  This is like the stillness escape velocity.
+    int drag_movement_threshold = 10;
+    
+    /*
+     * The following are variables and methods for recording the position of the
+     * user's pointing device and the time of the recording.
+     */
+    
+    // prev_pos and curr_pos both refer to the position of the pointer.
+    private int prev_pointer_x = 0;
+    private int prev_pointer_y = 0;
+    private int curr_pointer_x = 0;
+    private int curr_pointer_y = 0;
+    
+    // last_move_time and current_time  refer to the time at which the screen 
+    // was polled for the pointer position on a press or drag.
+    private Date last_drag_time;
+    private Date current_time;
+    
+    private void resetPointerPosition(int x, int y)
+    {
+        prev_pointer_x = curr_pointer_x = x;
+        prev_pointer_y = curr_pointer_y = y;
+        
+        has_updated_pointer = true;
+    }
+    
+    private void resetDragTime()
+    {
+        last_drag_time = new Date(0);
+        current_time = new Date();
+        
+        has_updated_pointer = true;
+    }
+    
+    private void updatePointerPosition(int x, int y)
+    {
+        prev_pointer_x = curr_pointer_x;
+        prev_pointer_y = curr_pointer_y;
+        
+        curr_pointer_x = x;
+        curr_pointer_y = y;
+        
+        has_updated_pointer = true;
+    }
+    
+    void updateDragTime()
+    {
+        last_drag_time = current_time;
+        current_time = new Date();
+        
+        has_updated_pointer = true;
+    }
+    
     public void pointerPressed(int x, int y) {
+        this.getLayout().handleEvent(Event.PRESSED, new LocationData(x,y));
         
         System.out.print("down  ");
         System.out.print(x);
@@ -501,34 +563,79 @@ public class Frame extends Canvas implements WidgetParent {
         System.out.println(y);
         
         // Reset the velocity and time.
-        pointer.resetPointerPosition(x,y);
-        pointer.resetDragTime();
-        
-        this.getLayout().handlePointerEvent(Event.PRESSED, pointer);
+        resetPointerPosition(x,y);
+        resetDragTime();
     }
     
     public void pointerDragged(int x, int y) {
+        this.getLayout().handleEvent(Event.DRAGGED, new LocationData(x,y));
         
         System.out.print("drag  ");
         System.out.print(x);
         System.out.print(", ");
         System.out.println(y);
         
-        pointer.updatePointerPosition(x,y);
-        pointer.updateDragTime();
-
-        this.getLayout().handlePointerEvent(Event.DRAGGED, pointer);
+        updatePointerPosition(x,y);
+        updateDragTime();
     }
     
     public void pointerReleased(int x, int y) {
+        this.getLayout().handleEvent(Event.RELEASED, new LocationData(x,y));
         
         System.out.print("up    ");
         System.out.print(x);
         System.out.print(", ");
         System.out.println(y);
         
-        pointer.updateDragTime();
+        updateDragTime();
+        calcVelocity();
         
-        this.getLayout().handlePointerEvent(Event.RELEASED, pointer);
+        MovementData flickData = new MovementData(x, y, 
+                this.current_time.getTime(), this.velocity_x, this.velocity_y);
+        this.getLayout().handleEvent(Event.FLICKED, flickData);
     }
+
+    /*
+     * The following are tools to determine the current velocity of the frame,
+     * and keep track of whether the frame has moved since the last calculation.
+     * If the frame has not moved, then the functions will return their stored
+     * values, so as not to do unnecessary floating-point calculations and 
+     * function calls.float
+     */
+    private boolean has_updated_pointer = false;
+    private float velocity_x = 0f;
+    private float velocity_y = 0f;
+    
+    private int dragDeltaX() { return curr_pointer_x - prev_pointer_x; }
+    private int dragDeltaY() { return curr_pointer_y - prev_pointer_y; }
+    private long dragDeltaTime() { return current_time.getTime() - last_drag_time.getTime(); }
+    
+    private synchronized void calcVelocity()
+    {
+        // Only update the velocity if we have to (in response to a press or 
+        // drag).
+        if (has_updated_pointer)
+        {
+            // If we have been still too long, no movement.
+            if (dragDeltaTime() > stillness_duration_threshold) {
+                velocity_x = 0f;
+                velocity_y = 0f;
+            }
+            else
+            {
+                float dx = dragDeltaX();
+                float dy = dragDeltaY();
+                long  dt = dragDeltaTime();
+
+                velocity_x = (float) dx / dt * 1000;
+                velocity_y = (float) dy / dt * 1000;
+            }
+        }
+        
+        // ::NOTE:: This 'has_updated_pointer' way of keeping track of state is vulnerable
+        //          to race conditions.  I just hope it won't be noticed too 
+        //          much.  And hopefully the 'synchronized' will solve it.
+        has_updated_pointer = false;
+    }
+    
 }

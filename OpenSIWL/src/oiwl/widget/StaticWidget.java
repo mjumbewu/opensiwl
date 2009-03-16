@@ -10,7 +10,7 @@ package oiwl.widget;
  * @author mjumbewu
  */
 public abstract class StaticWidget extends Widget {
-    public boolean handlePointerEvent(int type, PointerTracker pointer) {
+    public boolean handleEvent(int type, Object data) {
         return false;
     }
 }
