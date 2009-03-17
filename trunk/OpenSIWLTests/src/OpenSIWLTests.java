@@ -24,9 +24,13 @@ public class OpenSIWLTests extends MIDlet {
                 System.out.println("Creating the frames");
                 testFrames = new Vector();
                 testFrames.addElement(new TestFrame1(this, "1"));
+                testFrames.addElement(new TestFrame1L(this, "1 Landscape"));
                 testFrames.addElement(new TestFrame2(this, "2"));
+                testFrames.addElement(new TestFrame2L(this, "2 Landscape"));
                 testFrames.addElement(new TestFrame3(this, "3"));
+                testFrames.addElement(new TestFrame3L(this, "3 Landscape"));
                 testFrames.addElement(new TestFrame4(this, "4"));
+                testFrames.addElement(new TestFrame4L(this, "4 Landscape"));
                 currentTestIndex = 0;
                 isInitialized = true;
 
