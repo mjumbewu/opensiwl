@@ -21,8 +21,8 @@ public class TestFrame2 extends TestFrame {
     StaticText st_hor1 = new StaticText("Hor1");
     StaticText st_hor2 = new StaticText("Hor2");
     
-    public TestFrame2(OpenSIWLTests app, String id) {
-        super(app, id, Orientation.PORTRAIT);
+    public TestFrame2(OpenSIWLTests app, String id, int orient) {
+        super(app, id, orient);
 
         this.instructions = "This test starts off with two text items arranged" +
                 "vertically.  Then several more are added below.  Finally, two" +

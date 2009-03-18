@@ -15,8 +15,8 @@ public class TestFrame4 extends TestFrame implements EventListener {
 
     PushButton button = new PushButton();
     
-    public TestFrame4(OpenSIWLTests app, String id) {
-        super(app, id, Orientation.PORTRAIT);
+    public TestFrame4(OpenSIWLTests app, String id, int orient) {
+        super(app, id, orient);
         this.setLayout(layout);
         
         this.instructions = "This test ensures that the PushButton object will" +

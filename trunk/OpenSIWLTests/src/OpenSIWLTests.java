@@ -23,14 +23,16 @@ public class OpenSIWLTests extends MIDlet {
             try {
                 System.out.println("Creating the frames");
                 testFrames = new Vector();
-                testFrames.addElement(new TestFrame1(this, "1"));
-                testFrames.addElement(new TestFrame1L(this, "1 Landscape"));
-                testFrames.addElement(new TestFrame2(this, "2"));
-                testFrames.addElement(new TestFrame2L(this, "2 Landscape"));
-                testFrames.addElement(new TestFrame3(this, "3"));
-                testFrames.addElement(new TestFrame3L(this, "3 Landscape"));
-                testFrames.addElement(new TestFrame4(this, "4"));
-                testFrames.addElement(new TestFrame4L(this, "4 Landscape"));
+                testFrames.addElement(new TestFrame1(this, "1", Orientation.PORTRAIT));
+                testFrames.addElement(new TestFrame1(this, "1 Landscape", Orientation.LANDSCAPE));
+                testFrames.addElement(new TestFrame2(this, "2", Orientation.PORTRAIT));
+                testFrames.addElement(new TestFrame2(this, "2 Landscape", Orientation.LANDSCAPE));
+                testFrames.addElement(new TestFrame3(this, "3", Orientation.PORTRAIT));
+                testFrames.addElement(new TestFrame3(this, "3 Landscape", Orientation.LANDSCAPE));
+                testFrames.addElement(new TestFrame4(this, "4", Orientation.PORTRAIT));
+                testFrames.addElement(new TestFrame4(this, "4 Landscape", Orientation.LANDSCAPE));
+                testFrames.addElement(new TestFrame5(this, "5", Orientation.PORTRAIT));
+                testFrames.addElement(new TestFrame5(this, "5 Landscape", Orientation.LANDSCAPE));
                 currentTestIndex = 0;
                 isInitialized = true;
 
@@ -46,9 +48,13 @@ public class OpenSIWLTests extends MIDlet {
     public void nextTest() {
         if (currentTestIndex < testFrames.size()) {
             System.out.println("Displaying the frame.");
-            TestFrame currentTestFrame = (TestFrame)testFrames.elementAt(currentTestIndex++);
-            display.setCurrent(currentTestFrame);
-            currentTestFrame.start();
+            try {
+                TestFrame currentTestFrame = (TestFrame)testFrames.elementAt(currentTestIndex++);
+                display.setCurrent(currentTestFrame);
+                currentTestFrame.start();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         } else {
             this.notifyDestroyed();
         }

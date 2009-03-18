@@ -10,8 +10,8 @@ import oiwl.widget.*;
  * @author mjumbewu
  */
 public class TestFrame1 extends TestFrame {
-    public TestFrame1(OpenSIWLTests app, String id) {
-        super(app, id, Orientation.PORTRAIT);
+    public TestFrame1(OpenSIWLTests app, String id, int orient) {
+        super(app, id, orient);
 
         this.instructions = "This is a simple test.  It consists of a Frame " +
                 "with a vertical linear layout manager.  Several StaticText" +
