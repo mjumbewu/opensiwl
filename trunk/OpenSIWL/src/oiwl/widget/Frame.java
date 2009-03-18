@@ -130,6 +130,17 @@ public class Frame extends Canvas implements WidgetParent {
     public int getOrientation() {
         return this.m_orientation;
     }
+
+    /**
+     * Get the value needed when transforming the buffer to the device space.
+     * @return The transformation needed to get the buffer to the device
+     */
+    private int getTransformation() {
+        if (this.getOrientation() == Orientation.LANDSCAPE)
+            return Sprite.TRANS_ROT90;
+        else
+            return Sprite.TRANS_NONE;
+    }
     
     /**
      * Set the orientation of the Frame.
@@ -389,13 +400,27 @@ public class Frame extends Canvas implements WidgetParent {
         }
         
         // Request a repaint
-        this.repaint(x,y,w,h);
+        int untransformed_x = frameToDeviceX(x,y,w,h);
+        int untransformed_y = frameToDeviceY(x,y,w,h);
+        int untransformed_w = frameToDeviceW(x,y,w,h);
+        int untransformed_h = frameToDeviceH(x,y,w,h);
+        this.repaint(untransformed_x,untransformed_y,
+                untransformed_w,untransformed_h);
     }
     
     public void invalidate() {
         this.invalidate(0, 0, this.getWidth(), this.getHeight());
     }
-    
+
+    /**
+     * Draw the specified portion of the Frame's background to the graphics
+     * context.
+     * @param g
+     * @param x
+     * @param y
+     * @param w
+     * @param h
+     */
     private void drawBackground(Graphics g, int x, int y, int w, int h) {
         int c0 = g.getColor();
         
@@ -435,11 +460,11 @@ public class Frame extends Canvas implements WidgetParent {
         int h = b-y;
 
         if (this.canPaint()) {
-//            System.out.println("painting the region x="
-//                    + Integer.toString(x) + ", y="
-//                    + Integer.toString(y) + ", w="
-//                    + Integer.toString(w) + ", h="
-//                    + Integer.toString(h));
+            System.out.println("painting the region x="
+                    + Integer.toString(x) + ", y="
+                    + Integer.toString(y) + ", w="
+                    + Integer.toString(w) + ", h="
+                    + Integer.toString(h));
 
             // Draw the layout and the panels to the oriented buffer
             Graphics buffer = this.getGraphics();
@@ -457,18 +482,20 @@ public class Frame extends Canvas implements WidgetParent {
                 panel.draw(buffer, panelx, panely,
                         x - panelx, y - panely, w, h);
             }
+
+            buffer.drawRect(x, y, w-1, h-1);
             resetInvalidatedRegion();
         }
 
         if (this.m_orientedBuffer != null) {
             // Draw the oriented buffer to the screen
-            if (getOrientation() == Orientation.PORTRAIT)
-                g.drawRegion(m_orientedBuffer, x, y, w, h,
-                        Sprite.TRANS_NONE, x, y, Graphics.TOP|Graphics.LEFT);
+            int untransformed_x = this.frameToDeviceX(x, y, w, h);
+            int untransformed_y = this.frameToDeviceY(x, y, w, h);
+            int transformation = this.getTransformation();
+            System.out.println(transformation);
 
-            else /* LANDSCAPE, right-handed rotation */
-                g.drawRegion(m_orientedBuffer, x, y, w, h,
-                        Sprite.TRANS_ROT90, x, this.getHeight()-b, Graphics.TOP|Graphics.LEFT);
+            g.drawRegion(m_orientedBuffer, x, y, w, h, transformation,
+                    untransformed_x, untransformed_y, Graphics.TOP|Graphics.LEFT);
         }
     }
     
@@ -493,7 +520,110 @@ public class Frame extends Canvas implements WidgetParent {
 
     PointerTracker pointer = new PointerTracker();
 
-    public void pointerPressed(int x, int y) {
+    public int deviceToFrameX(int x, int y, int w, int h) {
+        if (this.getOrientation() == Orientation.LANDSCAPE)
+            x = y;
+
+        return x;
+    }
+
+    public int deviceToFrameY(int x, int y, int w, int h) {
+        if (this.getOrientation() == Orientation.LANDSCAPE)
+            y = this.getHeight() - x - w;
+
+        return y;
+    }
+
+    public int deviceToFrameW(int x, int y, int w, int h) {
+        if (this.getOrientation() == Orientation.LANDSCAPE)
+            w = h;
+
+        return w;
+    }
+
+    public int deviceToFrameH(int x, int y, int w, int h) {
+        if (this.getOrientation() == Orientation.LANDSCAPE)
+            h = w;
+
+        return h;
+    }
+
+    /**
+     * A function that derives a translated x-coordinate from coordinates
+     * specified in the device reference space.
+     * @param x The x-coordinate of the point in device space
+     * @param y The y-coordinate of the point in device space
+     * @return The x-coordinate of the point in the Frame's reference space
+     */
+    public int deviceToFrameX(int x, int y) {
+        return this.deviceToFrameX(x, y, 0, 0);
+    }
+
+    /**
+     * A function that derives a translated y-coordinate from coordinates
+     * specified in the device reference space.
+     * @param x The x-coordinate of the point in device space
+     * @param y The y-coordinate of the point in device space
+     * @return The y-coordinate of the point in the Frame's reference space
+     */
+    public int deviceToFrameY(int x, int y) {
+        return this.deviceToFrameY(x, y, 0, 0);
+    }
+
+    public int frameToDeviceX(int x, int y, int w, int h) {
+        if (this.getOrientation() == Orientation.LANDSCAPE)
+            x = this.getHeight() - y - h;
+
+        return x;
+    }
+
+    public int frameToDeviceY(int x, int y, int w, int h) {
+        if (this.getOrientation() == Orientation.LANDSCAPE)
+            y = x;
+
+        return y;
+    }
+
+    public int frameToDeviceW(int x, int y, int w, int h) {
+        if (this.getOrientation() == Orientation.LANDSCAPE)
+            w = h;
+
+        return w;
+    }
+
+    public int frameToDeviceH(int x, int y, int w, int h) {
+        if (this.getOrientation() == Orientation.LANDSCAPE)
+            h = w;
+
+        return h;
+    }
+
+    /**
+     * A function that derives a device x-coordinate from coordinates
+     * specified in the Frame's reference space.
+     * @param x The x-coordinate of the point in the Frame's reference space
+     * @param y The y-coordinate of the point in the Frame's reference space
+     * @return The x-coordinate of the point in device space
+     */
+    public int frameToDeviceX(int x, int y) {
+        return this.frameToDeviceX(x, y, 0, 0);
+    }
+
+    /**
+     * A function that derives a device y-coordinate from coordinates
+     * specified in the Frame's reference space.
+     * @param x The x-coordinate of the point in the Frame's reference space
+     * @param y The y-coordinate of the point in the Frame's reference space
+     * @return The y-coordinate of the point in device space
+     */
+    public int frameToDeviceY(int x, int y) {
+        return this.frameToDeviceY(x, y, 0, 0);
+    }
+
+    public void pointerPressed(int untransformed_x, int untransformed_y) {
+
+        int x = deviceToFrameX(untransformed_x, untransformed_y);
+        int y = deviceToFrameY(untransformed_x, untransformed_y);
         
         System.out.print("down  ");
         System.out.print(x);
@@ -507,8 +637,11 @@ public class Frame extends Canvas implements WidgetParent {
         this.getLayout().handlePointerEvent(Event.PRESSED, pointer);
     }
     
-    public void pointerDragged(int x, int y) {
+    public void pointerDragged(int untransformed_x, int untransformed_y) {
         
+        int x = deviceToFrameX(untransformed_x, untransformed_y);
+        int y = deviceToFrameY(untransformed_x, untransformed_y);
+
         System.out.print("drag  ");
         System.out.print(x);
         System.out.print(", ");
@@ -520,8 +653,11 @@ public class Frame extends Canvas implements WidgetParent {
         this.getLayout().handlePointerEvent(Event.DRAGGED, pointer);
     }
     
-    public void pointerReleased(int x, int y) {
+    public void pointerReleased(int untransformed_x, int untransformed_y) {
         
+        int x = deviceToFrameX(untransformed_x, untransformed_y);
+        int y = deviceToFrameY(untransformed_x, untransformed_y);
+
         System.out.print("up    ");
         System.out.print(x);
         System.out.print(", ");

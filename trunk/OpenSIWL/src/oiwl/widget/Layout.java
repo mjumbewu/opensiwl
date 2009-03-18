@@ -254,7 +254,6 @@ public abstract class Layout extends Widget
 
             // Only draw the Widget if it's within the draw region.
             if (item.intersectsLocal(x-itemx, y-itemy, width, height)) {
-                g.drawRect(xoff + itemx, yoff + itemy, item.getWidth(), item.getHeight());
                 item.draw(g, xoff + itemx, yoff + itemy,
                         x - itemx, y - itemy, width, height);
             }
