@@ -21,8 +21,8 @@ public class TestFrame3 extends TestFrame {
     StaticText st_hor1 = new StaticText("Hor1");
     StaticText st_hor2 = new StaticText("Hor2");
     
-    public TestFrame3(OpenSIWLTests app, String id) {
-        super(app, id, Orientation.PORTRAIT);
+    public TestFrame3(OpenSIWLTests app, String id, int orient) {
+        super(app, id, orient);
         
         this.instructions = "This test is very similar to the previous one.  " +
                 "The main difference is that painting of the frame is suppressed" +
