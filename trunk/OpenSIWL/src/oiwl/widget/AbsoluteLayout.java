@@ -33,7 +33,7 @@ public class AbsoluteLayout extends Layout {
 
     public void setZPos(Widget item, int pos) {
         this.removeWidget(item);
-        this.addWidget(item, pos);
+        this.addWidget_internal(item, pos);
     }
 
     public void moveUp(Widget item) {
@@ -77,7 +77,7 @@ public class AbsoluteLayout extends Layout {
     }
 
     public void manage(Widget item, int x, int y) {
-        this.addWidgetSafely(item, -1);
+        this.addWidget(item, -1);
         item.setLocalPos(x, y);
     }
 

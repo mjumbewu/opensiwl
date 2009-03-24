@@ -59,7 +59,7 @@ public class LinearLayout extends Layout {
             this.m_cells.addElement(box);
         else
             this.m_cells.insertElementAt(box, index);
-        this.addWidgetSafely(item, index);
+        this.addWidget(item, index);
     }
     
     public void unmanage(Widget item) {

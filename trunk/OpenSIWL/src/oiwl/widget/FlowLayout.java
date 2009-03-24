@@ -19,7 +19,7 @@ public class FlowLayout extends Layout {
     }
 
     public void manage(Widget item) {
-        this.addWidgetSafely(item, -1);
+        this.addWidget(item, -1);
     }
 
     public void unmanage(Widget item) {

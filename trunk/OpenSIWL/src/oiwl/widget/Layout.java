@@ -17,18 +17,18 @@ public abstract class Layout extends Widget
 
     private Vector m_widgets = new Vector();
 
-    protected void addWidgetSafely(Widget item, int index) {
+    protected void addWidget(Widget item, int index) {
         if (this.isValidChild(item)) {
             item.setParent(this);
             item.addEventListener(this);
-            this.addWidget(item, index);
+            this.addWidget_internal(item, index);
         } else {
             throw new java.lang.IllegalArgumentException("Cannot add Item of" +
                     "type " + item.getClass().getName() + " to Layout");
         }
     }
 
-    protected void addWidget(Widget item, int index) {
+    private void addWidget_internal(Widget item, int index) {
         if (index == -1) m_widgets.addElement(item);
         else             m_widgets.insertElementAt(item, index);
         this.invalidateSizes();
