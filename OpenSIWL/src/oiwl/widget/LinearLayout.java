@@ -14,8 +14,10 @@ import java.util.Vector;
 public class LinearLayout extends Layout {
     private LinearLayoutProperties m_props;
     private Vector m_cells = new Vector();
+    private int m_orientation;
     
     public LinearLayout(int orient) {
+        m_orientation = orient;
         if (orient == Orientation.VERTICAL)
             m_props = new VerticalLayoutProperties(this);
         else if (orient == Orientation.HORIZONTAL)
@@ -36,8 +38,8 @@ public class LinearLayout extends Layout {
     protected class LinearCell {
         Widget item;
         int offset = 0;
-        int ortho = 0;
-        int axial = 0;
+        int ortho_size = 0;
+        int axial_size = 0;
 
         int padding = 0;
         boolean expand = true;
@@ -180,9 +182,6 @@ public class LinearLayout extends Layout {
             return m_layout;
         }
         
-        abstract protected int getAxialPos();
-        abstract protected int getOrthoPos();
-
         abstract protected int getAxialSize();
         abstract protected int getOrthoSize();
         abstract protected void setAxialSize(int size);
@@ -195,8 +194,8 @@ public class LinearLayout extends Layout {
 
         abstract protected int getAxialPos(Widget item);
         abstract protected int getOrthoPos(Widget item);
-        abstract protected void setAxialPos(Widget item, int pos);
-        abstract protected void setOrthoPos(Widget item, int pos);
+//        abstract protected void setAxialPos(Widget item, int pos);
+//        abstract protected void setOrthoPos(Widget item, int pos);
 
         abstract protected int getAxialSize(Widget item);
         abstract protected int getOrthoSize(Widget item);
@@ -215,7 +214,7 @@ public class LinearLayout extends Layout {
     }
     
     /**
-     * Calculate the ortho and the axial as the ortho of the widest line and
+     * Calculate the ortho_size and the axial_size as the ortho_size of the widest line and
      * the sum of the heights of the lines, respectively, in this TextItem.
      */
     protected synchronized void recalculateLayout() {
@@ -252,14 +251,12 @@ public class LinearLayout extends Layout {
     /**
      * Calculate the relative positions of the tops of the lines in this
      * TextItem.  The offset-most line always has a offset=0.  Every offset from there
-     * on is the offset of the previous line offset by the axial of the previous
+     * on is the offset of the previous line offset by the axial_size of the previous
      * line.
      */
     protected synchronized void recalculateOffsets() {
         int num_items = this.getWidgetCount();
         
-        int layout_ax_pos = getProperties().getAxialPos();
-        int layout_op_pos = getProperties().getOrthoPos();
         int layout_ax_size = getProperties().getAxialSize();
         int layout_or_size = getProperties().getOrthoSize();
 
@@ -277,7 +274,7 @@ public class LinearLayout extends Layout {
         
         int offset = 0;
         
-        // Calculate and set the axial and orthogonal position and size for 
+        // Calculate and set the axial_size and orthogonal position and size for
         // each managed Widget object.  Every time the Layout receives a
         // MOVED or RESIZED event it invalidates its size again, so turn off
         // each Widget object's events before adjusting, or else we'll get
@@ -295,57 +292,27 @@ public class LinearLayout extends Layout {
             box.offset = offset;
             
             // Calculate the size of the current box
-            box.ortho = layout_or_size;
+            box.ortho_size = layout_or_size;
             int min_axial_box_size = getProperties().getMinAxialSize(box.item) + 2*box.padding;
             if (box.expand) 
-                box.axial =
+                box.axial_size =
                     Math.max(available_size / expanding_boxes, min_axial_box_size);
             else 
-                box.axial = min_axial_box_size;
+                box.axial_size = min_axial_box_size;
             
             // Make sure the Widget is properly sized
             if (box.fill) {
-                getProperties().setAxialSize(box.item, box.axial - 2*box.padding);
-                getProperties().setOrthoSize(box.item, box.ortho);
+                getProperties().setAxialSize(box.item, box.axial_size - 2*box.padding);
+                getProperties().setOrthoSize(box.item, box.ortho_size);
             } else {
                 getProperties().setAxialSize(box.item, getProperties().getMinAxialSize(box.item));
                 getProperties().setOrthoSize(box.item, getProperties().getMinOrthoSize(box.item));
-//                System.out.print(box.item.getClass().toString());
-//                System.out.print(",");
-//                System.out.print(getProperties().getOrthoSize(box.item));
-//                System.out.print(",");
-//                System.out.println(getProperties().getAxialSize(box.item));
             }
             
-            // Axially position
-            int ax_align = getProperties().getAxialAlign(index);
-            int ax_pos;
-
-            if ((ax_align & Alignment.MIN) != 0)
-                ax_pos = box.offset + box.padding;
-            else if ((ax_align & Alignment.CENTER) != 0)
-                ax_pos = (box.axial - getProperties().getAxialSize(box.item))/2 + box.offset;
-            else /* MAX */
-                ax_pos = box.axial - box.padding - getProperties().getAxialSize(box.item) + box.offset;
-
-            // Orthogonally position
-            int or_align = getProperties().getOrthoAlign(index);
-            int or_pos;
-
-            if ((or_align & Alignment.MIN) != 0)
-                or_pos = 0;
-            else if ((or_align & Alignment.CENTER) != 0)
-                or_pos = (box.ortho - getProperties().getOrthoSize(box.item))/2;
-            else /* MAX */
-                or_pos = box.ortho - getProperties().getOrthoSize(box.item);
-
-            getProperties().setAxialPos(box.item, ax_pos);
-            getProperties().setOrthoPos(box.item, or_pos);
-            
-            // Update the offset and available axial for the next box
-            offset += box.axial;
+            // Update the offset and available axial_size for the next box
+            offset += box.axial_size;
             if (box.expand) {
-                available_size -= box.axial;
+                available_size -= box.axial_size;
                 --expanding_boxes;
             }
             
@@ -354,12 +321,59 @@ public class LinearLayout extends Layout {
         }
     }
 
+    public int getChildXPos(Widget child) {
+        int index = this.getIndexOf(child);
+        LinearCell box = this.getCell(index);
+        int box_pos, box_size, child_pos, align;
+
+        if (this.m_orientation == Orientation.HORIZONTAL) {
+            box_pos = box.offset;
+            box_size = box.axial_size;
+            align = this.getProperties().getAxialAlign(index);
+        } else {
+            box_pos = 0;
+            box_size = box.ortho_size;
+            align = this.getProperties().getOrthoAlign(index);
+        }
+
+        if ((align & Alignment.MIN) != 0)
+            child_pos = box.padding;
+        else if ((align & Alignment.CENTER) != 0)
+            child_pos = (box_size - child.getWidth())/2;
+        else /* MAX */
+            child_pos = box_size - child.getWidth() - box.padding;
+
+        return box_pos + child_pos;
+    }
+
+    public int getChildYPos(Widget child) {
+        int index = this.getIndexOf(child);
+        LinearCell box = this.getCell(index);
+        int box_pos, box_size, child_pos, align;
+
+        if (this.m_orientation == Orientation.VERTICAL) {
+            box_pos = box.offset;
+            box_size = box.axial_size;
+            align = this.getProperties().getAxialAlign(index);
+        } else {
+            box_pos = 0;
+            box_size = box.ortho_size;
+            align = this.getProperties().getOrthoAlign(index);
+        }
+
+        if ((align & Alignment.MIN) != 0)
+            child_pos = box.padding;
+        else if ((align & Alignment.CENTER) != 0)
+            child_pos = (box_size - child.getWidth())/2;
+        else /* MAX */
+            child_pos = box_size - child.getWidth() - box.padding;
+
+        return box_pos + child_pos;
+    }
+
     class VerticalLayoutProperties extends LinearLayoutProperties {
         public VerticalLayoutProperties(LinearLayout layout)  { super(layout); }
         
-        protected int getAxialPos() { return getLayout().getLocalYPos(); }
-        protected int getOrthoPos() { return getLayout().getLocalXPos(); }
-
         protected int getAxialSize() { return getLayout().getHeight(); }
         protected int getOrthoSize() { return getLayout().getWidth(); }
         protected void setAxialSize(int size) { getLayout().setHeight(size); }
@@ -370,10 +384,10 @@ public class LinearLayout extends Layout {
         protected void setStretchedAxialSize(int size) { getLayout().setStretchedHeight(size); }
         protected void setStretchedOrthoSize(int size) { getLayout().setStretchedWidth(size); }
 
-        protected int getAxialPos(Widget item) { return item.getLocalYPos(); }
-        protected int getOrthoPos(Widget item) { return item.getLocalXPos(); }
-        protected void setAxialPos(Widget item, int pos) { item.setLocalYPos(pos); }
-        protected void setOrthoPos(Widget item, int pos) { item.setLocalXPos(pos); }
+        protected int getAxialPos(Widget item) { return getLayout().getChildYPos(item); }
+        protected int getOrthoPos(Widget item) { return getLayout().getChildXPos(item); }
+//        protected void setAxialPos(Widget item, int pos) { item.setLocalYPos(pos); }
+//        protected void setOrthoPos(Widget item, int pos) { item.setLocalXPos(pos); }
 
         protected int getAxialSize(Widget item) { return item.getHeight(); }
         protected int getOrthoSize(Widget item) { return item.getWidth(); }
@@ -390,9 +404,6 @@ public class LinearLayout extends Layout {
     class HorizontalLayoutProperties extends LinearLayoutProperties {
         public HorizontalLayoutProperties(LinearLayout layout)  { super(layout); }
         
-        protected int getOrthoPos() { return getLayout().getLocalYPos(); }
-        protected int getAxialPos() { return getLayout().getLocalXPos(); }
-
         protected int getOrthoSize() { return getLayout().getHeight(); }
         protected int getAxialSize() { return getLayout().getWidth(); }
         protected void setOrthoSize(int size) { getLayout().setHeight(size); }
@@ -403,10 +414,10 @@ public class LinearLayout extends Layout {
         protected void setStretchedOrthoSize(int size) { getLayout().setStretchedHeight(size); }
         protected void setStretchedAxialSize(int size) { getLayout().setStretchedWidth(size); }
 
-        protected int getOrthoPos(Widget item) { return item.getLocalYPos(); }
-        protected int getAxialPos(Widget item) { return item.getLocalXPos(); }
-        protected void setOrthoPos(Widget item, int pos) { item.setLocalYPos(pos); }
-        protected void setAxialPos(Widget item, int pos) { item.setLocalXPos(pos); }
+        protected int getOrthoPos(Widget item) { return getLayout().getChildYPos(item); }
+        protected int getAxialPos(Widget item) { return getLayout().getChildXPos(item); }
+//        protected void setOrthoPos(Widget item, int pos) { item.setLocalYPos(pos); }
+//        protected void setAxialPos(Widget item, int pos) { item.setLocalXPos(pos); }
 
         protected int getOrthoSize(Widget item) { return item.getHeight(); }
         protected int getAxialSize(Widget item) { return item.getWidth(); }

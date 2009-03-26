@@ -5,11 +5,36 @@
 
 package oiwl.widget;
 
+import java.util.Vector;
+
 /**
  *
  * @author mjumbewu
  */
 public class AbsoluteLayout extends Layout {
+
+    protected class WidgetPos {
+        Widget item;
+        int x=0, y=0;
+    }
+
+    Vector m_positions = new Vector();
+
+    public void manage(Widget item, int x, int y, int z) {
+        WidgetPos pos = new WidgetPos();
+        pos.item = item;
+        pos.x = x;
+        pos.y = y;
+
+        // Must add the cell before the widget, because adding the widget may
+        // cause a redraw, in turn causing a recalculateLayout, which needs the
+        // cell size.
+        if (z == -1)
+            this.m_positions.addElement(pos);
+        else
+            this.m_positions.insertElementAt(pos, z);
+        this.addWidget(item, z);
+    }
 
     /**
      * Set the x-position of the given Widget, relative to the top-left corner

@@ -228,7 +228,87 @@ public abstract class Layout extends Widget
     public int getMinHeight() {
         return this.getStretchedHeight();
     }
+
+    private int m_width;
+    private int m_height;
+
+    /**
+     * Get the desired width of the Layout
+     * @return The desired width of the Layout
+     */
+    protected int getSuggestedWidth() {
+        return this.m_width;
+    }
+
+    /**
+     * Get the desired height of the Layout
+     * @return The desired height of the Layout
+     */
+    protected int getSuggestedHeight() {
+        return this.m_height;
+    }
+
+    /**
+     * Set the width minimum of the Layout
+     * @param aWidth The width of the Layout
+     */
+    protected void setWidth(int width) {
+        if (m_width != width) {
+            int w = this.getWidth();
+            int h = this.getHeight();
+
+            this.m_width = width;
+            this.sendSizeChange(w, h);
+        }
+    }
+
+    /**
+     * Set the suggested height of the Layout
+     * @param aHeight The desired height of the Layout
+     */
+    protected void setHeight(int height) {
+        if (m_height != height) {
+            int w = this.getWidth();
+            int h = this.getHeight();
+
+            this.m_height = height;
+            this.sendSizeChange(w, h);
+        }
+    }
     
+    public int getChildLeft(Widget child) {
+        return this.getChildXPos(child);
+    }
+    
+    public int getChildTop(Widget child) {
+        return this.getChildYPos(child);
+    }
+    
+    public int getChildRight(Widget child) {
+        return this.getChildLeft(child) + child.getWidth();
+    }
+    
+    public int getChildBottom(Widget child) {
+        return this.getChildTop(child) + child.getHeight();
+    }
+
+    public boolean childIntersects(Widget child, int l, int t, int w, int h) {
+        int r = l + w;
+        int b = t + h;
+
+        return ((r > this.getChildLeft(child)) &&
+                (b > this.getChildTop(child)) &&
+                (l < this.getChildRight(child)) &&
+                (t < this.getChildBottom(child)));
+    }
+
+    public boolean childContains(Widget child, int x, int y) {
+        return ((x >= getChildLeft(child)) &&
+                (y >= getChildTop(child)) &&
+                (x < getChildRight(child)) &&
+                (y < getChildBottom(child)));
+    }
+
     /**
      * Draw the specified region (given in parent coordinates, not local) of
      * the Layout.
@@ -249,11 +329,10 @@ public abstract class Layout extends Widget
         
         for (int i = 0; i < num_items; ++i) {
             Widget item = this.getWidget(i);
-            int itemx = item.getLocalXPos();
-            int itemy = item.getLocalYPos();
-
             // Only draw the Widget if it's within the draw region.
-            if (item.intersectsLocal(x-itemx, y-itemy, width, height)) {
+            if (this.childIntersects(item, x, y, width, height)) {
+                int itemx = this.getChildXPos(item);
+                int itemy = this.getChildYPos(item);
                 item.draw(g, xoff + itemx, yoff + itemy,
                         x - itemx, y - itemy, width, height);
             }
@@ -269,7 +348,7 @@ public abstract class Layout extends Widget
      * @param y The local y coordinate
      * @return A Vector of Widget objects that intersect with the given point
      */
-    Vector getWidgetsContainingLocal(int x, int y) {
+    Vector getChildrenContaining(int x, int y) {
         // For the generic layout, this is a rather naive implementation.
         // More specific layouts should do better.
         Vector containing_widgets = new Vector();
@@ -277,18 +356,11 @@ public abstract class Layout extends Widget
         int num_items = this.getWidgetCount();
         for (int i = 0; i < num_items; ++i) {
             Widget item = this.getWidget(i);
-            int item_x = item.getLocalXPos();
-            int item_y = item.getLocalYPos();
-            if (item.containsLocal(x - item_x, y - item_y))
+            if (childContains(item, x, y))
                 containing_widgets.addElement(item);
         }
 
         return containing_widgets;
-    }
-
-    Vector getWidgetsContainingGlobal(int x, int y) {
-        return getWidgetsContainingLocal(x - this.getLocalXPos(),
-                y - this.getLocalYPos());
     }
 
     private Vector m_active_items = new Vector();
@@ -372,11 +444,11 @@ public abstract class Layout extends Widget
 
         //-------------------------------------------------
         // Next, check the widgets containing the pointer
-        int layout_x = this.getGlobalXPos();
-        int layout_y = this.getGlobalYPos();
+        int layout_x = this.getXPos();
+        int layout_y = this.getYPos();
 
         Vector containing_widgets =
-                this.getWidgetsContainingLocal(pointer.getXPos() - layout_x,
+                this.getChildrenContaining(pointer.getXPos() - layout_x,
                                                pointer.getYPos() - layout_y);
 
         int num_containing_items = containing_widgets.size();

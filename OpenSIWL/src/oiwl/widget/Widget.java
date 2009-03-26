@@ -8,6 +8,14 @@ package oiwl.widget;
 import javax.microedition.lcdui.Graphics;
 
 /**
+ * The stuff widgets store should be minimal.  The interface only needs to
+ * provide methods for getting position/size, drawing, event sending/listening,
+ * and getting/setting parentage.  The Widget class should not explicitly store
+ * width, height, x-pos, or y-pos.  X- and y-position are layout-determined, so
+ * should belong to layout.  Width and height gets calculated differently for
+ * different Widget objects.  Some may store the values, some calculate on the
+ * fly.
+ * 
  * Some Widget objects store state/progress.  Different events move them from
  * one state to the next.  For example, a PushButton click is implemented in
  * three states: INACTIVE, HOLDING, and ACCEPT.
@@ -20,14 +28,10 @@ import javax.microedition.lcdui.Graphics;
  * will move the click Event to the ACCEPT state.</li>
  * </ul>
  * Double click would be implemented in much the same way.
+ *
  * @author mjumbewu
  */
 public abstract class Widget {
-    private int m_height;
-    private int m_width;
-    private int m_xpos;
-    private int m_ypos;
-
     private WidgetParent m_parent;
     private EventSender m_eventSender = new EventSender();
     
@@ -79,110 +83,17 @@ public abstract class Widget {
     }
 
     /**
-     * Get the minimum width of the Layout
-     * @return The width of the Layout
-     */
-    public int getSuggestedWidth() {
-        return this.m_width;
-    }
-
-    /**
      * Set the width minimum of the Layout
      * @param aWidth The width of the Layout
      */
-    protected void setSuggestedWidth(int width) {
-        if (m_width != width) {
-            int w = this.getWidth();
-            int h = this.getHeight();
-
-            this.m_width = width;
-            this.sendSizeChange(w, h);
-        }
-    }
+    abstract protected void setWidth(int width);
 
     /**
-     * Get the minimum height of the Layout
-     * @return The height of the Layout
+     * Set the suggested height of the Widget
+     * @param aHeight The desired height of the Widget
      */
-    public int getSuggestedHeight() {
-        return this.m_height;
-    }
+    abstract protected void setHeight(int height);
 
-    /**
-     * Set the minimum height of the Layout
-     * @param aHeight The height of the Layout
-     */
-    protected void setSuggestedHeight(int height) {
-        if (m_height != height) {
-            int w = this.getWidth();
-            int h = this.getHeight();
-
-            this.m_height = height;
-            this.sendSizeChange(w, h);
-        }
-    }
-
-    /**
-     * Set the minimum width and height of the Layout
-     * @param w The width of the Layout
-     * @param h The height of the Layout
-     */
-    protected void setSuggestedSize(int w, int h) {
-        this.setSuggestedWidth(w);
-        this.setSuggestedHeight(h);
-    }
-    
-    /**
-     * Get the height of this Widget.
-     * @return The height of this widget
-     */
-    public int getHeight() {
-        return Math.max(this.getMinHeight(), this.getSuggestedHeight());
-    }
-
-    /**
-     * Get the minimum height that this Widget desires to be.  For most Widget
-     * objects, this corresponds to its actual height.  For some (e.g. Layout)
-     * it may be smaller.
-     * @return The minimum height that this Widget desires to be
-     */
-    int getMinHeight() {
-        return this.m_height;
-    }
-
-    /**
-     * Suggest a height for this Widget.
-     * @param height The height suggestion
-     */
-    void setHeight(int height) {
-        this.setSuggestedHeight(height);
-    }
-
-    /**
-     * Get the width of this Widget.
-     * @return The width of this widget
-     */
-    public int getWidth() {
-        return Math.max(this.getMinWidth(), this.getSuggestedWidth());
-    }
-    
-    /**
-     * Get the minimum width that this Widget desires to be.  For most Widget
-     * objects, this corresponds to its actual width.  For some (e.g. Layout)
-     * it may be smaller.
-     */
-    int getMinWidth() {
-        return this.m_width;
-    }
-
-    /**
-     * Suggest a width for this Widget.
-     * @param width The width suggestion
-     */
-    void setWidth(int width) {
-        this.setSuggestedWidth(width);
-    }
-    
     /**
      * Set the width and height of the Widget.  In some cases, this is just a
      * suggestion for the width and the height (e.g. in the case of a Layout,
@@ -190,10 +101,37 @@ public abstract class Widget {
      * @param w The suggested width
      * @param h The suggested height
      */
-    void setSize(int w, int h) {
+    protected void setSize(int w, int h) {
         this.setWidth(w);
         this.setHeight(h);
     }
+    
+    /**
+     * Get the height of this Widget.
+     * @return The height of this widget
+     */
+    abstract public int getHeight();
+
+    /**
+     * Get the minimum height that this Widget desires to be.  For most Widget
+     * objects, this corresponds to its actual height.  For some (e.g. Layout)
+     * it may be smaller.
+     * @return The minimum height that this Widget desires to be
+     */
+    abstract public int getMinHeight();
+
+    /**
+     * Get the width of this Widget.
+     * @return The width of this widget
+     */
+    abstract public int getWidth();
+    
+    /**
+     * Get the minimum width that this Widget desires to be.  For most Widget
+     * objects, this corresponds to its actual width.  For some (e.g. Layout)
+     * it may be smaller.
+     */
+    abstract public int getMinWidth();
 
     /**
      * Send a resized event if the size has actually changed
@@ -205,75 +143,12 @@ public abstract class Widget {
             this.m_eventSender.sendEvent(RESIZED_EVENT, this, new SizeData(oldw,oldh));
     }
 
-    /**
-     * Set the x-coordinate of this Widget object's top-left corner
-     * @param aPos The  x-coordinate of this Widget object's top-left corner
-     */
-    void setLocalXPos(int aPos) {
-        if (m_xpos != aPos) {
-            int x = this.getLocalXPos();
-            int y = this.getLocalYPos();
-
-            m_xpos = aPos;
-            this.sendPosChange(x, y);
-        }
+    public int getXPos() {
+        return getParent().getXPos() + getParent().getChildXPos(this);
     }
 
-    /**
-     * Get the x-coordinate of this Widget object's top-left corner
-     * @return The x-coordinate of this Widget object's top-left corner
-     */
-    public int getLocalXPos() {
-        return m_xpos;
-    }
-
-    public int getGlobalXPos() {
-        return getLocalXPos() + getParent().getGlobalXPos();
-    }
-
-    /**
-     * Set the y-coordinate of this Widget object's top-left corner
-     * @param aPos The y-coordinate of this Widget object's top-left corner
-     */
-    void setLocalYPos(int aPos) {
-        if (m_ypos != aPos) {
-            int x = this.getLocalXPos();
-            int y = this.getLocalYPos();
-
-            m_ypos = aPos;
-            this.sendPosChange(x, y);
-        }
-    }
-    
-    /**
-     * Get the y-coordinate of this widget's top-left corner
-     * @return The y-coordinate of this widget's top-left corner
-     */
-    public int getLocalYPos() {
-        return m_ypos;
-    }
-
-    public int getGlobalYPos() {
-        return getLocalYPos() + getParent().getGlobalYPos();
-    }
-
-    /**
-     * Set the x- and y-coordinates of this Widget object's top-left corner
-     * @param x The x-coordinate
-     * @param y The y-coordinate
-     */
-    void setLocalPos(int x, int y) {
-        this.setLocalXPos(x);
-        this.setLocalYPos(y);
-    }
-
-    /**
-     * Offset the x- and y-coordinates of this Widget object's top-left corner
-     * @param dx The x displacement
-     * @param dy The y displacement
-     */
-    void offsetBy(int dx, int dy) {
-        this.setLocalPos(this.getLocalXPos() + dx, this.getLocalYPos() + dy);
+    public int getYPos() {
+        return getParent().getYPos() + getParent().getChildYPos(this);
     }
 
     /**
@@ -282,42 +157,11 @@ public abstract class Widget {
      * @param oldy The previous y-position
      */
     protected void sendPosChange(int oldx, int oldy) {
-        if (oldx != this.getLocalXPos() || oldy != this.getLocalYPos())
+        if (oldx != this.getXPos() || oldy != this.getYPos())
             this.m_eventSender.sendEvent(MOVED_EVENT, this, new LocationData(oldx,oldy));
     }
+    
 
-    /**
-     * Get the x-value of the left-most edge of the Widget
-     * @return The left-most edge
-     */
-    public int getLeft() {
-        return this.getGlobalXPos();
-    }
-    
-    /**
-     * Get the y-value of the top-most edge of the Widget
-     * @return The top-most edge
-     */
-    public int getTop() {
-        return this.getGlobalYPos();
-    }
-    
-    /** 
-     * Get the x-value of the right-most edge of the Widget
-     * @return The right-most edge
-     */
-    public int getRight() {
-        return this.getLeft() + this.getWidth();
-    }
-    
-    /**
-     * Get the y-value of the bottom-most edge of the Widget
-     * @return The bottom-most edge
-     */
-    public int getBottom() {
-        return this.getTop() + this.getHeight();
-    }
-    
     /**
      * Determine whether the point specified by the coordinates are within the
      * bounding area of the Widget
@@ -326,9 +170,9 @@ public abstract class Widget {
      * @return True if the point is within the bounds of the widget, false
      *         otherwise
      */
-    public boolean containsGlobal(int x, int y) {
-        x -= this.getGlobalXPos();
-        y -= this.getGlobalYPos();
+    public boolean contains(int x, int y) {
+        x -= this.getXPos();
+        y -= this.getYPos();
         return this.containsLocal(x, y);
     }
     
@@ -355,25 +199,6 @@ public abstract class Widget {
         return x >= this.getWidth();
     }
     
-    /**
-     * Determine whether the rectangular region specified by the bounds 
-     * intersectsGlobal with this Widget
-     * @param l The left edge of the region
-     * @param t The top of the region
-     * @param w The width of the region
-     * @param h The height of the region
-     * @return True if the region intersect this Widget.  False otherwise.
-     */
-    public boolean intersectsGlobal(int l, int t, int w, int h) {
-        int r = l + w;
-        int b = t + h;
-        
-        return ((l < this.getRight()) &&
-                (r > this.getLeft()) &&
-                (t < this.getBottom()) &&
-                (b > this.getTop()));
-    }
-
     public boolean intersectsLocal(int l, int t, int w, int h) {
         int r = l + w;
         int b = t + h;

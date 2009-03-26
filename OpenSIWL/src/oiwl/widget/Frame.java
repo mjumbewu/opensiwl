@@ -207,7 +207,7 @@ public class Frame extends Canvas implements WidgetParent {
     
     public void handleChildRedraw(Widget item, int x, int y, int w, int h) {
         this.invalidate(
-                item.getGlobalXPos() + x, item.getGlobalYPos() + y, w, h);
+                item.getXPos() + x, item.getYPos() + y, w, h);
     }
 
     public int getGlobalXPos() {

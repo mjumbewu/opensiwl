@@ -30,8 +30,8 @@ public class FlowLayout extends Layout {
         int target_width = this.getSuggestedWidth();
 
         column.unmanageAll();
-        column.setSuggestedHeight(this.getSuggestedHeight());
-        column.setSuggestedWidth(this.getSuggestedWidth());
+        column.setHeight(this.getSuggestedHeight());
+        column.setWidth(this.getSuggestedWidth());
 
         int inserted_items = 0;
         int total_items = this.getWidgetCount();
