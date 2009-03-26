@@ -53,15 +53,13 @@ public abstract class WidgetWithLayout extends Widget implements WidgetParent {
         return this.getHeight();
     }
     
-    void setWidth(int aSize) {
-        super.setWidth(aSize);
+    public void setWidth(int aSize) {
         Layout layout = getLayout();
         if (layout != null)
             layout.setWidth(this.getDefaultLayoutWidth());
     }
     
-    void setHeight(int aSize) {
-        super.setHeight(aSize);
+    public void setHeight(int aSize) {
         Layout layout = getLayout();
         if (layout != null)
             layout.setHeight(this.getDefaultLayoutHeight());
@@ -70,14 +68,14 @@ public abstract class WidgetWithLayout extends Widget implements WidgetParent {
     public int getMinWidth() {
         Layout layout = this.getLayout();
         if (layout != null)
-            return layout.getStretchedWidth();
+            return layout.getMinWidth();
         return 0;
     }
     
     public int getMinHeight() {
         Layout layout = this.getLayout();
         if (layout != null)
-            return layout.getStretchedHeight();
+            return layout.getMinHeight();
         return 0;
     }
     
@@ -105,10 +103,41 @@ public abstract class WidgetWithLayout extends Widget implements WidgetParent {
     }
     
     void draw(Graphics g, int xoff, int yoff, int x, int y, int width, int height) {
-        Layout layout = this.getLayout();
-        int layoutx = layout.getLocalXPos();
-        int layouty = layout.getLocalYPos();
+        int layoutx = getLayoutXPos();
+        int layouty = getLayoutYPos();
         getLayout().draw(g, xoff + layoutx, yoff + layouty,
                 x - layoutx, y - layouty, width, height);
+    }
+
+    public int getLayoutXPos() {
+        return 0;
+    }
+
+    public int getLayoutYPos() {
+        return 0;
+    }
+
+    public int getWidth() {
+        return getLayout().getWidth();
+    }
+
+    public int getHeight() {
+        return getLayout().getHeight();
+    }
+
+    public int getChildXPos(Widget child) {
+        if (child == this.getLayout())
+            return this.getLayoutXPos();
+        else
+            throw new IllegalArgumentException("WidgetWithLayout should only " +
+                    "have a Layout as a child.");
+    }
+
+    public int getChildYPos(Widget child) {
+        if (child == this.getLayout())
+            return this.getLayoutYPos();
+        else
+            throw new IllegalArgumentException("WidgetWithLayout should only " +
+                    "have a Layout as a child.");
     }
 }

@@ -69,7 +69,7 @@ public class PushButton extends Button {
             // If the pointer is dragged outside of te button, cancel any
             // pending tapEvent events.
             if (type == Event.DRAGGED) {
-                if (!containsGlobal(pointer.getXPos(), pointer.getYPos())) {
+                if (!contains(pointer.getXPos(), pointer.getYPos())) {
                     cancelPointerEvents();
                     redraw();
                     return false;
