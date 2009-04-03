@@ -47,13 +47,13 @@ public class TestFrame2 extends TestFrame {
         hor_new.manage(st_hor1);
         hor_new.manage(st_hor2);
         
-        return (st1.getGlobalYPos() < st2.getGlobalYPos() &&
-                st2.getGlobalYPos() < hor_new.getGlobalYPos() &&
-                st2.getGlobalYPos() < st_hor1.getGlobalYPos() &&
-                st_hor1.getGlobalYPos() == st_hor2.getGlobalYPos() &&
-                st_hor2.getGlobalYPos() < st_new1.getGlobalYPos() &&
-                hor_new.getGlobalYPos() < st_new1.getGlobalYPos() &&
-                st_new1.getGlobalYPos() < st_new2.getGlobalYPos() &&
-                st_hor1.getGlobalXPos() < st_hor2.getGlobalXPos());
+        return (st1.getYPos() < st2.getYPos() &&
+                st2.getYPos() < hor_new.getYPos() &&
+                st2.getYPos() < st_hor1.getYPos() &&
+                st_hor1.getYPos() == st_hor2.getYPos() &&
+                st_hor2.getYPos() < st_new1.getYPos() &&
+                hor_new.getYPos() < st_new1.getYPos() &&
+                st_new1.getYPos() < st_new2.getYPos() &&
+                st_hor1.getXPos() < st_hor2.getXPos());
     }
 }
