@@ -83,34 +83,12 @@ public abstract class Widget {
     }
 
     /**
-     * Set the width minimum of the Layout
-     * @param aWidth The width of the Layout
-     */
-    abstract protected void setWidth(int width);
-
-    /**
-     * Set the suggested height of the Widget
-     * @param aHeight The desired height of the Widget
-     */
-    abstract protected void setHeight(int height);
-
-    /**
-     * Set the width and height of the Widget.  In some cases, this is just a
-     * suggestion for the width and the height (e.g. in the case of a Layout,
-     * when this sets the minimum width and height).
-     * @param w The suggested width
-     * @param h The suggested height
-     */
-    protected void setSize(int w, int h) {
-        this.setWidth(w);
-        this.setHeight(h);
-    }
-    
-    /**
      * Get the height of this Widget.
      * @return The height of this widget
      */
-    abstract public int getHeight();
+    public int getHeight() {
+        return Math.min(Math.max(this.getParent().getChildHeight(this), this.getMinHeight()), this.getMaxHeight());
+    }
 
     /**
      * Get the minimum height that this Widget desires to be.  For most Widget
@@ -121,10 +99,20 @@ public abstract class Widget {
     abstract public int getMinHeight();
 
     /**
+     * Get the maximum height that this Widget desires to be.
+     * @return The maximum height that this Widget desires to be
+     */
+    public int getMaxHeight() {
+        return Integer.MAX_VALUE;
+    }
+
+    /**
      * Get the width of this Widget.
      * @return The width of this widget
      */
-    abstract public int getWidth();
+    public int getWidth() {
+        return Math.min(Math.max(this.getParent().getChildWidth(this), this.getMinWidth()), this.getMaxWidth());
+    }
     
     /**
      * Get the minimum width that this Widget desires to be.  For most Widget
@@ -132,6 +120,14 @@ public abstract class Widget {
      * it may be smaller.
      */
     abstract public int getMinWidth();
+
+    /**
+     * Get the maximum width that this Widget desires to be.
+     * @return The maximum width that this Widget desires to be
+     */
+    public int getMaxWidth() {
+        return Integer.MAX_VALUE;
+    }
 
     /**
      * Send a resized event if the size has actually changed

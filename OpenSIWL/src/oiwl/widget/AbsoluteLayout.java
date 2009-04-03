@@ -13,18 +13,45 @@ import java.util.Vector;
  */
 public class AbsoluteLayout extends Layout {
 
+    public int getChildXPos(Widget child) {
+        int index = this.getIndexOf(child);
+        WidgetPos pos = (WidgetPos)this.m_positions.elementAt(index);
+        return pos.x;
+    }
+
+    public int getChildYPos(Widget child) {
+        int index = this.getIndexOf(child);
+        WidgetPos pos = (WidgetPos)this.m_positions.elementAt(index);
+        return pos.y;
+    }
+
+    public int getChildWidth(Widget child) {
+        int index = this.getIndexOf(child);
+        WidgetPos pos = (WidgetPos)this.m_positions.elementAt(index);
+        return Math.max(Math.min(pos.width, child.getMaxWidth()), child.getMinWidth());
+    }
+
+    public int getChildHeight(Widget child) {
+        int index = this.getIndexOf(child);
+        WidgetPos pos = (WidgetPos)this.m_positions.elementAt(index);
+        return Math.max(Math.min(pos.height, child.getMaxHeight()), child.getMinHeight());
+    }
+
     protected class WidgetPos {
         Widget item;
         int x=0, y=0;
+        int width=0, height=0;
     }
 
     Vector m_positions = new Vector();
 
-    public void manage(Widget item, int x, int y, int z) {
+    public void manage(Widget item, int x, int y, int z, int w, int h) {
         WidgetPos pos = new WidgetPos();
         pos.item = item;
         pos.x = x;
         pos.y = y;
+        pos.width = w;
+        pos.height = h;
 
         // Must add the cell before the widget, because adding the widget may
         // cause a redraw, in turn causing a recalculateLayout, which needs the
@@ -40,25 +67,29 @@ public class AbsoluteLayout extends Layout {
      * Set the x-position of the given Widget, relative to the top-left corner
      * of this Layout
      * @param item The Widget
-     * @param pos The x-position
+     * @param x The x-position
      */
-    public void setXPos(Widget item, int pos) {
-        item.setLocalXPos(pos);
+    public void setXPos(Widget item, int x) {
+        int index = this.getIndexOf(item);
+        WidgetPos pos = (WidgetPos)this.m_positions.elementAt(index);
+        pos.x = x;
     }
     
     /**
      * Set the y-position of the given Widget, relative to the top-left corner
      * of this Layout
      * @param item The Widget
-     * @param pos The y-position
+     * @param y The y-position
      */
-    public void setYPos(Widget item, int pos) {
-        item.setLocalYPos(pos);
+    public void setYPos(Widget item, int y) {
+        int index = this.getIndexOf(item);
+        WidgetPos pos = (WidgetPos)this.m_positions.elementAt(index);
+        pos.y = y;
     }
 
     public void setZPos(Widget item, int pos) {
         this.removeWidget(item);
-        this.addWidget_internal(item, pos);
+        this.addWidget(item, pos);
     }
 
     public void moveUp(Widget item) {
@@ -102,8 +133,7 @@ public class AbsoluteLayout extends Layout {
     }
 
     public void manage(Widget item, int x, int y) {
-        this.addWidget(item, -1);
-        item.setLocalPos(x, y);
+        this.manage(item, x, y, -1, 0, 0);
     }
 
     public void unmanage(Widget item) {

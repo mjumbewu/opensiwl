@@ -199,8 +199,8 @@ public class LinearLayout extends Layout {
 
         abstract protected int getAxialSize(Widget item);
         abstract protected int getOrthoSize(Widget item);
-        abstract protected void setAxialSize(Widget item, int size);
-        abstract protected void setOrthoSize(Widget item, int size);
+//        abstract protected void setAxialSize(Widget item, int size);
+//        abstract protected void setOrthoSize(Widget item, int size);
 
         abstract protected int getMinAxialSize(Widget item);
         abstract protected int getMinOrthoSize(Widget item);
@@ -300,14 +300,14 @@ public class LinearLayout extends Layout {
             else 
                 box.axial_size = min_axial_box_size;
             
-            // Make sure the Widget is properly sized
-            if (box.fill) {
-                getProperties().setAxialSize(box.item, box.axial_size - 2*box.padding);
-                getProperties().setOrthoSize(box.item, box.ortho_size);
-            } else {
-                getProperties().setAxialSize(box.item, getProperties().getMinAxialSize(box.item));
-                getProperties().setOrthoSize(box.item, getProperties().getMinOrthoSize(box.item));
-            }
+//            // Make sure the Widget is properly sized
+//            if (box.fill) {
+//                getProperties().setAxialSize(box.item, box.axial_size - 2*box.padding);
+//                getProperties().setOrthoSize(box.item, box.ortho_size);
+//            } else {
+//                getProperties().setAxialSize(box.item, getProperties().getMinAxialSize(box.item));
+//                getProperties().setOrthoSize(box.item, getProperties().getMinOrthoSize(box.item));
+//            }
             
             // Update the offset and available axial_size for the next box
             offset += box.axial_size;
@@ -371,6 +371,42 @@ public class LinearLayout extends Layout {
         return box_pos + child_pos;
     }
 
+    public int getChildWidth(Widget child) {
+        int index = this.getIndexOf(child);
+        LinearCell box = this.getCell(index);
+        int box_size, child_size;
+
+        if (this.m_orientation == Orientation.HORIZONTAL) {
+            box_size = box.axial_size;
+        } else {
+            box_size = this.getWidth();
+        }
+
+        child_size = box_size;
+        child_size = Math.max(child_size, child.getMinWidth());
+        child_size = Math.min(child_size, child.getMaxWidth());
+
+        return child_size;
+    }
+
+    public int getChildHeight(Widget child) {
+        int index = this.getIndexOf(child);
+        LinearCell box = this.getCell(index);
+        int box_size, child_size;
+
+        if (this.m_orientation == Orientation.VERTICAL) {
+            box_size = box.axial_size;
+        } else {
+            box_size = this.getHeight();
+        }
+
+        child_size = box_size;
+        child_size = Math.max(child_size, child.getMinWidth());
+        child_size = Math.min(child_size, child.getMaxWidth());
+
+        return child_size;
+    }
+
     class VerticalLayoutProperties extends LinearLayoutProperties {
         public VerticalLayoutProperties(LinearLayout layout)  { super(layout); }
         
@@ -391,8 +427,8 @@ public class LinearLayout extends Layout {
 
         protected int getAxialSize(Widget item) { return item.getHeight(); }
         protected int getOrthoSize(Widget item) { return item.getWidth(); }
-        protected void setAxialSize(Widget item, int size) { item.setHeight(size); }
-        protected void setOrthoSize(Widget item, int size) { item.setWidth(size); }
+//        protected void setAxialSize(Widget item, int size) { item.setHeight(size); }
+//        protected void setOrthoSize(Widget item, int size) { item.setWidth(size); }
 
         protected int getMinAxialSize(Widget item) { return item.getMinHeight(); }
         protected int getMinOrthoSize(Widget item) { return item.getMinWidth(); }
@@ -421,8 +457,8 @@ public class LinearLayout extends Layout {
 
         protected int getOrthoSize(Widget item) { return item.getHeight(); }
         protected int getAxialSize(Widget item) { return item.getWidth(); }
-        protected void setOrthoSize(Widget item, int size) { item.setHeight(size); }
-        protected void setAxialSize(Widget item, int size) { item.setWidth(size); }
+//        protected void setOrthoSize(Widget item, int size) { item.setHeight(size); }
+//        protected void setAxialSize(Widget item, int size) { item.setWidth(size); }
 
         protected int getMinOrthoSize(Widget item) { return item.getMinHeight(); }
         protected int getMinAxialSize(Widget item) { return item.getMinWidth(); }

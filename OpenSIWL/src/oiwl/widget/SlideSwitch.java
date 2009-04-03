@@ -25,8 +25,6 @@ public class SlideSwitch extends StatefulButton {
         this.setLayout(new AbsoluteLayout());
         
         m_switch = new StaticRectangle();
-        m_switch.setSize(20, 20);
-        m_switch.setLocalPos(0, 0);
         
         m_active = new StaticText("A", 0x0000ff00);
         m_inactive = new StaticText("B", 0x00ff0000);
@@ -34,7 +32,7 @@ public class SlideSwitch extends StatefulButton {
         m_stateLabelLayout.manage(this.m_active);
         m_stateLabelLayout.manage(this.m_inactive);
         
-        this.getLayout().manage(this.m_switch);
+        ((AbsoluteLayout)this.getLayout()).manage(this.m_switch, 0,0,-1,20,20);
         this.getLayout().manage(this.m_stateLabelLayout);
     }
     
@@ -60,8 +58,8 @@ public class SlideSwitch extends StatefulButton {
         g.setColor(c0);
         
         Layout layout = this.getLayout();
-        int layoutx = layout.getLocalXPos();
-        int layouty = layout.getLocalYPos();
+        int layoutx = this.getLayoutXPos();
+        int layouty = this.getLayoutYPos();
         getLayout().draw(g, xoff + layoutx, yoff + layouty,
                 x - layoutx, y - layouty, w, h);
     }

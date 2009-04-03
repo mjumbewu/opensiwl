@@ -28,4 +28,20 @@ public class StaticImage extends StaticWidget {
                 javax.microedition.lcdui.game.Sprite.TRANS_NONE,
                 xoff, yoff, Graphics.TOP | Graphics.LEFT);
     }
+
+    public int getMinHeight() {
+        return this.m_image.getHeight();
+    }
+
+    public int getMinWidth() {
+        return this.m_image.getWidth();
+    }
+
+    public int getMaxHeight() {
+        return this.m_image.getHeight();
+    }
+
+    public int getMaxWidth() {
+        return this.m_image.getWidth();
+    }
 }
