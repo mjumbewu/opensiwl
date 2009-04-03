@@ -15,4 +15,12 @@ public class StaticRectangle extends StaticWidget {
     public void draw(Graphics g, int xoff, int yoff, int x, int y, int w, int h) {
         g.fillRect(xoff, yoff, this.getWidth(), this.getHeight());
     }
+
+    public int getMinHeight() {
+        return 0;
+    }
+
+    public int getMinWidth() {
+        return 0;
+    }
 }

@@ -237,39 +237,29 @@ public class Frame extends Canvas implements WidgetParent {
     }
     
     private void reinitLayoutSize() {
-        if (this.getLayout() != null) {
-            getLayout().setSize(this.getLayoutWidth(), this.getLayoutHeight());
-        }
+//        if (this.getLayout() != null) {
+//            getLayout().setSize(this.getLayoutWidth(), this.getLayoutHeight());
+//        }
     }
     
     public void addPanel(Panel panel) {
-        if (panel.getAttachment() == Panel.TOP) {
-            panel.setLocalPos(this.getLayoutXPos(), this.getLayoutYPos());
-            panel.setWidth(this.getLayoutWidth());
-        }
-        else if (panel.getAttachment() == Panel.LEFT) {
-            panel.setLocalPos(this.getLayoutXPos(), this.getLayoutYPos());
-            panel.setHeight(this.getLayoutHeight());
-        }
-        else if (panel.getAttachment() == Panel.RIGHT) {
-            panel.setLocalPos(this.getLayoutXPos()+this.getLayoutWidth()-panel.getWidth(), this.getLayoutYPos());
-            panel.setHeight(this.getLayoutHeight());
-        }
-        else if (panel.getAttachment() == Panel.BOTTOM) {
-            panel.setLocalPos(this.getLayoutXPos(), this.getLayoutYPos()+this.getLayoutHeight()-panel.getHeight());
-            panel.setWidth(this.getLayoutWidth());
-        }
+//        if (panel.getAttachment() == Panel.TOP) {
+//            panel.setLocalPos(this.getLayoutXPos(), this.getLayoutYPos());
+//            panel.setWidth(this.getLayoutWidth());
+//        }
+//        else if (panel.getAttachment() == Panel.LEFT) {
+//            panel.setLocalPos(this.getLayoutXPos(), this.getLayoutYPos());
+//            panel.setHeight(this.getLayoutHeight());
+//        }
+//        else if (panel.getAttachment() == Panel.RIGHT) {
+//            panel.setLocalPos(this.getLayoutXPos()+this.getLayoutWidth()-panel.getWidth(), this.getLayoutYPos());
+//            panel.setHeight(this.getLayoutHeight());
+//        }
+//        else if (panel.getAttachment() == Panel.BOTTOM) {
+//            panel.setLocalPos(this.getLayoutXPos(), this.getLayoutYPos()+this.getLayoutHeight()-panel.getHeight());
+//            panel.setWidth(this.getLayoutWidth());
+//        }
         panel.setParent(this);
-        
-//        System.out.print("layout size: ");
-//        System.out.print(this.getDefaultLayoutWidth());
-//        System.out.print(",");
-//        System.out.println(this.getDefaultLayoutHeight());
-//        
-//        System.out.print("panel pos: ");
-//        System.out.print(panel.getLocalXPos());
-//        System.out.print(",");
-//        System.out.println(panel.getLocalYPos());
         m_panels.addElement(panel);
     }
     
@@ -471,14 +461,14 @@ public class Frame extends Canvas implements WidgetParent {
 
             this.drawBackground(buffer, x, y, w, h);
             Layout layout = this.getLayout();
-            int layoutx = layout.getLocalXPos();
-            int layouty = layout.getLocalYPos();
+            int layoutx = this.getChildXPos(layout);
+            int layouty = this.getChildYPos(layout);
             layout.draw(buffer, layoutx, layouty, 
                     x - layoutx, y - layouty, w, h);
             for (int i = 0; i < this.getNumPanels(); ++i) {
                 Panel panel = this.getPanel(i);
-                int panelx = panel.getLocalXPos();
-                int panely = panel.getLocalYPos();
+                int panelx = this.getChildXPos(panel);
+                int panely = this.getChildYPos(panel);
                 panel.draw(buffer, panelx, panely,
                         x - panelx, y - panely, w, h);
             }
@@ -666,5 +656,29 @@ public class Frame extends Canvas implements WidgetParent {
         pointer.updateDragTime();
         
         this.getLayout().handlePointerEvent(Event.RELEASED, pointer);
+    }
+
+    public int getXPos() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public int getYPos() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public int getChildXPos(Widget child) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public int getChildYPos(Widget child) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public int getChildWidth(Widget child) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public int getChildHeight(Widget child) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

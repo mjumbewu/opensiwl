@@ -95,4 +95,12 @@ public class StaticText extends StaticWidget {
         g.setFont(f0);
         g.setColor(c0);
     }
+
+    public int getMinHeight() {
+        return this.getFont().getHeight();
+    }
+
+    public int getMinWidth() {
+        return this.getFont().stringWidth(this.getText());
+    }
 }

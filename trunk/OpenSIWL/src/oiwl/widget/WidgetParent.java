@@ -36,4 +36,17 @@ public interface WidgetParent {
      * @return The y-position of the child
      */
     public int getChildYPos(Widget child);
+
+    /**
+     * Get the width of the child
+     * @param child The child Widget in question
+     * @return The width of the child
+     */
+    public int getChildWidth(Widget child);
+    /**
+     * Get the height of the child
+     * @param child The child Widget in question
+     * @return The height of the child
+     */
+    public int getChildHeight(Widget child);
 }

@@ -8,7 +8,9 @@ package oiwl.widget;
 import javax.microedition.lcdui.Graphics;
 
 /**
- *
+ * A ScrollViewWidget is a WidgetWithLayout, but its viewed widget is not
+ * managed by its layout.  the layout of the ScrollViewWidget exists on top of
+ * the viewed Widget.  This is useful for overlays and panels and the like.
  * @author mjumbewu
  */
 public class ScrollViewWidget extends WidgetWithLayout {

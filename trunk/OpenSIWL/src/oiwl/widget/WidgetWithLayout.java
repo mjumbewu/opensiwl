@@ -29,8 +29,6 @@ public abstract class WidgetWithLayout extends Widget implements WidgetParent {
             throw new IllegalArgumentException("Layout should not be null");
         m_layout = aLayout;
         m_layout.setParent(this);
-        m_layout.setLocalPos(this.getDefaultLayoutXPos(), this.getDefaultLayoutYPos());
-        m_layout.setSize(this.getDefaultLayoutWidth(), this.getDefaultLayoutHeight());
     }
     
     public Layout getLayout() {
@@ -117,6 +115,14 @@ public abstract class WidgetWithLayout extends Widget implements WidgetParent {
         return 0;
     }
 
+    public int getLayoutWidth() {
+        return this.getWidth();
+    }
+
+    public int getLayoutHeight() {
+        return this.getHeight();
+    }
+
     public int getWidth() {
         return getLayout().getWidth();
     }
@@ -136,6 +142,22 @@ public abstract class WidgetWithLayout extends Widget implements WidgetParent {
     public int getChildYPos(Widget child) {
         if (child == this.getLayout())
             return this.getLayoutYPos();
+        else
+            throw new IllegalArgumentException("WidgetWithLayout should only " +
+                    "have a Layout as a child.");
+    }
+
+    public int getChildWidth(Widget child) {
+        if (child == this.getLayout())
+            return this.getLayoutWidth();
+        else
+            throw new IllegalArgumentException("WidgetWithLayout should only " +
+                    "have a Layout as a child.");
+    }
+
+    public int getChildHeight(Widget child) {
+        if (child == this.getLayout())
+            return this.getLayoutHeight();
         else
             throw new IllegalArgumentException("WidgetWithLayout should only " +
                     "have a Layout as a child.");

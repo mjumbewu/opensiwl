@@ -21,7 +21,7 @@ public class Panel extends WidgetWithLayout implements WidgetParent {
     
     public Panel(int attatch) {
         super();
-        this.setSize(50, 50);
+//        this.setSize(50, 50);
         this.m_attatchment = attatch;
         if (attatch == TOP || attatch == BOTTOM)
             setLayout(new LinearLayout(Orientation.HORIZONTAL));
@@ -43,8 +43,8 @@ public class Panel extends WidgetWithLayout implements WidgetParent {
         if (this.intersectsLocal(x, y, w, h)) {
             g.drawRect(xoff, yoff, this.getWidth(), this.getHeight());
             Layout layout = this.getLayout();
-            int layoutx = layout.getLocalXPos();
-            int layouty = layout.getLocalYPos();
+            int layoutx = this.getLayoutXPos();
+            int layouty = this.getLayoutYPos();
             getLayout().draw(g, xoff + layoutx, yoff + layouty,
                     x - layoutx, y - layouty, w, h);
         }

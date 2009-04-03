@@ -77,4 +77,20 @@ public class FlowLayout extends Layout {
         column.recalculateLayout();
     }
 
+    public int getChildXPos(Widget child) {
+        return column.getChildXPos(child);
+    }
+
+    public int getChildYPos(Widget child) {
+        return column.getChildYPos(child);
+    }
+
+    public int getChildWidth(Widget child) {
+        return column.getChildWidth(child);
+    }
+
+    public int getChildHeight(Widget child) {
+        return column.getChildHeight(child);
+    }
+
 }
