@@ -51,18 +51,6 @@ public abstract class WidgetWithLayout extends Widget implements WidgetParent {
         return this.getHeight();
     }
     
-    public void setWidth(int aSize) {
-        Layout layout = getLayout();
-        if (layout != null)
-            layout.setWidth(this.getDefaultLayoutWidth());
-    }
-    
-    public void setHeight(int aSize) {
-        Layout layout = getLayout();
-        if (layout != null)
-            layout.setHeight(this.getDefaultLayoutHeight());
-    }
-    
     public int getMinWidth() {
         Layout layout = this.getLayout();
         if (layout != null)
@@ -76,7 +64,21 @@ public abstract class WidgetWithLayout extends Widget implements WidgetParent {
             return layout.getMinHeight();
         return 0;
     }
-    
+
+    public int getMaxWidth() {
+        Layout layout = this.getLayout();
+        if (layout != null)
+            return layout.getMaxWidth();
+        return 0;
+    }
+
+    public int getMaxHeight() {
+        Layout layout = this.getLayout();
+        if (layout != null)
+            return layout.getMaxHeight();
+        return 0;
+    }
+
     /**
      * The method called to respond to user input or any other events passed 
      * along from this Widget object's parent.  A WidgetWithLayout will first
@@ -121,14 +123,6 @@ public abstract class WidgetWithLayout extends Widget implements WidgetParent {
 
     public int getLayoutHeight() {
         return this.getHeight();
-    }
-
-    public int getWidth() {
-        return getLayout().getWidth();
-    }
-
-    public int getHeight() {
-        return getLayout().getHeight();
     }
 
     public int getChildXPos(Widget child) {
