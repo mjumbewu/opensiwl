@@ -13,14 +13,26 @@ import javax.microedition.lcdui.Graphics;
  * the viewed Widget.  This is useful for overlays and panels and the like.
  * @author mjumbewu
  */
-public class ScrollViewWidget extends WidgetWithLayout {
+public class ScrollViewWidget extends ViewportWidget {
     
     public ScrollViewWidget() {
         setLayout(new LinearLayout(Orientation.VERTICAL));
     }
 
-    public void setLayout(Layout layout) {
-        super.setLayout(layout);
+    public void scrollXTo(int x) {
+        this.setViewXOffset(x);
+    }
+
+    public void scrollYTo(int y) {
+        this.setViewYOffset(y);
+    }
+    
+    public void scrollXBy(int dx) {
+        this.setViewXOffset(this.getViewXOffset() + dx);
+    }
+
+    public void scrollYBy(int dy) {
+        this.setViewYOffset(this.getViewYOffset() + dy);
     }
 
     public boolean isValidChild(Widget item) {
@@ -65,7 +77,8 @@ public class ScrollViewWidget extends WidgetWithLayout {
                 if (pointer.isMoving()) {
                     setPointerState(SCROLLING_STATE);
                     cancelLayoutPointerEvents();
-                    getLayout().offsetBy(pointer.dragDeltaX(), pointer.dragDeltaY());
+                    this.scrollXBy(pointer.dragDeltaX());
+                    this.scrollYBy(pointer.dragDeltaY());
                     return true;
                 }
             }
@@ -84,7 +97,8 @@ public class ScrollViewWidget extends WidgetWithLayout {
             }
             
             if (type == Event.DRAGGED || type == Event.FLICKED) {
-                getLayout().offsetBy(pointer.dragDeltaX(), pointer.dragDeltaY());
+                this.scrollXBy(pointer.dragDeltaX());
+                this.scrollYBy(pointer.dragDeltaY());
                 return true;
             }
 
