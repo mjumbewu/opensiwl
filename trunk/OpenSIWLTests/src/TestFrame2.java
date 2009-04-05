@@ -29,7 +29,8 @@ public class TestFrame2 extends TestFrame {
                 "more are inserted within a horizontally oriented LinearLayout" +
                 "across all of these.";
         
-        this.setLayout(layout);
+        ViewportLayout viewport = (ViewportLayout)this.getLayout();
+        viewport.view(layout);
         layout.manage(st1);
         layout.manage(st2);
     }

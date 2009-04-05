@@ -22,7 +22,8 @@ public class TestFrame5 extends TestFrame implements EventListener {
                 "displayed in a column on the screen.";
 
         AbsoluteLayout layout = new AbsoluteLayout();
-        this.setLayout(layout);
+        ViewportLayout viewport = (ViewportLayout)this.getLayout();
+        viewport.view(layout);
 
         layout.manage(testButton);
         layout.setXPos(testButton, 30);

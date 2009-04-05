@@ -31,7 +31,8 @@ public class TestFrame3 extends TestFrame {
                 "additional managed Widget, now the Frame should update all at" +
                 "once at the end.";
 
-        this.setLayout(layout);
+        ViewportLayout viewport = (ViewportLayout)this.getLayout();
+        viewport.view(layout);
         layout.manage(st1);
         layout.manage(st2);
     }

@@ -17,7 +17,8 @@ public class TestFrame4 extends TestFrame implements EventListener {
     
     public TestFrame4(OpenSIWLTests app, String id, int orient) {
         super(app, id, orient);
-        this.setLayout(layout);
+        ViewportLayout viewport = (ViewportLayout)this.getLayout();
+        viewport.view(layout);
         
         this.instructions = "This test ensures that the PushButton object will" +
                 "correctly send tap events.  It consists of a StaticText item " +
