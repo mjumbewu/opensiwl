@@ -12,10 +12,10 @@ import javax.microedition.lcdui.Graphics;
  * @author mjumbewu
  */
 public class Panel extends WidgetWithLayout implements WidgetParent {
-    public static int TOP = 0;
-    public static int BOTTOM = 1;
-    public static int LEFT = 2;
-    public static int RIGHT = 3;
+    public static final int TOP = 0;
+    public static final int BOTTOM = 1;
+    public static final int LEFT = 2;
+    public static final int RIGHT = 3;
     
     int m_attatchment;
     

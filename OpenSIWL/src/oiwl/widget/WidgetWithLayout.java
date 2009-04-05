@@ -69,14 +69,14 @@ public abstract class WidgetWithLayout extends Widget implements WidgetParent {
         Layout layout = this.getLayout();
         if (layout != null)
             return layout.getMaxWidth();
-        return 0;
+        return Integer.MAX_VALUE;
     }
 
     public int getMaxHeight() {
         Layout layout = this.getLayout();
         if (layout != null)
             return layout.getMaxHeight();
-        return 0;
+        return Integer.MAX_VALUE;
     }
 
     /**

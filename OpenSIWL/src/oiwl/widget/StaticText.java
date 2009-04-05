@@ -42,8 +42,6 @@ public class StaticText extends StaticWidget {
         m_text = text;
         m_font = font;
         m_color = color;
-        
-        this.setSize(font.stringWidth(text), font.getHeight());
     }
     
     /**
@@ -101,6 +99,14 @@ public class StaticText extends StaticWidget {
     }
 
     public int getMinWidth() {
+        return this.getFont().stringWidth(this.getText());
+    }
+
+    public int getMaxHeight() {
+        return this.getFont().getHeight();
+    }
+
+    public int getMaxWidth() {
         return this.getFont().stringWidth(this.getText());
     }
 }

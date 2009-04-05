@@ -28,13 +28,13 @@ public class AbsoluteLayout extends Layout {
     public int getChildWidth(Widget child) {
         int index = this.getIndexOf(child);
         WidgetPos pos = (WidgetPos)this.m_positions.elementAt(index);
-        return Math.max(Math.min(pos.width, child.getMaxWidth()), child.getMinWidth());
+        return pos.width;
     }
 
     public int getChildHeight(Widget child) {
         int index = this.getIndexOf(child);
         WidgetPos pos = (WidgetPos)this.m_positions.elementAt(index);
-        return Math.max(Math.min(pos.height, child.getMaxHeight()), child.getMinHeight());
+        return pos.height;
     }
 
     protected class WidgetPos {

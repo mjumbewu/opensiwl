@@ -55,7 +55,7 @@ public class Frame extends Canvas implements WidgetParent {
     private int m_backgroundColor = 0x00ffffff;
     private Image m_backgroundImage = null;
     
-    private Layout m_layout = null;
+    private Layout m_layout = new ViewportLayout();
     private Vector m_panels = new Vector();
 
     /**
@@ -72,6 +72,7 @@ public class Frame extends Canvas implements WidgetParent {
      */
     public Frame(int orient) {
         super();
+        this.m_layout.setParent(this);
         this.setOrientation(orient);
         this.invalidate();
     }
@@ -199,7 +200,8 @@ public class Frame extends Canvas implements WidgetParent {
     public boolean isValidChild(Widget item) {
         if (Layout.class.isInstance(item) ||
                 ItemWidget.class.isInstance(item) ||
-                StaticWidget.class.isInstance(item))
+                StaticWidget.class.isInstance(item) ||
+                Panel.class.isInstance(item))
             return true;
         else
             return false;
@@ -222,7 +224,7 @@ public class Frame extends Canvas implements WidgetParent {
      * Set this Frame object's Layout
      * @param aLayout The layout
      */
-    public void setLayout(Layout aLayout) {
+    protected void setLayout(Layout aLayout) {
         aLayout.setParent(this);
         this.m_layout = aLayout;
         this.reinitLayoutSize();
@@ -237,40 +239,15 @@ public class Frame extends Canvas implements WidgetParent {
     }
     
     private void reinitLayoutSize() {
-//        if (this.getLayout() != null) {
-//            getLayout().setSize(this.getLayoutWidth(), this.getLayoutHeight());
-//        }
+        if (this.getLayout() != null) {
+            this.getLayout().invalidateSizes();
+        }
     }
     
     public void addPanel(Panel panel) {
-//        if (panel.getAttachment() == Panel.TOP) {
-//            panel.setLocalPos(this.getLayoutXPos(), this.getLayoutYPos());
-//            panel.setWidth(this.getLayoutWidth());
-//        }
-//        else if (panel.getAttachment() == Panel.LEFT) {
-//            panel.setLocalPos(this.getLayoutXPos(), this.getLayoutYPos());
-//            panel.setHeight(this.getLayoutHeight());
-//        }
-//        else if (panel.getAttachment() == Panel.RIGHT) {
-//            panel.setLocalPos(this.getLayoutXPos()+this.getLayoutWidth()-panel.getWidth(), this.getLayoutYPos());
-//            panel.setHeight(this.getLayoutHeight());
-//        }
-//        else if (panel.getAttachment() == Panel.BOTTOM) {
-//            panel.setLocalPos(this.getLayoutXPos(), this.getLayoutYPos()+this.getLayoutHeight()-panel.getHeight());
-//            panel.setWidth(this.getLayoutWidth());
-//        }
-        panel.setParent(this);
-        m_panels.addElement(panel);
+        this.getLayout().manage(panel);
     }
-    
-    public int getNumPanels() {
-        return m_panels.size();
-    }
-    
-    public Panel getPanel(int index) {
-        return (Panel)m_panels.elementAt(index);
-    }
-    
+
     /**
      * Return the width of the Frame.  The width is the shorter dimension in
      * PORTRAIT mode and the longer dimension in LANDSCAPE mode.
@@ -295,56 +272,6 @@ public class Frame extends Canvas implements WidgetParent {
         
         else /* LANDSCAPE */
             return super.getWidth();
-    }
-    
-    public int getLayoutXPos() {
-        int pos = 0;
-        int num_panels = this.getNumPanels();
-        
-        for (int i = 0; i < num_panels; ++i) {
-            Panel panel = this.getPanel(i);
-            if (panel.getAttachment() == Panel.LEFT)
-                pos += panel.getWidth();
-        }
-        return pos;
-    }
-    
-    public int getLayoutYPos() {
-        int pos = 0;
-        int num_panels = this.getNumPanels();
-        
-        for (int i = 0; i < num_panels; ++i) {
-            Panel panel = this.getPanel(i);
-            if (panel.getAttachment() == Panel.TOP)
-                pos += panel.getHeight();
-        }
-        return pos;
-    }
-    
-    public int getLayoutWidth() {
-        int total = this.getWidth();
-        int num_panels = this.getNumPanels();
-        
-        for (int i = 0; i < num_panels; ++i) {
-            Panel panel = this.getPanel(i);
-            if (panel.getAttachment() == Panel.RIGHT ||
-                    panel.getAttachment() == Panel.LEFT)
-                total -= panel.getWidth();
-        }
-        return total;
-    }
-    
-    public int getLayoutHeight() {
-        int total = this.getHeight();
-        int num_panels = this.getNumPanels();
-        
-        for (int i = 0; i < num_panels; ++i) {
-            Panel panel = this.getPanel(i);
-            if (panel.getAttachment() == Panel.BOTTOM ||
-                    panel.getAttachment() == Panel.TOP)
-                total -= panel.getHeight();
-        }
-        return total;
     }
     
     protected Graphics getGraphics() {
@@ -465,13 +392,6 @@ public class Frame extends Canvas implements WidgetParent {
             int layouty = this.getChildYPos(layout);
             layout.draw(buffer, layoutx, layouty, 
                     x - layoutx, y - layouty, w, h);
-            for (int i = 0; i < this.getNumPanels(); ++i) {
-                Panel panel = this.getPanel(i);
-                int panelx = this.getChildXPos(panel);
-                int panely = this.getChildYPos(panel);
-                panel.draw(buffer, panelx, panely,
-                        x - panelx, y - panely, w, h);
-            }
 
             buffer.drawRect(x, y, w-1, h-1);
             resetInvalidatedRegion();
@@ -659,26 +579,26 @@ public class Frame extends Canvas implements WidgetParent {
     }
 
     public int getXPos() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return 0;
     }
 
     public int getYPos() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return 0;
     }
 
     public int getChildXPos(Widget child) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return 0;
     }
 
     public int getChildYPos(Widget child) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return 0;
     }
 
     public int getChildWidth(Widget child) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return this.getWidth();
     }
 
     public int getChildHeight(Widget child) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return this.getHeight();
     }
 }

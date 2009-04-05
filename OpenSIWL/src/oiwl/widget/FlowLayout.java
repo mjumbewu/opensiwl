@@ -5,13 +5,25 @@
 
 package oiwl.widget;
 
+import java.util.Hashtable;
+
 /**
  * 
  * @author mjumbewu
  */
 public class FlowLayout extends Layout {
 
+    /**
+     * A LinearLayout that contains all the rows of the FlowLayout
+     */
     LinearLayout column = new LinearLayout(Orientation.VERTICAL);
+    /**
+     * A map from each widget to its corresponding row
+     */
+    Hashtable item_rows = new Hashtable();
+    /**
+     * The alignment
+     */
     int halign = Alignment.SPREAD;
 
     public FlowLayout() {
@@ -26,12 +38,16 @@ public class FlowLayout extends Layout {
         this.removeWidget(item);
     }
 
+    public int getTargetWidth() {
+        return this.getParent().getChildWidth(this);
+    }
+
     protected void recalculateLayout() {
-        int target_width = this.getSuggestedWidth();
+        int target_width = this.getTargetWidth();
 
         column.unmanageAll();
-        column.setHeight(this.getSuggestedHeight());
-        column.setWidth(this.getSuggestedWidth());
+//        column.setHeight(this.getSuggestedHeight());
+//        column.setWidth(this.getSuggestedWidth());
 
         int inserted_items = 0;
         int total_items = this.getWidgetCount();
@@ -54,6 +70,7 @@ public class FlowLayout extends Layout {
 
                 // Add the item.
                 row.manage(next_item, -1, 0, /*expand*/false, /*fill*/true);
+                this.item_rows.put(next_item, row);
 
                 // Remember, when the row layout began to manage the item, it
                 // stole its parentage.  So we have to steal it back.
@@ -74,7 +91,9 @@ public class FlowLayout extends Layout {
 
             column.manage(row);
         }
-        column.recalculateLayout();
+//        column.recalculateLayout();
+        this.setStretchedWidth(column.getMinWidth());
+        this.setStretchedHeight(column.getMinHeight());
     }
 
     public int getChildXPos(Widget child) {
@@ -86,11 +105,20 @@ public class FlowLayout extends Layout {
     }
 
     public int getChildWidth(Widget child) {
-        return column.getChildWidth(child);
+        if (child == column) {
+            return this.getTargetWidth();
+        } else {
+            return ((LinearLayout)item_rows.get(child)).getChildWidth(child);
+        }
     }
 
     public int getChildHeight(Widget child) {
-        return column.getChildHeight(child);
+        if (child == column) {
+            return this.getParent().getChildHeight(this);
+        } else {
+            return ((LinearLayout)item_rows.get(child)).getChildHeight(child);
+        }
     }
+
 
 }
