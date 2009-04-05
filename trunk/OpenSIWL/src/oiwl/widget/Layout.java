@@ -157,7 +157,7 @@ public abstract class Layout extends Widget
      * complete contents.
      * @return The width of the bounding box
      */
-    public int getStretchedWidth() {
+    public int getMinWidth() {
         if (!m_areSizesValid) this.recalculateLayout();
         return m_stretched_width;
     }
@@ -176,7 +176,7 @@ public abstract class Layout extends Widget
      * complete contents.
      * @return The height of the bounding box
      */
-    public int getStretchedHeight() {
+    public int getMinHeight() {
         if (!m_areSizesValid) this.recalculateLayout();
         return m_stretched_height;
     }
@@ -201,81 +201,73 @@ public abstract class Layout extends Widget
         this.setStretchedHeight(h);
     }
     
-    /**
-     * Get the effective width of the Layout object.  This will be the greater
-     * of the stretched width (the contents' bounding box) and the minimum 
-     * width (as likely set by this object's container).
-     * @return The effective width
-     */
-    public int getWidth() {
-        return Math.max(this.getSuggestedWidth(), this.getStretchedWidth());
-    }
-    
-    /**
-     * Get the effective height of the Layout object.  This will be the greater
-     * of the stretched height (the contents' bounding box) and the minimum 
-     * height (as likely set by this object's container).
-     * @return The effective height
-     */
-    public int getHeight() {
-        return Math.max(this.getSuggestedHeight(), this.getStretchedHeight());
-    }
-    
-    public int getMinWidth() {
-        return this.getStretchedWidth();
-    }
-    
-    public int getMinHeight() {
-        return this.getStretchedHeight();
-    }
-
-    private int m_width;
-    private int m_height;
-
-    /**
-     * Get the desired width of the Layout
-     * @return The desired width of the Layout
-     */
-    protected int getSuggestedWidth() {
-        return this.m_width;
-    }
-
-    /**
-     * Get the desired height of the Layout
-     * @return The desired height of the Layout
-     */
-    protected int getSuggestedHeight() {
-        return this.m_height;
-    }
-
-    /**
-     * Set the width minimum of the Layout
-     * @param aWidth The width of the Layout
-     */
-    protected void setWidth(int width) {
-        if (m_width != width) {
-            int w = this.getWidth();
-            int h = this.getHeight();
-
-            this.m_width = width;
-            this.sendSizeChange(w, h);
-        }
-    }
-
-    /**
-     * Set the suggested height of the Layout
-     * @param aHeight The desired height of the Layout
-     */
-    protected void setHeight(int height) {
-        if (m_height != height) {
-            int w = this.getWidth();
-            int h = this.getHeight();
-
-            this.m_height = height;
-            this.sendSizeChange(w, h);
-        }
-    }
-    
+//    /**
+//     * Get the effective width of the Layout object.  This will be the greater
+//     * of the stretched width (the contents' bounding box) and the minimum
+//     * width (as likely set by this object's container).
+//     * @return The effective width
+//     */
+//    public int getWidth() {
+//        return Math.max(this.getSuggestedWidth(), this.getMinWidth());
+//    }
+//
+//    /**
+//     * Get the effective height of the Layout object.  This will be the greater
+//     * of the stretched height (the contents' bounding box) and the minimum
+//     * height (as likely set by this object's container).
+//     * @return The effective height
+//     */
+//    public int getHeight() {
+//        return Math.max(this.getSuggestedHeight(), this.getMinHeight());
+//    }
+//
+//    private int m_width;
+//    private int m_height;
+//
+//    /**
+//     * Get the desired width of the Layout
+//     * @return The desired width of the Layout
+//     */
+//    protected int getSuggestedWidth() {
+//        return this.m_width;
+//    }
+//
+//    /**
+//     * Get the desired height of the Layout
+//     * @return The desired height of the Layout
+//     */
+//    protected int getSuggestedHeight() {
+//        return this.m_height;
+//    }
+//
+//    /**
+//     * Set the width minimum of the Layout
+//     * @param aWidth The width of the Layout
+//     */
+//    protected void setWidth(int width) {
+//        if (m_width != width) {
+//            int w = this.getWidth();
+//            int h = this.getHeight();
+//
+//            this.m_width = width;
+//            this.sendSizeChange(w, h);
+//        }
+//    }
+//
+//    /**
+//     * Set the suggested height of the Layout
+//     * @param aHeight The desired height of the Layout
+//     */
+//    protected void setHeight(int height) {
+//        if (m_height != height) {
+//            int w = this.getWidth();
+//            int h = this.getHeight();
+//
+//            this.m_height = height;
+//            this.sendSizeChange(w, h);
+//        }
+//    }
+//
     public int getChildLeft(Widget child) {
         return this.getChildXPos(child);
     }

@@ -13,26 +13,30 @@ import javax.microedition.lcdui.Graphics;
  * the viewed Widget.  This is useful for overlays and panels and the like.
  * @author mjumbewu
  */
-public class ScrollViewWidget extends ViewportWidget {
+public class ScrollViewWidget extends WidgetWithLayout {
     
     public ScrollViewWidget() {
-        setLayout(new LinearLayout(Orientation.VERTICAL));
+        setLayout(new ViewportLayout());
     }
 
     public void scrollXTo(int x) {
-        this.setViewXOffset(x);
+        ViewportLayout layout = ((ViewportLayout)this.getLayout());
+        layout.setViewXOffset(x);
     }
 
     public void scrollYTo(int y) {
-        this.setViewYOffset(y);
+        ViewportLayout layout = ((ViewportLayout)this.getLayout());
+        layout.setViewYOffset(y);
     }
     
     public void scrollXBy(int dx) {
-        this.setViewXOffset(this.getViewXOffset() + dx);
+        ViewportLayout layout = ((ViewportLayout)this.getLayout());
+        layout.setViewXOffset(layout.getViewXOffset() + dx);
     }
 
     public void scrollYBy(int dy) {
-        this.setViewYOffset(this.getViewYOffset() + dy);
+        ViewportLayout layout = ((ViewportLayout)this.getLayout());
+        layout.setViewYOffset(layout.getViewYOffset() + dy);
     }
 
     public boolean isValidChild(Widget item) {

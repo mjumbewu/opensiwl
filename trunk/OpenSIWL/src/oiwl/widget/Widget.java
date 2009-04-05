@@ -87,7 +87,8 @@ public abstract class Widget {
      * @return The height of this widget
      */
     public int getHeight() {
-        return Math.min(Math.max(this.getParent().getChildHeight(this), this.getMinHeight()), this.getMaxHeight());
+        int parent_desired_height = this.getParent().getChildHeight(this);
+        return Math.min(Math.max(parent_desired_height, this.getMinHeight()), this.getMaxHeight());
     }
 
     /**
@@ -111,7 +112,8 @@ public abstract class Widget {
      * @return The width of this widget
      */
     public int getWidth() {
-        return Math.min(Math.max(this.getParent().getChildWidth(this), this.getMinWidth()), this.getMaxWidth());
+        int parent_desired_width = this.getParent().getChildWidth(this);
+        return Math.min(Math.max(parent_desired_width, this.getMinWidth()), this.getMaxWidth());
     }
     
     /**

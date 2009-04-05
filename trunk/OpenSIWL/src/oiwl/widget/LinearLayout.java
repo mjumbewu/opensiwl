@@ -184,8 +184,8 @@ public class LinearLayout extends Layout {
         
         abstract protected int getAxialSize();
         abstract protected int getOrthoSize();
-        abstract protected void setAxialSize(int size);
-        abstract protected void setOrthoSize(int size);
+//        abstract protected void setAxialSize(int size);
+//        abstract protected void setOrthoSize(int size);
 
         abstract protected int getStretchedAxialSize();
         abstract protected int getStretchedOrthoSize();
@@ -214,8 +214,9 @@ public class LinearLayout extends Layout {
     }
     
     /**
-     * Calculate the ortho_size and the axial_size as the ortho_size of the widest line and
-     * the sum of the heights of the lines, respectively, in this TextItem.
+     * Calculate the orthogonal and the axial size.  For example, in a vertical
+     * oriented layout, the orthogonal size is the width of the widest item and
+     * axial size is the sum of the heights of the items.
      */
     protected synchronized void recalculateLayout() {
         int num_items = this.getWidgetCount();
@@ -226,8 +227,8 @@ public class LinearLayout extends Layout {
         for (int index = 0; index < num_items; ++index) {
             LinearCell box = (LinearCell)this.getCell(index);
 
-            axial += getProperties().getAxialSize(box.item) + 2*box.padding;
-            ortho = Math.max(ortho, getProperties().getOrthoSize(box.item));
+            axial += getProperties().getMinAxialSize(box.item) + 2*box.padding;
+            ortho = Math.max(ortho, getProperties().getMinOrthoSize(box.item));
         }
 
         // We validate the sizes before actualy setting them so that we can
@@ -235,17 +236,17 @@ public class LinearLayout extends Layout {
         // tried to gram the sizes, getWidth/Height would just call this 
         // method again (inf. loop).
         this.validateSizes();
-        int oldw = this.getWidth();
-        int oldh = this.getHeight();
-        
-        // Now set the stretched (minimum) sizes and reposition the contents.
-        getProperties().setStretchedAxialSize(axial);
-        getProperties().setStretchedOrthoSize(ortho);
+//        int oldw = this.getWidth();
+//        int oldh = this.getHeight();
+//
+//        // Now set the stretched (minimum) sizes and reposition the contents.
+//        getProperties().setStretchedAxialSize(axial);
+//        getProperties().setStretchedOrthoSize(ortho);
         this.recalculateOffsets();
         
         // Finally, send the event.  Note, the size did not necessarily change
         // (i.e. if the requested size is greater than the stretched size).
-        this.sendSizeChange(oldw, oldh);
+//        this.sendSizeChange(oldw, oldh);
     }
 
     /**
@@ -383,9 +384,6 @@ public class LinearLayout extends Layout {
         }
 
         child_size = box_size;
-        child_size = Math.max(child_size, child.getMinWidth());
-        child_size = Math.min(child_size, child.getMaxWidth());
-
         return child_size;
     }
 
@@ -401,9 +399,6 @@ public class LinearLayout extends Layout {
         }
 
         child_size = box_size;
-        child_size = Math.max(child_size, child.getMinWidth());
-        child_size = Math.min(child_size, child.getMaxWidth());
-
         return child_size;
     }
 
@@ -412,11 +407,11 @@ public class LinearLayout extends Layout {
         
         protected int getAxialSize() { return getLayout().getHeight(); }
         protected int getOrthoSize() { return getLayout().getWidth(); }
-        protected void setAxialSize(int size) { getLayout().setHeight(size); }
-        protected void setOrthoSize(int size) { getLayout().setWidth(size); }
+//        protected void setAxialSize(int size) { getLayout().setHeight(size); }
+//        protected void setOrthoSize(int size) { getLayout().setWidth(size); }
 
-        protected int getStretchedAxialSize() { return getLayout().getStretchedHeight(); }
-        protected int getStretchedOrthoSize() { return getLayout().getStretchedWidth(); }
+        protected int getStretchedAxialSize() { return getLayout().getMinHeight(); }
+        protected int getStretchedOrthoSize() { return getLayout().getMinWidth(); }
         protected void setStretchedAxialSize(int size) { getLayout().setStretchedHeight(size); }
         protected void setStretchedOrthoSize(int size) { getLayout().setStretchedWidth(size); }
 
@@ -442,11 +437,11 @@ public class LinearLayout extends Layout {
         
         protected int getOrthoSize() { return getLayout().getHeight(); }
         protected int getAxialSize() { return getLayout().getWidth(); }
-        protected void setOrthoSize(int size) { getLayout().setHeight(size); }
-        protected void setAxialSize(int size) { getLayout().setWidth(size); }
+//        protected void setOrthoSize(int size) { getLayout().setHeight(size); }
+//        protected void setAxialSize(int size) { getLayout().setWidth(size); }
 
-        protected int getStretchedOrthoSize() { return getLayout().getStretchedHeight(); }
-        protected int getStretchedAxialSize() { return getLayout().getStretchedWidth(); }
+        protected int getStretchedOrthoSize() { return getLayout().getMinHeight(); }
+        protected int getStretchedAxialSize() { return getLayout().getMinWidth(); }
         protected void setStretchedOrthoSize(int size) { getLayout().setStretchedHeight(size); }
         protected void setStretchedAxialSize(int size) { getLayout().setStretchedWidth(size); }
 
