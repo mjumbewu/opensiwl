@@ -365,9 +365,9 @@ public class LinearLayout extends Layout {
         if ((align & Alignment.MIN) != 0)
             child_pos = box.padding;
         else if ((align & Alignment.CENTER) != 0)
-            child_pos = (box_size - child.getWidth())/2;
+            child_pos = (box_size - child.getHeight())/2;
         else /* MAX */
-            child_pos = box_size - child.getWidth() - box.padding;
+            child_pos = box_size - child.getHeight() - box.padding;
 
         return box_pos + child_pos;
     }
