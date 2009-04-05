@@ -24,7 +24,6 @@ public class OpenSIWLTests extends MIDlet {
                 System.out.println("Creating the frames");
                 testFrames = new Vector();
                 testFrames.addElement(new TestFrame1(this, "1", Orientation.PORTRAIT));
-                System.out.println("Created Portrait Frame 1");
                 testFrames.addElement(new TestFrame1(this, "1 Landscape", Orientation.LANDSCAPE));
                 testFrames.addElement(new TestFrame2(this, "2", Orientation.PORTRAIT));
                 testFrames.addElement(new TestFrame2(this, "2 Landscape", Orientation.LANDSCAPE));
