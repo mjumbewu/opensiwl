@@ -286,19 +286,21 @@ public class Frame extends Canvas implements WidgetParent {
     private int m_invalidated_r = 0;
     private int m_invalidated_b = 0;
     
-    private void resetInvalidatedRegion() {
+    private synchronized void resetInvalidatedRegion() {
         m_invalidated_l = 0;
         m_invalidated_t = 0;
         m_invalidated_r = 0;
         m_invalidated_b = 0;
+        System.out.println("reset the invalidated region");
     }
     
     public synchronized void invalidate(int x, int y, int w, int h) {
-//        System.out.println("-invalidating the region x="
-//                + Integer.toString(l) + ", y="
-//                + Integer.toString(t) + ", w="
-//                + Integer.toString(r-l) + ", h="
-//                + Integer.toString(b-t));
+        System.out.println("invalidating the region x="
+                + Integer.toString(x) + ", y="
+                + Integer.toString(y) + ", w="
+                + Integer.toString(w) + ", h="
+                + Integer.toString(h));
+
         // If the invalidated region is empty, then set to the parameters
         if (m_invalidated_l == m_invalidated_r ||
             m_invalidated_t == m_invalidated_b) {
@@ -368,7 +370,7 @@ public class Frame extends Canvas implements WidgetParent {
         return this.m_paintAllowed;
     }
     
-    public void paint(Graphics g) {
+    public synchronized void paint(Graphics g) {
         int x = m_invalidated_l;
         int y = m_invalidated_t;
         int r = m_invalidated_r;
@@ -402,7 +404,6 @@ public class Frame extends Canvas implements WidgetParent {
             int untransformed_x = this.frameToDeviceX(x, y, w, h);
             int untransformed_y = this.frameToDeviceY(x, y, w, h);
             int transformation = this.getTransformation();
-            System.out.println(transformation);
 
             g.drawRegion(m_orientedBuffer, x, y, w, h, transformation,
                     untransformed_x, untransformed_y, Graphics.TOP|Graphics.LEFT);
