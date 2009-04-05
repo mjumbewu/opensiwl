@@ -208,6 +208,12 @@ public class Frame extends Canvas implements WidgetParent {
     }
     
     public void handleChildRedraw(Widget item, int x, int y, int w, int h) {
+        System.out.println("requesting redraw at x="
+                + Integer.toString(x) + ", y="
+                + Integer.toString(y) + ", w="
+                + Integer.toString(w) + ", h="
+                + Integer.toString(h) + " on widget "
+                + item.getClass().toString());
         this.invalidate(
                 item.getXPos() + x, item.getYPos() + y, w, h);
     }
