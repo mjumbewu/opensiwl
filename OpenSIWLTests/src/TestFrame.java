@@ -23,13 +23,9 @@ public abstract class TestFrame extends Frame implements Runnable {
         super(Orient);
         testID = TestID;
         app = App;
-        System.out.println("initialized super-base");
         this.addPanel(testPanel);
-        System.out.println("added panel");
         statusText = new StaticText(testID + ": Performing test...", Font.getDefaultFont(), 0x000000ff);
-        System.out.println("created some text");
         testPanel.getLayout().manage(statusText);
-        System.out.println("managed first in panel");
     }
     
     protected void start() {
