@@ -5,7 +5,7 @@
 
 package oiwl.widget;
 
-import java.util.Vector;
+import java.util.Hashtable;
 
 /**
  *
@@ -14,26 +14,22 @@ import java.util.Vector;
 public class AbsoluteLayout extends Layout {
 
     public int getChildXPos(Widget child) {
-        int index = this.getIndexOf(child);
-        WidgetPos pos = (WidgetPos)this.m_positions.elementAt(index);
+        WidgetPos pos = (WidgetPos)this.m_positions.get(child);
         return pos.x;
     }
 
     public int getChildYPos(Widget child) {
-        int index = this.getIndexOf(child);
-        WidgetPos pos = (WidgetPos)this.m_positions.elementAt(index);
+        WidgetPos pos = (WidgetPos)this.m_positions.get(child);
         return pos.y;
     }
 
     public int getChildWidth(Widget child) {
-        int index = this.getIndexOf(child);
-        WidgetPos pos = (WidgetPos)this.m_positions.elementAt(index);
+        WidgetPos pos = (WidgetPos)this.m_positions.get(child);
         return pos.width;
     }
 
     public int getChildHeight(Widget child) {
-        int index = this.getIndexOf(child);
-        WidgetPos pos = (WidgetPos)this.m_positions.elementAt(index);
+        WidgetPos pos = (WidgetPos)this.m_positions.get(child);
         return pos.height;
     }
 
@@ -43,7 +39,7 @@ public class AbsoluteLayout extends Layout {
         int width=0, height=0;
     }
 
-    Vector m_positions = new Vector();
+    Hashtable m_positions = new Hashtable();
 
     public void manage(Widget item, int x, int y, int z, int w, int h) {
         WidgetPos pos = new WidgetPos();
@@ -56,10 +52,7 @@ public class AbsoluteLayout extends Layout {
         // Must add the cell before the widget, because adding the widget may
         // cause a redraw, in turn causing a recalculateLayout, which needs the
         // cell size.
-        if (z == -1)
-            this.m_positions.addElement(pos);
-        else
-            this.m_positions.insertElementAt(pos, z);
+        this.m_positions.put(item, pos);
         this.addWidget(item, z);
     }
 
@@ -70,8 +63,7 @@ public class AbsoluteLayout extends Layout {
      * @param x The x-position
      */
     public void setXPos(Widget item, int x) {
-        int index = this.getIndexOf(item);
-        WidgetPos pos = (WidgetPos)this.m_positions.elementAt(index);
+        WidgetPos pos = (WidgetPos)this.m_positions.get(item);
         pos.x = x;
     }
     
@@ -82,9 +74,18 @@ public class AbsoluteLayout extends Layout {
      * @param y The y-position
      */
     public void setYPos(Widget item, int y) {
-        int index = this.getIndexOf(item);
-        WidgetPos pos = (WidgetPos)this.m_positions.elementAt(index);
+        WidgetPos pos = (WidgetPos)this.m_positions.get(item);
         pos.y = y;
+    }
+
+    public void setWidth(Widget item, int w) {
+        WidgetPos pos = (WidgetPos)this.m_positions.get(item);
+        pos.width = w;
+    }
+
+    public void setHeight(Widget item, int h) {
+        WidgetPos pos = (WidgetPos)this.m_positions.get(item);
+        pos.height = h;
     }
 
     public void setZPos(Widget item, int pos) {
