@@ -243,7 +243,10 @@ public abstract class Widget {
     
     /**
      * Update the specified section of the widget.  The given bounds are given
-     * in local coordinates
+     * in local coordinates.  When a Widget draws itself, it says "I will give
+     * you at least what is in the given rectangle, but maybe more."  If you
+     * want exactly what is in that rectangle it is your responsibility to crop
+     * it.
      * @param g The Graphics context to draw to.
      * @param xoff The global (i.e. device coordinated) x offset where the
      *             Widget will be drawn
